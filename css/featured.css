@@ -1,0 +1,136 @@
+/* =====================================================================
+   featured.css — FEATURED PAGE LAYOUT (featured.html only)
+   ---------------------------------------------------------------------
+   The featured section box and its side-scrolling row of cards.
+   ===================================================================== */
+
+/* =========================================================
+ FEATURED SECTION + SIDE-SCROLLING ROW
+ ---------------------------------------------------------
+ .featured-track is one horizontal row of cards:
+
+   display: flex + overflow-x: auto  -> a sideways row that
+                                        scrolls left/right
+   scroll-snap-type: x mandatory     -> scrolling stops neatly
+                                        on a card, not halfway
+   flex: 0 0 <width>                 -> every card keeps the
+                                        same width instead of
+                                        squishing to fit
+
+ On desktop, the arrow buttons in the header scroll the row
+ by one card. With a trackpad/touch you can also just swipe.
+ The arrows hide themselves when all cards already fit.
+ ========================================================= */
+
+.featured-section {
+  background: var(--accent-bg);
+  border: 1px solid var(--accent-light);
+  border-radius: 16px;
+  padding: 22px 0 8px;
+}
+
+.featured-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 22px;
+  margin-bottom: 14px;
+}
+
+.featured-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--accent);
+  margin: 0;
+}
+
+.featured-sub {
+  font-size: 13px;
+  color: var(--ink-faint);
+  margin: 4px 0 0;
+}
+
+.scroll-btns {
+  display: flex;
+  gap: 8px;
+}
+
+.scroll-btns[hidden] { display: none; }
+
+.scroll-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--accent-light);
+  background: #fff;
+  color: var(--accent);
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.scroll-btn:hover:not(:disabled) {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.scroll-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.featured-track {
+  display: flex;
+  gap: 22px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding-left: 22px;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  padding: 6px 22px 20px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent-light) transparent;
+}
+
+.featured-track::-webkit-scrollbar { height: 6px; }
+.featured-track::-webkit-scrollbar-thumb { background: var(--accent-light); border-radius: 3px; }
+
+.featured-track .card {
+  flex: 0 0 clamp(280px, 30vw, 380px); /* same size as the main grid cards */
+  min-width: 0; /* stop long tags from stretching a card wider than its size */
+  scroll-snap-align: start;
+}
+
+.featured-empty,
+.loading {
+  flex: 1 0 100%;
+  padding: 40px 10px;
+  text-align: center;
+  color: #666;
+  font-size: 15px;
+}
+
+.featured-track .error-state { flex: 1 0 100%; }
+
+@media (max-width: 700px) {
+  body { padding: 12px; }
+  :root { --card-pad: 16px; }
+
+  .featured-section { padding-top: 18px; }
+  .featured-head { padding: 0 16px; }
+  .featured-title { font-size: 21px; }
+  .scroll-btns { display: none; } /* just swipe on phones */
+
+  .featured-track {
+    gap: 14px;
+    padding: 6px 16px 18px;
+    scroll-padding-left: 16px;
+  }
+
+  .featured-track .card { flex-basis: 86%; } /* next card peeks in */
+}

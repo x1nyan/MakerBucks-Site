@@ -1,0 +1,517 @@
+/* =====================================================================
+   cards.css — SHARED STYLES
+   ---------------------------------------------------------------------
+   Used by BOTH index.html and featured.html:
+ colors, the project card, the enlarged flip view, the photo
+ carousel, and loading/error states.
+   Page-specific layout lives in showcase.css and featured.css.
+   ===================================================================== */
+
+/*
+  COLOR + STYLE VARIABLES
+  These are reused everywhere below as var(--name).
+  Change a color here and it updates across the whole page.
+  --accent is the WPI red used for buttons, labels, and highlights.
+*/
+:root {
+  --accent: #ac2b37;
+  --accent-light: #f1b2b8;
+  --accent-bg: #fff8f8;
+  --ink: #1c1c1c;
+  --ink-soft: #555;
+  --ink-faint: #777;
+  --line: #e4e4e4;
+  --panel: #ffffff;
+  --page-bg: #f7f7f5;
+  --radius: 12px;
+  --card-pad: 22px; /* inner spacing of each card face */
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  background: var(--page-bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+body { padding: 20px; }
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 3px solid #1a73e8;
+  outline-offset: 2px;
+}
+
+
+/* =========================================================
+ CARDS IN THE GRID
+ ---------------------------------------------------------
+ A grid card only shows its FRONT (photo, tags, title,
+ overview, scope). The card is exactly as tall as that
+ content — no fixed heights. Clicking it opens the
+ enlarged, flipped view described in the next section.
+ ========================================================= */
+
+.card {
+  display: flex; /* lets the front stretch to the row's height */
+  cursor: pointer;
+}
+
+.card.is-hidden { display: none !important; }
+
+/* While a card is open in the enlarged view, its spot in the
+   grid is kept (so nothing shifts) but made invisible. */
+.card.is-open { visibility: hidden; }
+
+.card-inner {
+  flex: 1;
+  min-width: 0; /* never wider than the card, even with long tags */
+  position: relative;
+}
+
+.card-face {
+  height: 100%;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
+  padding: var(--card-pad);
+  overflow: hidden; /* clips the photo to the card's rounded corners */
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.card:hover .card-face { box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12); }
+
+
+/* =========================================================
+ ENLARGED FLIP VIEW
+ ---------------------------------------------------------
+ What happens when you click a card:
+
+   1. A full-screen .card-overlay fades in. Its
+      "backdrop-filter: blur()" blurs the whole page behind it.
+
+   2. A copy of the card (.expanded-card) is placed exactly
+      on top of the original, using "position: fixed" and the
+      original's on-screen position and size.
+
+   3. Its top/left/width/height are then changed to a big
+      centered box. Because those four properties have a
+      "transition", the browser animates the card growing
+      and gliding to the middle of the screen.
+
+   4. At the same time the class "flipped" is added, which
+      rotates .card-inner 180° (a 3D flip) to show the back.
+
+ Closing does the same thing in reverse: it flips back to
+ the front while shrinking into its original spot, then the
+ copy is removed.
+
+ How the flip works inside .expanded-card:
+   .card-inner    the part that rotates; "preserve-3d" keeps
+                  both faces in 3D space
+     .card-front  a copy of the grid card's front
+     .card-back   the details, pre-rotated 180° to face away
+ "backface-visibility: hidden" makes whichever face is
+ turned away invisible.
+
+ The enlarged size is worked out in JavaScript so the back
+ fits all of its text (see openCard()).
+ ========================================================= */
+
+.card-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(20, 18, 18, 0.35);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  opacity: 0;
+  transition: opacity 0.45s ease;
+  cursor: pointer;
+}
+
+.card-overlay.show { opacity: 1; }
+
+.expanded-card {
+  position: fixed;
+  z-index: 60;
+  perspective: 2200px;
+  cursor: pointer;
+  transition:
+    top 0.6s cubic-bezier(0.2, 0.8, 0.2, 1),
+    left 0.6s cubic-bezier(0.2, 0.8, 0.2, 1),
+    width 0.6s cubic-bezier(0.2, 0.8, 0.2, 1),
+    height 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* The enlarged card gets keyboard focus (for screen readers and
+   the Escape key) but shouldn't draw a focus outline around it. */
+.expanded-card:focus { outline: none; }
+
+.expanded-card .card-inner {
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.3, 0.7, 0.3, 1);
+}
+
+.expanded-card.flipped .card-inner { transform: rotateY(180deg); }
+
+.expanded-card .card-face {
+  position: absolute;
+  inset: 0;
+  height: auto;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+}
+
+/* Only the back casts the big shadow, and it sits a hair in
+   front of the front face so no edge of the front peeks
+   around its corners when flipped. */
+.expanded-card .card-front { box-shadow: none; }
+
+/* Once the flip has finished, hide the front completely so it
+   can't show through anywhere (added/removed by JavaScript). */
+.expanded-card.settled .card-front { visibility: hidden; }
+
+.card-back {
+  transform: rotateY(180deg) translateZ(1px);
+  border-color: var(--accent-light);
+  padding: 32px;
+  overflow-y: auto; /* only a fallback for very long projects on small screens */
+  overscroll-behavior: contain;
+}
+
+.card-back { scrollbar-width: thin; scrollbar-color: var(--accent-light) transparent; }
+.card-back::-webkit-scrollbar { width: 6px; }
+.card-back::-webkit-scrollbar-thumb { background: var(--accent-light); border-radius: 3px; }
+
+
+/* =========================================================
+ CARD TEXT
+ ========================================================= */
+
+.card-title {
+  font-size: 21px;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0 0 10px 0;
+  line-height: 1.25;
+}
+
+.flip-title {
+  display: inline;
+  border: none;
+  background: transparent;
+  padding: 0;
+  font: inherit;
+  font-weight: 700;
+  color: var(--ink);
+  cursor: pointer;
+  text-align: left;
+}
+
+.flip-title:hover {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+.flip-hint {
+  display: block;
+  margin-top: 5px;
+  color: var(--ink-faint);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.header-tags {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.cat-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.cat-tag {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: #e8f0fe;
+  color: #1a73e8;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 9px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.maker-tag {
+  color: #666;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.card-desc {
+  color: #444;
+  font-size: 15px;
+  line-height: 1.55;
+  margin: 0 0 12px;
+}
+
+.section-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin-top: 12px;
+  margin-bottom: 4px;
+}
+
+.section-text {
+  color: #555;
+  font-size: 14px;
+  line-height: 1.5;
+  white-space: pre-line; /* keeps the line breaks from the sheet */
+}
+
+
+/* =========================================================
+ BACK OF CARD (enlarged view)
+ ---------------------------------------------------------
+ Title and maker across the top, then two columns:
+   left:  Materials + Outcome
+   right: Fabrication Steps (usually the longest)
+ On narrow screens the columns stack into one.
+ ========================================================= */
+
+.back-header { margin-bottom: 22px; }
+
+.back-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--accent);
+  margin: 0 0 4px;
+}
+
+.back-meta {
+  color: var(--ink-soft);
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 6px;
+}
+
+.back-hint {
+  color: var(--ink-faint);
+  font-size: 12px;
+  margin: 0;
+}
+
+.back-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
+  gap: 32px;
+}
+
+.back-section { margin-bottom: 22px; }
+.back-section:last-child { margin-bottom: 0; }
+.back-section .section-label { margin-top: 0; }
+.card-back .section-text { font-size: 15px; line-height: 1.6; }
+
+.back-empty {
+  color: var(--ink-faint);
+  font-style: italic;
+}
+
+@media (max-width: 700px) {
+  .back-columns { grid-template-columns: 1fr; gap: 22px; }
+  .card-back { padding: 22px; }
+  .back-title { font-size: 22px; }
+}
+
+
+/* =========================================================
+ IMAGE CAROUSEL
+ ---------------------------------------------------------
+ How the photo fits into the card:
+
+   - EDGE TO EDGE: the frame uses negative margins equal to
+     the card's padding, so it runs right to the card's edges
+     and top, with only the top corners rounded. It reads as
+     part of the card instead of a box sitting inside it.
+
+   - NOTHING CROPPED: each photo uses "object-fit: contain",
+     so the whole image is always visible.
+
+   - NO GRAY BARS: behind the photo sits a blurred, zoomed-in
+     copy of the same photo (.carousel-backdrop). Any space the
+     photo doesn't cover is filled with its own soft colors,
+     so it blends in smoothly whatever shape the photo is.
+
+ To change the frame's shape, edit aspect-ratio below
+ (1 / 1 = square, 4 / 3 = wider, 4 / 5 = taller).
+ ========================================================= */
+
+.carousel-container,
+.no-photo {
+  aspect-ratio: 1 / 1;
+  width: calc(100% + 2 * var(--card-pad));
+  margin: calc(-1 * var(--card-pad)) calc(-1 * var(--card-pad)) 18px;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+
+.carousel-container {
+  position: relative;
+  overflow: hidden;
+  background: #e9e9e6;
+}
+
+/* Blurred copy of the photo that fills the frame behind it */
+.carousel-backdrop {
+  position: absolute;
+  inset: -30px;              /* oversized so blur has no soft edges */
+  background-size: cover;
+  background-position: center;
+  filter: blur(24px) saturate(1.1) brightness(0.92);
+  transition: background-image 0.2s;
+}
+
+.carousel-slide {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: none;
+}
+
+.carousel-slide.active { display: block; }
+
+.carousel-btn {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  border: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.carousel-btn:hover { background: rgba(0, 0, 0, 0.85); }
+.carousel-btn.prev { left: 10px; }
+.carousel-btn.next { right: 10px; }
+
+.carousel-dots {
+  position: absolute;
+  bottom: 10px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  z-index: 2;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: none;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.dot.active { background: #fff; }
+
+
+/* =========================================================
+ NO PHOTO
+ ========================================================= */
+
+.no-photo {
+  background: repeating-linear-gradient(45deg, #f0f0f0, #f0f0f0 10px, #e9e9e9 10px, #e9e9e9 20px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  padding: 8px;
+}
+
+
+/* =========================================================
+ STATES
+ ========================================================= */
+
+.loading,
+.no-results {
+  grid-column: 1 / -1;
+  font-size: 15px;
+  color: #666;
+  padding: 40px 10px;
+  text-align: center;
+}
+
+.no-results {
+  background: #f9f9f9;
+  border: 1px dashed #ccc;
+  border-radius: 8px;
+  display: none;
+  width: 100%;
+}
+
+.no-results button { margin-top: 10px; }
+
+.error-state {
+  grid-column: 1 / -1;
+  background: #fff4f4;
+  border: 1px solid #f3c2c2;
+  color: #7a1f1f;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+
+/* =========================================================
+ REDUCED MOTION
+ ---------------------------------------------------------
+ Users who've turned on "reduce motion" in their OS get an
+ instant flip instead of the rotation animation.
+ ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .card-inner,
+  .expanded-card,
+  .card-overlay { transition: none; }
+}
