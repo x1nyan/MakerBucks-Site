@@ -278,28 +278,33 @@
 
 
 /* =========================================================
- TITLE CARD (top of the page)
+ TITLE BANNER
  ---------------------------------------------------------
- The photo comes from images/title-card.jpg in the repo and
- fills the whole card ("object-fit: cover" crops the edges
- rather than stretching). A dark gradient over the bottom
- keeps the white text readable on any photo.
- To change which part of the photo shows, add e.g.
- object-position: center 30%; to .title-card-img
+ .banner-img   the background photo; fills the whole banner
+               ("object-fit: cover" crops the edges rather
+               than stretching). To choose which part of the
+               photo shows, add e.g. object-position: center 30%;
+ ::after       a dark layer over the photo so the white title
+               is readable on any picture
+ .banner-logo  sits in the top-left corner, above the dark layer
+ .banner-title centered in the middle of the banner
  ========================================================= */
 
-.title-card {
+.banner {
   position: relative;
   display: flex;
-  align-items: flex-end;
-  min-height: 280px;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
   margin-bottom: 20px;
+  padding: 40px 24px;
   border-radius: 16px;
   overflow: hidden;
-  background: #2a2a2a; /* shows while the image loads, or if it's missing */
+  background: #2a2a2a; /* shows while the photo loads, or if it's missing */
+  text-align: center;
 }
 
-.title-card-img {
+.banner-img {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -307,33 +312,48 @@
   object-fit: cover;
 }
 
-.title-card::after {
+.banner::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.05) 65%);
+  background: rgba(0, 0, 0, 0.45);
 }
 
-.title-card-text {
+.banner-logo {
+  position: absolute;
+  top: 18px;
+  left: 20px;
+  z-index: 2;
+  height: 64px;       /* logo height; width follows automatically */
+  width: auto;
+  max-width: 40%;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4));
+}
+
+.banner-title {
   position: relative;
   z-index: 1;
-  padding: 28px 32px;
-  color: #fff;
-}
-
-.title-card-text h1 {
-  margin: 0 0 6px;
-  font-size: clamp(28px, 4vw, 44px);
-  line-height: 1.1;
-}
-
-.title-card-text p {
   margin: 0;
-  font-size: 16px;
-  opacity: 0.9;
+  color: #fff;
+  font-size: clamp(30px, 5vw, 56px);
+  line-height: 1.1;
+  letter-spacing: 0.01em;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
 }
+
+.banner [hidden] { display: none; }
 
 @media (max-width: 700px) {
-  .title-card { min-height: 190px; border-radius: 12px; }
-  .title-card-text { padding: 20px; }
+  .banner {
+    min-height: 200px;
+    padding: 64px 16px 32px; /* extra top room so the logo doesn't touch the title */
+    border-radius: 12px;
+  }
+
+  .banner-logo {
+    top: 12px;
+    left: 14px;
+    height: 42px;
+  }
 }

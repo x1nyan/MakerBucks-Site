@@ -90,8 +90,29 @@ window.MB = window.MB || {};
 
 
 
+  /* =========================================================
+     TITLE BANNER
+     ---------------------------------------------------------
+     The banner at the top of the page. Each image can be:
+       - a path to an image in this repo, e.g. 'images/banner.jpg'
+         (relative to index.html), or
+       - a full link to an image on GitHub, e.g.
+         'https://raw.githubusercontent.com/<user>/<repo>/main/images/banner.jpg'
+         or the github.com ".../blob/..." link from the file's page
+         (the code adds "?raw=true" for you so it loads as an image).
+     Leave logoUrl as '' to show no logo.
+     ========================================================= */
+
+  const BANNER = {
+    title: 'WPI MakerBucks Showroom',
+    imageUrl: 'images/banner.jpg',   // big background photo
+    logoUrl: 'images/logo.png',      // small logo in the top-left corner
+    logoAlt: 'WPI MakerBucks logo'   // read aloud by screen readers
+  };
+
   // Share these with the other scripts
   MB.config = {
+    BANNER,
     SHEET_URL,
     SHEET_ID,
     FULL_URL,

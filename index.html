@@ -5,7 +5,7 @@
   =====================================================================
 
   From top to bottom the page shows:
-    1. Title card        (photo from images/title-card.jpg)
+    1. Title banner      (photo, logo, and title set in js/config.js)
     2. Featured Projects (side-scrolling row of projects marked TRUE
                           in the sheet's Featured column)
     3. Search / filter / sort bar
@@ -16,17 +16,19 @@
     index.html          this file: the page structure (HTML only)
 
     css/cards.css       shared: colors, cards, flip view, photos
-    css/showcase.css    title card, search/filter bar, and the grid
+    css/showcase.css    title banner, search/filter bar, and the grid
     css/featured.css    the Featured Projects row
 
-    js/config.js        THE GOOGLE SHEET LINK (edit this one)
+    js/config.js        SETTINGS: the Google Sheet link + banner images
+    js/banner.js        fills in the title banner
     js/cards.js         building cards, flip view, loading the sheet
     js/featured.js      the Featured Projects row + its arrows
     js/showcase.js      search, filters, sort, and the grid
 
   How it runs:
     At the bottom of this file the scripts load IN ORDER:
-      config.js   -> sets up the sheet link
+      config.js   -> settings (sheet link, banner images)
+      banner.js   -> fills in the title banner
       cards.js    -> adds the shared card tools
       featured.js -> fills the Featured row
       showcase.js -> fills the main grid
@@ -43,7 +45,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>MakerBucks Showcase</title>
+  <title>WPI MakerBucks Showroom</title>
 
   <link rel="stylesheet" href="css/cards.css">
   <link rel="stylesheet" href="css/showcase.css">
@@ -53,21 +55,15 @@
 <body>
 
   <!-- =========================================================
-     TITLE CARD
-     The image is read from this repo: images/title-card.jpg
-     (the path is relative to this HTML file). To use a different
-     image, replace that file, or change the src below.
-     If the image is missing, the card still shows with a dark
-     background (onerror hides the broken-image icon).
+     TITLE BANNER
+     The photo, logo, and title are set in js/config.js (BANNER)
+     and filled in by js/banner.js — edit config.js to change them.
      ========================================================= -->
 
-  <header class="title-card">
-    <img class="title-card-img" src="images/title-card.jpg" alt=""
-      onerror="this.style.display='none'">
-    <div class="title-card-text">
-      <h1>MakerBucks Showcase</h1>
-      <p>Student projects built with WPI MakerBucks funding</p>
-    </div>
+  <header class="banner">
+    <img class="banner-img" id="bannerImg" alt="">
+    <img class="banner-logo" id="bannerLogo" alt="">
+    <h1 class="banner-title" id="bannerTitle">WPI MakerBucks Showroom</h1>
   </header>
 
 
@@ -161,6 +157,7 @@
 
   <!-- Scripts: order matters (see the note at the top of this file) -->
   <script src="js/config.js"></script>
+  <script src="js/banner.js"></script>
   <script src="js/cards.js"></script>
   <script src="js/featured.js"></script>
   <script src="js/showcase.js"></script>
