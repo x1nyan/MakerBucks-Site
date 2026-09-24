@@ -32,7 +32,7 @@ window.MB = window.MB || {};
      ========================================================= */
 
   const SHEET_URL =
-    'https://docs.google.com/spreadsheets/d/1A3suZI9d214BswXTqZHHBaLbkmP4bNgEHilgmp-g-8E/edit?usp=sharing';
+    'https://docs.google.com/spreadsheets/d/1_8gULGuEwFKvUAFQ9VZzuVbb8r_SoVHErGSsu_ScTr0/edit?usp=sharing';
 
   // The long code between "/d/" and the next "/"
   const SHEET_ID = (SHEET_URL.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/) || [])[1] || '';
@@ -105,8 +105,8 @@ window.MB = window.MB || {};
 
   const BANNER = {
     title: 'WPI MakerBucks Showroom',
-    imageUrl: 'images/banner.jpg',   // big background photo
-    logoUrl: 'images/logo.png',      // small logo in the top-left corner
+    imageUrl: 'images/Banner.jfif',   // big background photo
+    logoUrl: 'images/Gears-05.png',      // small logo in the top-left corner
     logoAlt: 'WPI MakerBucks logo'   // read aloud by screen readers
   };
 
