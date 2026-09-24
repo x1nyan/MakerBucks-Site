@@ -1,0 +1,2249 @@
+<!DOCTYPE html>
+<!--
+  =====================================================================
+  MAKERBUCKS SHOWCASE — HOW THIS PAGE WORKS
+  =====================================================================
+
+  This is a single, self-contained HTML file (HTML + CSS + JavaScript).
+  It doesn't store any project data itself. Instead, every time the page
+  loads, it downloads the project list from a public Google Sheet and
+  builds a card for each row.
+
+  The big picture, in order:
+
+    1. PAGE LOADS
+       The browser draws the search bar, filter dropdown, and sort menu,
+       plus a "Loading projects…" placeholder.
+
+    2. FETCH THE SHEET
+       The script asks Google Sheets for the data using the "gviz" query
+       endpoint, which returns the sheet as JSON. (The sheet must be
+       shared as "Anyone with the link can view" or this step fails.)
+
+    3. TURN ROWS INTO PROJECT OBJECTS
+       Each spreadsheet row becomes a JavaScript object like:
+         { title, maker, categories[], featured, overview, scope,
+           materials, fabrication, outcome, photoUrls[], score, ... }
+       Empty rows are skipped.
+
+    4. BUILD THE FILTER DROPDOWN
+       Every unique category found in the sheet gets its own checkbox in
+       the filter dropdown, so adding a new category in the sheet adds a
+       new option automatically — no code changes needed.
+
+    5. FEATURED ROW
+       Projects marked TRUE in the Featured column also appear in a
+       side-scrolling "Featured Projects" row at the top of the page.
+       (The row hides itself if nothing is featured.) Featured projects
+       still appear in the main grid below too.
+
+    6. SORT + RENDER CARDS
+       Projects are sorted (by default, the most detailed projects first)
+       and a flip-card is created for each one, 3 per row (2 on tablets,
+       a side-swiping row on phones). Each card grows tall enough to fit
+       its front-side text. Clicking a card flips it over and enlarges
+       it in the middle of the screen with the page blurred behind it,
+       showing the materials and fabrication steps. Clicking again flips
+       it back and shrinks it into place.
+
+    7. FILTER ON THE FLY
+       Search, category checkboxes, and "Featured only" never rebuild the
+       cards; they just hide/show existing ones. That keeps it fast.
+       Filters only affect the main grid, not the Featured row.
+
+  To edit the content, edit the Google Sheet — not this file.
+  To point at a different sheet, paste its link into SHEET_URL in the CONFIG section
+  of the script near the bottom.
+  =====================================================================
+-->
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MakerBucks Showcase</title>
+
+  <style>
+    /*
+      COLOR + STYLE VARIABLES
+      These are reused everywhere below as var(--name).
+      Change a color here and it updates across the whole page.
+      --accent is the WPI red used for buttons, labels, and highlights.
+    */
+    :root {
+      --accent: #ac2b37;
+      --accent-light: #f1b2b8;
+      --accent-bg: #fff8f8;
+      --ink: #1c1c1c;
+      --ink-soft: #555;
+      --ink-faint: #777;
+      --line: #e4e4e4;
+      --panel: #ffffff;
+      --page-bg: #f7f7f5;
+      --radius: 12px;
+      --card-pad: 22px; /* inner spacing of each card face */
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      background: var(--page-bg);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body { padding: 20px; }
+
+    a:focus-visible,
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible {
+      outline: 3px solid #1a73e8;
+      outline-offset: 2px;
+    }
+
+
+    /* =========================================================
+     CONTROLS
+     ---------------------------------------------------------
+     One row: search box, filter dropdown, sort menu, and a
+     "Clear filters" link that only appears when something is
+     filtered.
+     ========================================================= */
+
+    .controls {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 20px;
+    }
+
+    .search-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: stretch;
+      gap: 10px;
+    }
+
+    .search-wrap {
+      position: relative;
+      flex: 1;
+      min-width: 220px;
+    }
+
+    .search-input {
+      width: 100%;
+      height: 100%;
+      min-height: 40px;
+      padding: 10px 34px 10px 14px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .search-input:focus { border-color: var(--accent); }
+
+    .search-clear {
+      position: absolute;
+      right: 6px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 26px;
+      height: 26px;
+      border: none;
+      background: transparent;
+      color: var(--ink-faint);
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 50%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .search-clear:hover { background: #f1f1f1; color: var(--ink); }
+    .search-clear.visible { display: flex; }
+
+    .sort-select {
+      padding: 10px 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 13px;
+      background: #fff;
+      cursor: pointer;
+    }
+
+    .clear-filters-btn {
+      background: none;
+      border: none;
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 7px 8px;
+      text-decoration: underline;
+      display: none;
+    }
+
+    .clear-filters-btn.visible { display: inline-block; }
+
+
+    /* =========================================================
+     FILTER DROPDOWN
+     ---------------------------------------------------------
+     A button that opens a panel of checkboxes underneath it.
+     The panel is positioned "absolute" relative to
+     .filter-dropdown, so it floats over the page instead of
+     pushing content down. The [hidden] attribute (toggled by
+     JavaScript) shows and hides it.
+     ========================================================= */
+
+    .filter-dropdown { position: relative; }
+
+    .filter-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      height: 100%;
+      min-height: 40px;
+      padding: 10px 14px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background: #fff;
+      font-size: 13px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .filter-toggle:hover { border-color: var(--accent); }
+
+    /* Turns the toggle red when any filter is active */
+    .filter-toggle.has-active {
+      border-color: var(--accent);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .filter-caret {
+      font-size: 10px;
+      transition: transform 0.15s;
+    }
+
+    .filter-toggle[aria-expanded="true"] .filter-caret { transform: rotate(180deg); }
+
+    .filter-panel {
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      z-index: 20;
+      width: 260px;
+      max-height: 360px;
+      overflow-y: auto;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      padding: 8px;
+    }
+
+    .filter-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .filter-option:hover { background: var(--accent-bg); }
+
+    .filter-option input {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .filter-divider {
+      height: 1px;
+      background: var(--line);
+      margin: 6px 4px;
+    }
+
+
+    /* =========================================================
+     RESULTS
+     ========================================================= */
+
+    .results-summary {
+      font-size: 13px;
+      color: var(--ink-faint);
+      margin: 0 0 14px 2px;
+    }
+
+    /* Only shown on phones (see PHONE section below) */
+    .swipe-hint {
+      display: none;
+      font-size: 12px;
+      color: var(--ink-faint);
+      margin: -8px 0 10px 2px;
+    }
+
+
+    /* =========================================================
+     GRID — 3 CARDS PER ROW
+     ---------------------------------------------------------
+     "repeat(3, minmax(0, 1fr))" = 3 equal columns. The
+     minmax(0, ...) stops long words from stretching a column.
+     Grid rows automatically make every card in the same row
+     as tall as the tallest one, so rows line up neatly.
+     Tablets drop to 2 per row, and phones switch to a
+     side-scrolling row (see the bottom of the CSS).
+     ========================================================= */
+
+    .project-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 24px;
+    }
+
+
+    /* =========================================================
+     CARDS IN THE GRID
+     ---------------------------------------------------------
+     A grid card only shows its FRONT (photo, tags, title,
+     overview, scope). The card is exactly as tall as that
+     content — no fixed heights. Clicking it opens the
+     enlarged, flipped view described in the next section.
+     ========================================================= */
+
+    .card {
+      display: flex; /* lets the front stretch to the row's height */
+      cursor: pointer;
+    }
+
+    .card.is-hidden { display: none !important; }
+
+    /* While a card is open in the enlarged view, its spot in the
+       grid is kept (so nothing shifts) but made invisible. */
+    .card.is-open { visibility: hidden; }
+
+    .card-inner {
+      flex: 1;
+      min-width: 0; /* never wider than the card, even with long tags */
+      position: relative;
+    }
+
+    .card-face {
+      height: 100%;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
+      padding: var(--card-pad);
+      overflow: hidden; /* clips the photo to the card's rounded corners */
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+
+    .card:hover .card-face { box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12); }
+
+
+    /* =========================================================
+     ENLARGED FLIP VIEW
+     ---------------------------------------------------------
+     What happens when you click a card:
+
+       1. A full-screen .card-overlay fades in. Its
+          "backdrop-filter: blur()" blurs the whole page behind it.
+
+       2. A copy of the card (.expanded-card) is placed exactly
+          on top of the original, using "position: fixed" and the
+          original's on-screen position and size.
+
+       3. Its top/left/width/height are then changed to a big
+          centered box. Because those four properties have a
+          "transition", the browser animates the card growing
+          and gliding to the middle of the screen.
+
+       4. At the same time the class "flipped" is added, which
+          rotates .card-inner 180° (a 3D flip) to show the back.
+
+     Closing does the same thing in reverse: it flips back to
+     the front while shrinking into its original spot, then the
+     copy is removed.
+
+     How the flip works inside .expanded-card:
+       .card-inner    the part that rotates; "preserve-3d" keeps
+                      both faces in 3D space
+         .card-front  a copy of the grid card's front
+         .card-back   the details, pre-rotated 180° to face away
+     "backface-visibility: hidden" makes whichever face is
+     turned away invisible.
+
+     The enlarged size is worked out in JavaScript so the back
+     fits all of its text (see openCard()).
+     ========================================================= */
+
+    .card-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      background: rgba(20, 18, 18, 0.35);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      opacity: 0;
+      transition: opacity 0.45s ease;
+      cursor: pointer;
+    }
+
+    .card-overlay.show { opacity: 1; }
+
+    .expanded-card {
+      position: fixed;
+      z-index: 60;
+      perspective: 2200px;
+      cursor: pointer;
+      transition:
+        top 0.6s cubic-bezier(0.2, 0.8, 0.2, 1),
+        left 0.6s cubic-bezier(0.2, 0.8, 0.2, 1),
+        width 0.6s cubic-bezier(0.2, 0.8, 0.2, 1),
+        height 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    /* The enlarged card gets keyboard focus (for screen readers and
+       the Escape key) but shouldn't draw a focus outline around it. */
+    .expanded-card:focus { outline: none; }
+
+    .expanded-card .card-inner {
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.6s cubic-bezier(0.3, 0.7, 0.3, 1);
+    }
+
+    .expanded-card.flipped .card-inner { transform: rotateY(180deg); }
+
+    .expanded-card .card-face {
+      position: absolute;
+      inset: 0;
+      height: auto;
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+    }
+
+    /* Only the back casts the big shadow, and it sits a hair in
+       front of the front face so no edge of the front peeks
+       around its corners when flipped. */
+    .expanded-card .card-front { box-shadow: none; }
+
+    /* Once the flip has finished, hide the front completely so it
+       can't show through anywhere (added/removed by JavaScript). */
+    .expanded-card.settled .card-front { visibility: hidden; }
+
+    .card-back {
+      transform: rotateY(180deg) translateZ(1px);
+      border-color: var(--accent-light);
+      padding: 32px;
+      overflow-y: auto; /* only a fallback for very long projects on small screens */
+      overscroll-behavior: contain;
+    }
+
+    .card-back { scrollbar-width: thin; scrollbar-color: var(--accent-light) transparent; }
+    .card-back::-webkit-scrollbar { width: 6px; }
+    .card-back::-webkit-scrollbar-thumb { background: var(--accent-light); border-radius: 3px; }
+
+
+    /* =========================================================
+     CARD TEXT
+     ========================================================= */
+
+    .card-title {
+      font-size: 21px;
+      font-weight: 700;
+      color: var(--ink);
+      margin: 0 0 10px 0;
+      line-height: 1.25;
+    }
+
+    .flip-title {
+      display: inline;
+      border: none;
+      background: transparent;
+      padding: 0;
+      font: inherit;
+      font-weight: 700;
+      color: var(--ink);
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .flip-title:hover {
+      color: var(--accent);
+      text-decoration: underline;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 3px;
+    }
+
+    .flip-hint {
+      display: block;
+      margin-top: 5px;
+      color: var(--ink-faint);
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .header-tags {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .cat-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .cat-tag {
+      display: inline-block;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      background: #e8f0fe;
+      color: #1a73e8;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 9px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .maker-tag {
+      color: #666;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .card-desc {
+      color: #444;
+      font-size: 15px;
+      line-height: 1.55;
+      margin: 0 0 12px;
+    }
+
+    .section-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-top: 12px;
+      margin-bottom: 4px;
+    }
+
+    .section-text {
+      color: #555;
+      font-size: 14px;
+      line-height: 1.5;
+      white-space: pre-line; /* keeps the line breaks from the sheet */
+    }
+
+
+    /* =========================================================
+     BACK OF CARD (enlarged view)
+     ---------------------------------------------------------
+     Title and maker across the top, then two columns:
+       left:  Materials + Outcome
+       right: Fabrication Steps (usually the longest)
+     On narrow screens the columns stack into one.
+     ========================================================= */
+
+    .back-header { margin-bottom: 22px; }
+
+    .back-title {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--accent);
+      margin: 0 0 4px;
+    }
+
+    .back-meta {
+      color: var(--ink-soft);
+      font-size: 14px;
+      font-weight: 600;
+      margin: 0 0 6px;
+    }
+
+    .back-hint {
+      color: var(--ink-faint);
+      font-size: 12px;
+      margin: 0;
+    }
+
+    .back-columns {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
+      gap: 32px;
+    }
+
+    .back-section { margin-bottom: 22px; }
+    .back-section:last-child { margin-bottom: 0; }
+    .back-section .section-label { margin-top: 0; }
+    .card-back .section-text { font-size: 15px; line-height: 1.6; }
+
+    .back-empty {
+      color: var(--ink-faint);
+      font-style: italic;
+    }
+
+    @media (max-width: 700px) {
+      .back-columns { grid-template-columns: 1fr; gap: 22px; }
+      .card-back { padding: 22px; }
+      .back-title { font-size: 22px; }
+    }
+
+
+    /* =========================================================
+     IMAGE CAROUSEL
+     ---------------------------------------------------------
+     How the photo fits into the card:
+
+       - EDGE TO EDGE: the frame uses negative margins equal to
+         the card's padding, so it runs right to the card's edges
+         and top, with only the top corners rounded. It reads as
+         part of the card instead of a box sitting inside it.
+
+       - NOTHING CROPPED: each photo uses "object-fit: contain",
+         so the whole image is always visible.
+
+       - NO GRAY BARS: behind the photo sits a blurred, zoomed-in
+         copy of the same photo (.carousel-backdrop). Any space the
+         photo doesn't cover is filled with its own soft colors,
+         so it blends in smoothly whatever shape the photo is.
+
+     To change the frame's shape, edit aspect-ratio below
+     (1 / 1 = square, 4 / 3 = wider, 4 / 5 = taller).
+     ========================================================= */
+
+    .carousel-container,
+    .no-photo {
+      aspect-ratio: 1 / 1;
+      width: calc(100% + 2 * var(--card-pad));
+      margin: calc(-1 * var(--card-pad)) calc(-1 * var(--card-pad)) 18px;
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+
+    .carousel-container {
+      position: relative;
+      overflow: hidden;
+      background: #e9e9e6;
+    }
+
+    /* Blurred copy of the photo that fills the frame behind it */
+    .carousel-backdrop {
+      position: absolute;
+      inset: -30px;              /* oversized so blur has no soft edges */
+      background-size: cover;
+      background-position: center;
+      filter: blur(24px) saturate(1.1) brightness(0.92);
+      transition: background-image 0.2s;
+    }
+
+    .carousel-slide {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: none;
+    }
+
+    .carousel-slide.active { display: block; }
+
+    .carousel-btn {
+      position: absolute;
+      z-index: 2;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0, 0, 0, 0.5);
+      color: #fff;
+      border: none;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+    }
+
+    .carousel-btn:hover { background: rgba(0, 0, 0, 0.85); }
+    .carousel-btn.prev { left: 10px; }
+    .carousel-btn.next { right: 10px; }
+
+    .carousel-dots {
+      position: absolute;
+      bottom: 10px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      z-index: 2;
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      padding: 0;
+      border: none;
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .dot.active { background: #fff; }
+
+
+    /* =========================================================
+     NO PHOTO
+     ========================================================= */
+
+    .no-photo {
+      background: repeating-linear-gradient(45deg, #f0f0f0, #f0f0f0 10px, #e9e9e9 10px, #e9e9e9 20px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #999;
+      font-size: 13px;
+      font-weight: 600;
+      text-align: center;
+      padding: 8px;
+    }
+
+
+    /* =========================================================
+     STATES
+     ========================================================= */
+
+    .loading,
+    .no-results {
+      grid-column: 1 / -1;
+      font-size: 15px;
+      color: #666;
+      padding: 40px 10px;
+      text-align: center;
+    }
+
+    .no-results {
+      background: #f9f9f9;
+      border: 1px dashed #ccc;
+      border-radius: 8px;
+      display: none;
+      width: 100%;
+    }
+
+    .no-results button { margin-top: 10px; }
+
+    .error-state {
+      grid-column: 1 / -1;
+      background: #fff4f4;
+      border: 1px solid #f3c2c2;
+      color: #7a1f1f;
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+
+    /* =========================================================
+     FEATURED SECTION (top of page) + SIDE-SCROLLING ROW
+     ---------------------------------------------------------
+     Shows only projects marked TRUE in the Featured column.
+     The whole section hides itself if none are featured.
+
+     .featured-track is one horizontal row of cards:
+
+       display: flex + overflow-x: auto  -> a sideways row that
+                                            scrolls left/right
+       scroll-snap-type: x mandatory     -> scrolling stops neatly
+                                            on a card, not halfway
+       flex: 0 0 <width>                 -> every card keeps the
+                                            same width instead of
+                                            squishing to fit
+
+     On desktop, the arrow buttons in the header scroll the row
+     by one card. With a trackpad/touch you can also just swipe.
+     The arrows hide themselves when all cards already fit.
+     ========================================================= */
+
+    .featured-section[hidden] { display: none; }
+
+    .featured-section {
+      margin-bottom: 24px;
+      background: var(--accent-bg);
+      border: 1px solid var(--accent-light);
+      border-radius: 16px;
+      padding: 22px 0 8px;
+    }
+
+    .featured-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 0 22px;
+      margin-bottom: 14px;
+    }
+
+    .featured-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--accent);
+      margin: 0;
+    }
+
+    .featured-sub {
+      font-size: 13px;
+      color: var(--ink-faint);
+      margin: 4px 0 0;
+    }
+
+    .scroll-btns {
+      display: flex;
+      gap: 8px;
+    }
+
+    .scroll-btns[hidden] { display: none; }
+
+    .scroll-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 1px solid var(--accent-light);
+      background: #fff;
+      color: var(--accent);
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .scroll-btn:hover:not(:disabled) {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .scroll-btn:disabled {
+      opacity: 0.35;
+      cursor: default;
+    }
+
+    .featured-track {
+      display: flex;
+      gap: 22px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-padding-left: 22px;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+      padding: 6px 22px 20px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--accent-light) transparent;
+    }
+
+    .featured-track::-webkit-scrollbar { height: 6px; }
+    .featured-track::-webkit-scrollbar-thumb { background: var(--accent-light); border-radius: 3px; }
+
+    .featured-track .card {
+      flex: 0 0 clamp(280px, 30vw, 380px); /* same size as the main grid cards */
+      min-width: 0; /* stop long tags from stretching a card wider than its size */
+      scroll-snap-align: start;
+    }
+
+    .featured-track .loading {
+      flex: 1 0 100%;
+      padding: 40px 10px;
+      text-align: center;
+      color: #666;
+      font-size: 15px;
+    }
+
+    .featured-track .error-state { flex: 1 0 100%; }
+
+    @media (max-width: 700px) {
+      .featured-section { padding-top: 18px; }
+      .featured-head { padding: 0 16px; }
+      .featured-title { font-size: 21px; }
+      .scroll-btns { display: none; } /* just swipe on phones */
+
+      .featured-track {
+        gap: 14px;
+        padding: 6px 16px 18px;
+        scroll-padding-left: 16px;
+      }
+
+      .featured-track .card { flex-basis: 86%; } /* next card peeks in */
+    }
+
+
+    /* =========================================================
+     TABLET — 2 per row
+     ========================================================= */
+
+    @media (max-width: 1000px) {
+      .project-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+
+    /* =========================================================
+     PHONE — SIDE-SCROLLING CARDS
+     ---------------------------------------------------------
+     On narrow screens the grid turns into one horizontal row
+     you swipe through, one card at a time:
+
+       display: flex + overflow-x: auto   -> a sideways row
+       scroll-snap-type: x mandatory      -> each swipe lands
+                                             neatly on a card
+       flex: 0 0 86%                      -> each card is 86% of
+                                             the screen, so the
+                                             next one peeks in
+                                             from the edge
+       align-items: flex-start            -> each card keeps its
+                                             own height instead of
+                                             matching the tallest
+     ========================================================= */
+
+    @media (max-width: 700px) {
+      body { padding: 12px; }
+
+      .search-row { flex-direction: column; }
+      .sort-select,
+      .filter-toggle { width: 100%; justify-content: space-between; }
+      .filter-panel { left: 0; right: 0; width: auto; }
+
+      .swipe-hint { display: block; }
+
+      .project-grid {
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        padding: 4px 4px 14px;
+        margin: 0 -12px;           /* let the row run to the screen edges */
+        padding-left: 12px;
+        padding-right: 12px;
+        scroll-padding-left: 12px;
+      }
+
+      .project-grid .card {
+        flex: 0 0 86%;
+        scroll-snap-align: start;
+      }
+
+      .project-grid .loading,
+      .project-grid .error-state { flex: 1 0 100%; }
+
+      :root { --card-pad: 16px; }
+      .card-title { font-size: 19px; }
+    }
+
+
+    /* =========================================================
+     REDUCED MOTION
+     ---------------------------------------------------------
+     Users who've turned on "reduce motion" in their OS get an
+     instant flip instead of the rotation animation.
+     ========================================================= */
+
+    @media (prefers-reduced-motion: reduce) {
+      .card-inner,
+      .expanded-card,
+      .card-overlay { transition: none; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- =========================================================
+     FEATURED PROJECTS
+     ========================================================= -->
+
+  <section class="featured-section" id="featuredSection" aria-labelledby="featuredTitle" hidden>
+    <div class="featured-head">
+      <div>
+        <h2 class="featured-title" id="featuredTitle">★ Featured Projects</h2>
+        <p class="featured-sub" id="featuredSub">Click a project to see how it was made</p>
+      </div>
+
+      <div class="scroll-btns" id="scrollBtns" hidden>
+        <button class="scroll-btn" id="scrollPrev" type="button" aria-label="Scroll to previous projects">&#10094;</button>
+        <button class="scroll-btn" id="scrollNext" type="button" aria-label="Scroll to more projects">&#10095;</button>
+      </div>
+    </div>
+
+    <div class="featured-track" id="featuredTrack">
+      <div class="loading">Loading featured projects…</div>
+    </div>
+  </section>
+
+
+  <!-- =========================================================
+     CONTROLS
+     ========================================================= -->
+
+  <div class="controls">
+    <div class="search-row">
+      <div class="search-wrap">
+        <input type="text" id="searchInput" class="search-input"
+          placeholder="Search by project, maker, category, or keyword..." aria-label="Search projects">
+        <button class="search-clear" id="searchClearBtn" type="button" aria-label="Clear search">&times;</button>
+      </div>
+
+      <!-- Filter dropdown: button + hidden panel of checkboxes.
+           The category checkboxes are added by JavaScript once the
+           sheet loads (inside #categoryOptions), using whatever
+           categories are in the sheet's Category column. -->
+      <div class="filter-dropdown" id="filterDropdown">
+        <button class="filter-toggle" id="filterToggle" type="button"
+          aria-haspopup="true" aria-expanded="false" aria-controls="filterPanel">
+          <span id="filterToggleLabel">Filter: All categories</span>
+          <span class="filter-caret" aria-hidden="true">▼</span>
+        </button>
+
+        <div class="filter-panel" id="filterPanel" hidden>
+          <label class="filter-option">
+            <input type="checkbox" id="featuredCheckbox">
+            ★ Featured only
+          </label>
+          <div class="filter-divider"></div>
+          <div id="categoryOptions"></div>
+        </div>
+      </div>
+
+      <select id="sortSelect" class="sort-select" aria-label="Sort projects">
+        <option value="detail">Sort: Most detailed first</option>
+        <option value="featured">Sort: Featured first</option>
+        <option value="az">Sort: A → Z</option>
+        <option value="za">Sort: Z → A</option>
+        <option value="maker">Sort: Maker A → Z</option>
+      </select>
+
+      <button class="clear-filters-btn" id="clearFiltersBtn" type="button">Clear filters</button>
+    </div>
+  </div>
+
+
+  <!-- =========================================================
+     RESULTS
+     ========================================================= -->
+
+  <p class="results-summary" id="resultsSummary" aria-live="polite"></p>
+  <p class="swipe-hint">Swipe sideways to see more projects →</p>
+
+  <div class="project-grid" id="projectContainer">
+    <div class="loading" id="loadingState">Loading projects…</div>
+  </div>
+
+  <div class="no-results" id="noResultsState">
+    No matching projects found.
+    Try a different search term, or
+    <button class="clear-filters-btn visible" id="noResultsClearBtn" type="button">clear your filters</button>.
+  </div>
+
+
+  <script>
+    /*
+      Everything is wrapped in (function () { ... })(); — an
+      "immediately invoked function". It runs once on load and keeps
+      all these variables private, so they can't clash with any other
+      scripts on the page (useful if this is embedded in a larger site).
+    */
+    (function () {
+      'use strict'; // catches common mistakes like typos in variable names
+
+      /* =========================================================
+         CONFIG
+         ---------------------------------------------------------
+         SHEET_URL: paste the Google Sheet's full link here, exactly
+         as you copy it from the browser or the Share button, e.g.
+           https://docs.google.com/spreadsheets/d/<id>/edit?usp=sharing
+
+         The code pulls what it needs out of that link:
+           - the spreadsheet ID (the long code after /d/)
+           - the tab, if the link includes "gid=" (Google adds this
+             when you copy the link while viewing a specific tab).
+             With no gid, the first tab is used.
+         ========================================================= */
+
+      const SHEET_URL =
+        'https://docs.google.com/spreadsheets/d/1_8gULGuEwFKvUAFQ9VZzuVbb8r_SoVHErGSsu_ScTr0/edit?usp=sharing';
+
+      // The long code between "/d/" and the next "/"
+      const SHEET_ID = (SHEET_URL.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/) || [])[1] || '';
+
+      // The tab number after "gid=" (in the ?query or the #hash), if there is one
+      const SHEET_GID = (SHEET_URL.match(/[?#&]gid=(\d+)/) || [])[1] || '';
+
+      /*
+        Optional: a tab NAME to read instead. Leave empty ('') to use
+        the tab from the link (gid), or the first tab if there isn't one.
+      */
+      const SHEET_TITLE = '';
+
+      /*
+        Google Sheet columns:
+        A = Project
+        B = Maker(s)
+        C = Category
+        D = Featured
+        E = Overview
+        F = Scope
+        G = Materials
+        H = Fabrication Steps
+        I = Outcome
+        J = Photos
+        K = Url
+      */
+
+      // A2:K = start at row 2 (skipping the header row), columns A through K.
+      const SHEET_RANGE = 'A2:K';
+
+      /*
+        The "gviz/tq" address is Google's public query endpoint. Instead of
+        the normal spreadsheet page, it returns just the cell data as JSON.
+        tqx=out:json   -> ask for JSON
+        sheet=... / gid=... -> which tab (SHEET_TITLE if set, else the
+                               gid from the link, else the first tab)
+        range=...      -> which cells
+      */
+      const FULL_URL =
+        `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json` +
+        (SHEET_TITLE
+          ? `&sheet=${encodeURIComponent(SHEET_TITLE)}`
+          : (SHEET_GID ? `&gid=${SHEET_GID}` : '')) +
+        `&range=${SHEET_RANGE}`;
+
+      /*
+        OPTIONAL manual override for category names that contain a
+        comma. You normally DON'T need to touch this: the page works
+        these out from the Category column on its own (see
+        splitCategories below). Only add a name here if the automatic
+        detection ever splits a category the wrong way.
+      */
+      const MULTI_WORD_CATEGORIES = [];
+
+
+      /* =========================================================
+         STATE
+         ---------------------------------------------------------
+         These variables remember what the user has chosen so far.
+         Every filter/sort function reads from them.
+         ========================================================= */
+
+      // allProjects:         every project loaded from the sheet
+      // selectedCategories:  lowercase names of checked categories
+      //                      (a Set, so each name appears only once)
+      // featuredOnly:        true when "★ Featured only" is checked
+      // currentSort:         value of the sort dropdown
+      // searchDebounceTimer: used to wait until typing pauses (see below)
+
+      let allProjects = [];
+      let selectedCategories = new Set();
+      let featuredOnly = false;
+      let currentSort = 'detail';
+      let searchDebounceTimer = null;
+
+
+      /* =========================================================
+         DOM
+         ---------------------------------------------------------
+         Grab references to page elements once, up front, so the
+         rest of the code doesn't have to look them up repeatedly.
+         Each id matches an id="..." in the HTML above.
+         ========================================================= */
+
+      const container = document.getElementById('projectContainer');
+
+      // Featured row at the top
+      const featuredSection = document.getElementById('featuredSection');
+      const track = document.getElementById('featuredTrack');
+      const scrollBtns = document.getElementById('scrollBtns');
+      const scrollPrev = document.getElementById('scrollPrev');
+      const scrollNext = document.getElementById('scrollNext');
+      const filterDropdown = document.getElementById('filterDropdown');
+      const filterToggle = document.getElementById('filterToggle');
+      const filterToggleLabel = document.getElementById('filterToggleLabel');
+      const filterPanel = document.getElementById('filterPanel');
+      const featuredCheckbox = document.getElementById('featuredCheckbox');
+      const categoryOptions = document.getElementById('categoryOptions');
+      const clearFiltersBtn = document.getElementById('clearFiltersBtn');
+      const noResultsClearBtn = document.getElementById('noResultsClearBtn');
+      const noResultsState = document.getElementById('noResultsState');
+      const resultsSummary = document.getElementById('resultsSummary');
+      const searchInput = document.getElementById('searchInput');
+      const searchClearBtn = document.getElementById('searchClearBtn');
+      const sortSelect = document.getElementById('sortSelect');
+
+
+      /* =========================================================
+         HELPERS
+         ========================================================= */
+
+      /*
+        escapeHtml: makes sheet text safe to insert into the page.
+        Without this, a cell containing "<" or a quote could break
+        the HTML (or inject code). It swaps those characters for
+        their harmless "&...;" versions, which display the same.
+      */
+      function escapeHtml(str) {
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      /*
+        parseUrls: reads the Photos cell. You can put several image
+        links in one cell, separated by commas or new lines, and each
+        becomes a slide in the carousel. Anything that isn't a web
+        link (http/https) is ignored.
+      */
+      function parseUrls(cellValue) {
+        if (!cellValue) return [];
+        return String(cellValue)
+          .split(/[\n,]+/)
+          .map(s => s.trim())
+          .filter(s => s.startsWith('http://') || s.startsWith('https://'));
+      }
+
+      /*
+        CATEGORIES — READ STRAIGHT FROM THE CATEGORY COLUMN
+        ---------------------------------------------------------
+        The filter dropdown lists exactly the categories that appear
+        in column C. Add, rename, or remove a category in the sheet
+        and the dropdown changes to match on the next page load.
+
+        The tricky part: one cell can hold several categories
+        separated by commas ("Robotics, Electronics & Hardware"), but
+        a category's own name can ALSO contain a comma
+        ("Props, Costumes & Art"). So the page learns which pieces
+        are real categories by looking at the whole column:
+
+          1. findStandaloneCategories() collects every cell that has
+             NO comma. Those are definitely whole category names
+             (e.g. "Robotics", "Electronics & Hardware").
+
+          2. splitCategories() splits a cell on commas, then:
+               - a piece that's a known standalone category stays
+                 on its own
+               - pieces that are NOT known standalones and sit next
+                 to each other get glued back together with ", "
+
+             Example: "Props, Costumes & Art, Electronics & Hardware"
+               pieces:  Props | Costumes & Art | Electronics & Hardware
+               known?   no    | no             | yes
+               result:  ["Props, Costumes & Art", "Electronics & Hardware"]
+
+        Rare edge case: two different comma-containing categories
+        listed right next to each other would get glued together.
+        If that ever happens, add the names to MULTI_WORD_CATEGORIES
+        in the config and they'll be matched first.
+
+        A blank Category cell becomes "General".
+      */
+      function findStandaloneCategories(cellValues) {
+        const standalone = new Set();
+        cellValues.forEach(v => {
+          const text = String(v || '').trim();
+          if (text && !text.includes(',')) standalone.add(text.toLowerCase());
+        });
+        return standalone;
+      }
+
+      function splitCategories(cellValue, standalone) {
+        if (!cellValue) return ['General'];
+
+        let text = String(cellValue);
+        const found = [];
+
+        // Manual overrides first (normally an empty list)
+        MULTI_WORD_CATEGORIES.forEach(name => {
+          if (text.includes(name)) {
+            found.push(name);
+            text = text.split(name).join('');
+          }
+        });
+
+        const pieces = text.split(',').map(s => s.trim()).filter(Boolean);
+        let unknownRun = []; // consecutive pieces that aren't standalone categories
+
+        const flushUnknown = () => {
+          if (unknownRun.length) found.push(unknownRun.join(', '));
+          unknownRun = [];
+        };
+
+        pieces.forEach(piece => {
+          if (standalone.has(piece.toLowerCase())) {
+            flushUnknown();
+            found.push(piece);
+          } else {
+            unknownRun.push(piece);
+          }
+        });
+        flushUnknown();
+
+        // Remove accidental duplicates within one cell
+        const unique = [...new Map(found.map(c => [c.toLowerCase(), c])).values()];
+        return unique.length ? unique : ['General'];
+      }
+
+      /*
+        slugify: "ABV Meter" -> "abv-meter". Not used on screen yet;
+        it's stored on each project so you can later give each one
+        a link/anchor (e.g. showcase.html#abv-meter).
+      */
+      function slugify(str) {
+        return String(str)
+          .toLowerCase()
+          .trim()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/(^-|-$)/g, '');
+      }
+
+      /*
+        contentScore: a rough "how complete is this project?" number,
+        used by the default sort to push thinner cards to the bottom.
+
+        Points come from:
+          - total characters across Overview, Scope, Materials,
+            Fabrication Steps, and Outcome
+          - +60 per numbered fabrication step ("1.", "2.", ...)
+          - +40 per "•" material bullet
+          - +300 if the project has at least one photo
+
+        Want photos to matter more (or less)? Change the 300.
+        Want step count to matter more? Raise the 60.
+      */
+      function contentScore(p) {
+        const textLength =
+          p.overview.length +
+          p.scope.length +
+          p.materials.length +
+          p.fabrication.length +
+          p.outcome.length;
+
+        const stepCount = (p.fabrication.match(/^\s*\d+\./gm) || []).length;
+        const materialCount = (p.materials.match(/•/g) || []).length;
+        const photoBonus = p.photoUrls.length > 0 ? 300 : 0;
+
+        return textLength + stepCount * 60 + materialCount * 40 + photoBonus;
+      }
+
+
+      /* =========================================================
+         MEDIA
+         ---------------------------------------------------------
+         Builds the photo area at the top of a card, as an HTML
+         string:
+           - 1 photo    -> just the image
+           - 2+ photos  -> images + prev/next arrows + dots
+           - no photos  -> a striped "Photos coming soon" box
+         loading="lazy" means images below the fold don't download
+         until the user scrolls near them (faster first load).
+         ========================================================= */
+
+      function buildMediaHTML(project) {
+        if (project.photoUrls.length > 0) {
+          const slides = project.photoUrls
+            .map((url, i) =>
+              `<img src="${escapeHtml(url)}"
+                    class="carousel-slide ${i === 0 ? 'active' : ''}"
+                    alt="${escapeHtml(project.title)} photo ${i + 1}"
+                    loading="lazy">`)
+            .join('');
+
+          const dots = project.photoUrls.length > 1
+            ? `<ul class="carousel-dots">
+                ${project.photoUrls.map((_, i) =>
+                  `<li><button class="dot ${i === 0 ? 'active' : ''}"
+                        aria-label="Show photo ${i + 1}" type="button"></button></li>`).join('')}
+               </ul>`
+            : '';
+
+          const navControls = project.photoUrls.length > 1
+            ? `<button class="carousel-btn prev" aria-label="Previous photo" type="button">&#10094;</button>
+               <button class="carousel-btn next" aria-label="Next photo" type="button">&#10095;</button>
+               ${dots}`
+            : '';
+
+          // Blurred copy of the first photo, behind everything (see CSS)
+          const backdrop =
+            `<div class="carousel-backdrop" aria-hidden="true"
+                  style="background-image: url('${escapeHtml(project.photoUrls[0]).replace(/'/g, '%27')}')"></div>`;
+
+          return `<div class="carousel-container" data-index="0">${backdrop}${slides}${navControls}</div>`;
+        }
+
+        return `<div class="no-photo">Photos coming soon</div>`;
+      }
+
+
+      /* =========================================================
+         CARD HTML
+         ---------------------------------------------------------
+         These functions build the inside of each card as text
+         (an HTML "template string" using backticks and ${...}).
+         Every value from the sheet goes through escapeHtml first.
+         ========================================================= */
+
+      /*
+        backSection: one labeled block on the back of the card.
+        If the sheet cell is empty, it shows emptyText in italics
+        instead — or nothing at all if emptyText is ''.
+      */
+      function backSection(label, value, emptyText) {
+        if (value) {
+          return `<div class="back-section">
+                    <div class="section-label">${label}</div>
+                    <div class="section-text">${escapeHtml(value)}</div>
+                  </div>`;
+        }
+        if (emptyText) {
+          return `<div class="back-section">
+                    <div class="section-label">${label}</div>
+                    <div class="section-text back-empty">${emptyText}</div>
+                  </div>`;
+        }
+        return '';
+      }
+
+      /*
+        buildFrontHTML: what shows in the grid.
+          photo, category tags, maker, title, overview, scope
+        Sections with no content are simply left out.
+      */
+      function buildFrontHTML(project) {
+        const catTags = project.categories
+          .map(c => `<span class="cat-tag">${escapeHtml(c)}</span>`)
+          .join('');
+
+        const frontOverview = project.overview
+          ? `<p class="card-desc">${escapeHtml(project.overview)}</p>`
+          : '';
+
+        const frontScope = project.scope
+          ? `<div class="section-label">Scope</div>
+             <div class="section-text">${escapeHtml(project.scope)}</div>`
+          : '';
+
+        return `
+          <div class="card-inner">
+            <div class="card-face card-front">
+              ${buildMediaHTML(project)}
+
+              <div class="header-tags">
+                <div class="cat-tags">${catTags}</div>
+                ${project.maker ? `<span class="maker-tag">By: ${escapeHtml(project.maker)}</span>` : ''}
+              </div>
+
+              <h3 class="card-title">
+                <button class="flip-title" type="button" aria-expanded="false">${escapeHtml(project.title)}</button>
+                <span class="flip-hint">Click to see materials &amp; fabrication</span>
+              </h3>
+
+              ${frontOverview}
+              ${frontScope}
+            </div>
+          </div>`;
+      }
+
+      /*
+        buildBackHTML: the details side, only built when a card is
+        opened in the enlarged view.
+          header: title, maker, "click to close" hint
+          left column:  Materials, Outcome
+          right column: Fabrication Steps
+      */
+      function buildBackHTML(project) {
+        return `
+          <div class="card-face card-back">
+            <div class="back-header">
+              <div class="back-title">${escapeHtml(project.title)}</div>
+              ${project.maker ? `<p class="back-meta">By: ${escapeHtml(project.maker)}</p>` : ''}
+              <p class="back-hint">Click anywhere to close</p>
+            </div>
+
+            <div class="back-columns">
+              <div>
+                ${backSection('Materials', project.materials, 'No materials listed.')}
+                ${backSection('Outcome', project.outcome, '')}
+              </div>
+              <div>
+                ${backSection('Fabrication Steps', project.fabrication, 'No fabrication steps listed.')}
+              </div>
+            </div>
+          </div>`;
+      }
+
+
+      /* =========================================================
+         CREATE CARD
+         ---------------------------------------------------------
+         Wraps the card HTML in a real <div class="card"> element
+         and attaches "data-" attributes to it. These are little
+         labels stored on the element that the filter code reads
+         later, so filtering never has to look at the sheet again:
+
+           data-categories  "robotics|electronics & hardware"
+           data-featured    "1" or "0"
+           data-search-text every text field, lowercase, joined
+                            together — the search box just checks
+                            whether this contains what you typed
+         ========================================================= */
+
+      function makeCardEl(project) {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.dataset.categories = project.categories.join('|').toLowerCase();
+        card.dataset.featured = project.featured ? '1' : '0';
+        card.dataset.searchText = [
+          project.title,
+          project.maker,
+          project.categories.join(' '),
+          project.overview,
+          project.scope,
+          project.materials,
+          project.fabrication,
+          project.outcome
+        ].join(' ').toLowerCase();
+
+        card.innerHTML = buildFrontHTML(project);
+        card.project = project; // remembered so openCard() can build the back
+        return card;
+      }
+
+
+      /* =========================================================
+         FILTER DROPDOWN
+         ---------------------------------------------------------
+         renderCategoryOptions: creates one checkbox per category
+         actually found in the sheet (alphabetical) inside the
+         dropdown panel. Checking a box adds that category to
+         selectedCategories; unchecking removes it. Multiple can
+         be checked at once, and a card shows if it matches ANY
+         checked category.
+
+         updateFilterLabel: keeps the dropdown button's text in
+         sync with what's selected, e.g.
+           "Filter: All categories"
+           "Filter: Robotics"
+           "Filter: 3 selected"
+           "Filter: ★ Featured, Robotics"
+         ========================================================= */
+
+      function renderCategoryOptions(categories) {
+        categoryOptions.innerHTML = '';
+
+        Array.from(categories)
+          .sort((a, b) => a.localeCompare(b))
+          .forEach(cat => {
+            const label = document.createElement('label');
+            label.className = 'filter-option';
+
+            const box = document.createElement('input');
+            box.type = 'checkbox';
+            box.value = cat.toLowerCase();
+            box.dataset.display = cat;
+
+            box.addEventListener('change', () => {
+              if (box.checked) selectedCategories.add(box.value);
+              else selectedCategories.delete(box.value);
+              applyFilters();
+            });
+
+            label.appendChild(box);
+            label.appendChild(document.createTextNode(cat));
+            categoryOptions.appendChild(label);
+          });
+      }
+
+      function updateFilterLabel() {
+        const checkedNames = Array.from(
+          categoryOptions.querySelectorAll('input:checked')
+        ).map(b => b.dataset.display);
+
+        const parts = [];
+        if (featuredOnly) parts.push('★ Featured');
+
+        if (checkedNames.length === 1) parts.push(checkedNames[0]);
+        else if (checkedNames.length > 1) parts.push(`${checkedNames.length} categories`);
+
+        filterToggleLabel.textContent = parts.length
+          ? `Filter: ${parts.join(', ')}`
+          : 'Filter: All categories';
+
+        filterToggle.classList.toggle('has-active', parts.length > 0);
+      }
+
+      // Open/close the panel. aria-expanded tells screen readers its state.
+      function setPanelOpen(open) {
+        filterPanel.hidden = !open;
+        filterToggle.setAttribute('aria-expanded', String(open));
+      }
+
+      filterToggle.addEventListener('click', () => {
+        setPanelOpen(filterPanel.hidden);
+      });
+
+      // Clicking anywhere outside the dropdown closes it.
+      document.addEventListener('click', e => {
+        if (!filterPanel.hidden && !filterDropdown.contains(e.target)) {
+          setPanelOpen(false);
+        }
+      });
+
+      // Pressing Escape closes it and puts focus back on the button.
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && !filterPanel.hidden) {
+          setPanelOpen(false);
+          filterToggle.focus();
+        }
+      });
+
+      featuredCheckbox.addEventListener('change', () => {
+        featuredOnly = featuredCheckbox.checked;
+        applyFilters();
+      });
+
+
+      /* =========================================================
+         SORTING
+         ---------------------------------------------------------
+         Returns a sorted copy of the project list (the original
+         order is left alone). Sort compare functions return a
+         negative/positive number to decide which item goes first;
+         the "||" chains act as tie-breakers, e.g. for 'featured':
+           1st: featured projects before non-featured
+           2nd: if tied, higher content score first
+           3rd: if still tied, alphabetical by title
+         ========================================================= */
+
+      function sortProjects(list) {
+        const sorted = list.slice();
+
+        switch (currentSort) {
+          case 'az':
+            sorted.sort((a, b) => a.title.localeCompare(b.title));
+            break;
+
+          case 'za':
+            sorted.sort((a, b) => b.title.localeCompare(a.title));
+            break;
+
+          case 'maker':
+            sorted.sort((a, b) => (a.maker || '').localeCompare(b.maker || ''));
+            break;
+
+          case 'featured':
+            sorted.sort((a, b) =>
+              (b.featured - a.featured) ||
+              (b.score - a.score) ||
+              a.title.localeCompare(b.title));
+            break;
+
+          case 'detail':
+          default:
+            // Most content first; thinner cards sink to the bottom
+            sorted.sort((a, b) =>
+              (b.score - a.score) ||
+              a.title.localeCompare(b.title));
+            break;
+        }
+
+        return sorted;
+      }
+
+
+      /* =========================================================
+         RENDER ALL
+         ---------------------------------------------------------
+         Wipes the container and rebuilds every card in sorted
+         order. Only runs on first load and when the sort changes.
+         Then re-applies the current filters so hidden cards stay
+         hidden.
+         ========================================================= */
+
+      function renderAll() {
+        container.innerHTML = '';
+        sortProjects(allProjects).forEach(project => {
+          container.appendChild(makeCardEl(project));
+        });
+        applyFilters();
+      }
+
+
+      /* =========================================================
+         FILTERING
+         ---------------------------------------------------------
+         Runs whenever the search text or a filter changes.
+         It loops over every card and checks three things:
+
+           matchesCategory - no category checked, OR the card has
+                             at least one of the checked categories
+           matchesFeatured - "Featured only" off, OR card is featured
+           matchesSearch   - search box empty, OR the card's search
+                             text contains what was typed
+
+         A card is shown only if all three pass; otherwise it gets
+         the "is-hidden" class (display: none). Afterward it updates
+         the "Showing X of Y" line, the no-results message, the
+         dropdown's label, and whether "Clear filters" is visible.
+         ========================================================= */
+
+      function applyFilters() {
+        const query = searchInput.value.trim().toLowerCase();
+        const anyCategoryFilter = selectedCategories.size > 0;
+        let visibleCount = 0;
+
+        container.querySelectorAll('.card').forEach(card => {
+          const cardCats = card.dataset.categories.split('|');
+
+          const matchesCategory =
+            !anyCategoryFilter || cardCats.some(c => selectedCategories.has(c));
+          const matchesFeatured =
+            !featuredOnly || card.dataset.featured === '1';
+          const matchesSearch =
+            !query || card.dataset.searchText.includes(query);
+
+          const show = matchesCategory && matchesFeatured && matchesSearch;
+          card.classList.toggle('is-hidden', !show);
+          if (show) visibleCount++;
+        });
+
+        const activeFilterCount = selectedCategories.size + (featuredOnly ? 1 : 0);
+
+        clearFiltersBtn.classList.toggle('visible', activeFilterCount > 0 || query.length > 0);
+        noResultsState.style.display = visibleCount === 0 && allProjects.length ? 'block' : 'none';
+        searchClearBtn.classList.toggle('visible', query.length > 0);
+        updateFilterLabel();
+
+        // On phones (side-scrolling row), jump back to the first card
+        // so a new search/filter doesn't leave you staring at empty space.
+        container.scrollLeft = 0;
+
+        resultsSummary.textContent = allProjects.length
+          ? `Showing ${visibleCount} of ${allProjects.length} projects`
+          : '';
+      }
+
+
+      /* =========================================================
+         CLEAR FILTERS
+         ---------------------------------------------------------
+         Unchecks everything, empties the search box, and shows
+         all cards again.
+         ========================================================= */
+
+      function clearAllFilters() {
+        selectedCategories.clear();
+        featuredOnly = false;
+        featuredCheckbox.checked = false;
+        searchInput.value = '';
+        categoryOptions.querySelectorAll('input').forEach(b => { b.checked = false; });
+        applyFilters();
+      }
+
+
+      /* =========================================================
+         RENDER FEATURED
+         ---------------------------------------------------------
+         Fills the Featured row at the top of the page.
+         Keeps only projects whose Featured cell is TRUE, puts the
+         most detailed ones first (same content score as the main
+         page), and builds a card for each into the scrolling row.
+         ========================================================= */
+
+      function renderFeatured() {
+        const featured = allProjects
+          .filter(p => p.featured)
+          .sort((a, b) => (b.score - a.score) || a.title.localeCompare(b.title));
+
+        track.innerHTML = '';
+
+        // No featured projects? Hide the whole section.
+        featuredSection.hidden = featured.length === 0;
+        if (featured.length === 0) return;
+
+        featured.forEach(project => track.appendChild(makeCardEl(project)));
+        updateScrollButtons();
+      }
+
+
+      /* =========================================================
+         SCROLL ARROWS
+         ---------------------------------------------------------
+         Each arrow scrolls the row by one card (card width + gap).
+         updateScrollButtons() hides both arrows when everything
+         already fits, and greys out an arrow at either end.
+         It re-runs whenever the row is scrolled or the window
+         is resized.
+         ========================================================= */
+
+      function scrollStep() {
+        const card = track.querySelector('.card');
+        if (!card) return track.clientWidth * 0.8;
+        const gap = parseFloat(getComputedStyle(track).columnGap) || 0;
+        return card.getBoundingClientRect().width + gap;
+      }
+
+      function updateScrollButtons() {
+        const maxScroll = track.scrollWidth - track.clientWidth;
+        scrollBtns.hidden = maxScroll <= 2;
+        scrollPrev.disabled = track.scrollLeft <= 2;
+        scrollNext.disabled = track.scrollLeft >= maxScroll - 2;
+      }
+
+      scrollPrev.addEventListener('click', () => track.scrollBy({ left: -scrollStep() }));
+      scrollNext.addEventListener('click', () => track.scrollBy({ left: scrollStep() }));
+      track.addEventListener('scroll', updateScrollButtons, { passive: true });
+      window.addEventListener('resize', updateScrollButtons);
+
+
+      /* =========================================================
+         ENLARGED FLIP VIEW (open + close)
+         ---------------------------------------------------------
+         See the "ENLARGED FLIP VIEW" notes in the CSS for the idea.
+         Only one card can be open at a time; these variables track
+         it. "busy" blocks clicks while an animation is running so
+         a double-click can't tangle things up.
+         ========================================================= */
+
+      const ANIMATION_MS = 650; // a bit longer than the CSS transitions
+
+      let openState = null; // { card, expanded, overlay } while open
+      let busy = false;
+
+      /*
+        getTargetBox: works out how big the enlarged card should be
+        and where it goes (centered on screen).
+
+        Width:  up to 900px, but never wider than the screen.
+        Height: exactly what the back needs to fit ALL its text.
+                To find that out, the back is built invisibly
+                off-screen at the target width and measured.
+                (Only if a project is taller than the screen does
+                the back fall back to scrolling.)
+      */
+      function getTargetBox(project, startHeight) {
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        const margin = vw <= 700 ? 12 : 32;
+
+        const width = Math.min(900, vw - margin * 2);
+
+        const measure = document.createElement('div');
+        measure.innerHTML = buildBackHTML(project);
+        const face = measure.firstElementChild;
+        Object.assign(face.style, {
+          position: 'absolute',
+          visibility: 'hidden',
+          transform: 'none',
+          inset: 'auto',
+          top: '0',
+          left: '-10000px',
+          width: width + 'px',
+          height: 'auto',
+          overflow: 'visible'
+        });
+        document.body.appendChild(face);
+        const contentHeight = face.offsetHeight;
+        face.remove();
+
+        // Never smaller than the card started, never taller than the screen
+        const height = Math.min(Math.max(contentHeight, startHeight), vh - margin * 2);
+
+        return {
+          width,
+          height,
+          left: (vw - width) / 2,
+          top: (vh - height) / 2
+        };
+      }
+
+      function setBox(el, box) {
+        el.style.top = box.top + 'px';
+        el.style.left = box.left + 'px';
+        el.style.width = box.width + 'px';
+        el.style.height = box.height + 'px';
+      }
+
+      /*
+        Stop the page behind from scrolling while a card is open.
+        Hiding the scrollbar would make the page jump sideways, so
+        the scrollbar's width is added as padding to compensate.
+      */
+      function lockScroll() {
+        const scrollbar = window.innerWidth - document.documentElement.clientWidth;
+        const pad = parseFloat(getComputedStyle(document.body).paddingRight) || 0;
+        document.body.style.paddingRight = (pad + scrollbar) + 'px';
+        document.body.style.overflow = 'hidden';
+      }
+
+      function unlockScroll() {
+        document.body.style.paddingRight = '';
+        document.body.style.overflow = '';
+      }
+
+      function openCard(card) {
+        if (openState || busy) return;
+        busy = true;
+
+        const start = card.getBoundingClientRect();
+
+        // 1. Blurred overlay
+        const overlay = document.createElement('div');
+        overlay.className = 'card-overlay';
+        document.body.appendChild(overlay);
+
+        // 2. Copy of the card, placed exactly over the original
+        const expanded = document.createElement('div');
+        expanded.className = 'expanded-card';
+        expanded.setAttribute('role', 'dialog');
+        expanded.setAttribute('aria-modal', 'true');
+        expanded.setAttribute('aria-label', card.project.title + ' details');
+        expanded.tabIndex = -1;
+
+        const inner = document.createElement('div');
+        inner.className = 'card-inner';
+        inner.appendChild(card.querySelector('.card-front').cloneNode(true)); // keeps the current photo
+        inner.insertAdjacentHTML('beforeend', buildBackHTML(card.project));
+        expanded.appendChild(inner);
+
+        setBox(expanded, start);
+        document.body.appendChild(expanded);
+
+        const target = getTargetBox(card.project, start.height);
+
+        card.classList.add('is-open');
+        lockScroll();
+
+        // 3 + 4. Next frame: grow to the center AND flip.
+        // (Waiting one frame makes sure the browser has drawn the
+        //  starting position first, so there's something to animate from.)
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            overlay.classList.add('show');
+            setBox(expanded, target);
+            expanded.classList.add('flipped');
+          });
+        });
+
+        const titleButton = card.querySelector('.flip-title');
+        if (titleButton) titleButton.setAttribute('aria-expanded', 'true');
+
+        openState = { card, expanded, overlay };
+        setTimeout(() => {
+          busy = false;
+          expanded.classList.add('settled');
+          expanded.focus({ preventScroll: true });
+        }, ANIMATION_MS);
+      }
+
+      function closeCard() {
+        if (!openState || busy) return;
+        busy = true;
+
+        const { card, expanded, overlay } = openState;
+
+        // Shrink back to wherever the original card is now, while flipping back
+        const end = card.getBoundingClientRect();
+        expanded.classList.remove('settled');
+        expanded.classList.remove('flipped');
+        setBox(expanded, end);
+        overlay.classList.remove('show');
+
+        setTimeout(() => {
+          expanded.remove();
+          overlay.remove();
+          card.classList.remove('is-open');
+          unlockScroll();
+
+          const titleButton = card.querySelector('.flip-title');
+          if (titleButton) {
+            titleButton.setAttribute('aria-expanded', 'false');
+            titleButton.focus({ preventScroll: true });
+          }
+
+          openState = null;
+          busy = false;
+        }, ANIMATION_MS);
+      }
+
+      /*
+        One click listener for the whole page ("event delegation"),
+        so it works for every card, even ones rebuilt by sorting.
+
+          - Carousel arrow or dot?           -> ignore (carousel handles it)
+          - A card is open?                  -> any click closes it
+          - Clicked a card (featured row or grid)? -> open it
+          - Highlighting text on a card?     -> don't open, so text
+                                               can still be copied
+      */
+      document.addEventListener('click', function (e) {
+        if (e.target.closest('.carousel-btn') || e.target.closest('.dot')) return;
+
+        const selection = window.getSelection();
+        const selecting = selection && selection.toString().length > 0;
+
+        if (openState) {
+          if (selecting && openState.expanded.contains(selection.anchorNode)) return;
+          closeCard();
+          return;
+        }
+
+        // A card in the featured row or the main grid
+        const card = e.target.closest('.card');
+        if (!card || !card.closest('.project-grid, .featured-track')) return;
+        if (selecting && card.contains(selection.anchorNode)) return;
+
+        openCard(card);
+      });
+
+      // Escape key closes an open card
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && openState) closeCard();
+      });
+
+      // If the window is resized while open, re-center the card
+      window.addEventListener('resize', () => {
+        if (!openState || busy) return;
+        setBox(openState.expanded, getTargetBox(openState.card.project, 0));
+      });
+
+
+      /* =========================================================
+         CAROUSEL
+         ---------------------------------------------------------
+         Each carousel remembers which photo it's on in its
+         data-index attribute. goToSlide() removes "active" from
+         the current photo/dot and adds it to the new one.
+
+         The "(index + length) % length" math makes it wrap around:
+         going "previous" from the first photo lands on the last,
+         and "next" from the last lands on the first.
+
+         Like the flip, this uses one document-wide click listener.
+         ========================================================= */
+
+      function goToSlide(carousel, index) {
+        const slides = carousel.querySelectorAll('.carousel-slide');
+        const dots = carousel.querySelectorAll('.dot');
+        const current = parseInt(carousel.getAttribute('data-index'), 10) || 0;
+
+        if (slides[current]) slides[current].classList.remove('active');
+        if (dots[current]) dots[current].classList.remove('active');
+
+        const next = (index + slides.length) % slides.length;
+
+        if (slides[next]) {
+          slides[next].classList.add('active');
+
+          // Swap the blurred background to match the new photo
+          const backdrop = carousel.querySelector('.carousel-backdrop');
+          if (backdrop) {
+            backdrop.style.backgroundImage =
+              `url('${slides[next].getAttribute('src').replace(/'/g, '%27')}')`;
+          }
+        }
+        if (dots[next]) dots[next].classList.add('active');
+
+        carousel.setAttribute('data-index', next);
+      }
+
+      document.addEventListener('click', function (e) {
+        const prevBtn = e.target.closest('.carousel-btn.prev');
+        const nextBtn = e.target.closest('.carousel-btn.next');
+        const dotBtn = e.target.closest('.dot');
+
+        if (prevBtn) {
+          const carousel = prevBtn.closest('.carousel-container');
+          const current = parseInt(carousel.getAttribute('data-index'), 10) || 0;
+          goToSlide(carousel, current - 1);
+        } else if (nextBtn) {
+          const carousel = nextBtn.closest('.carousel-container');
+          const current = parseInt(carousel.getAttribute('data-index'), 10) || 0;
+          goToSlide(carousel, current + 1);
+        } else if (dotBtn) {
+          const carousel = dotBtn.closest('.carousel-container');
+          const dots = Array.from(carousel.querySelectorAll('.dot'));
+          goToSlide(carousel, dots.indexOf(dotBtn));
+        }
+      });
+
+
+      /* =========================================================
+         EVENT WIRING
+         ---------------------------------------------------------
+         Connects the remaining buttons and inputs to the
+         functions above.
+         ========================================================= */
+
+      clearFiltersBtn.addEventListener('click', clearAllFilters);
+      noResultsClearBtn.addEventListener('click', clearAllFilters);
+
+      /*
+        Search "debounce": instead of filtering on every single
+        keystroke, wait until the user pauses typing for 150ms.
+        Each new keystroke cancels the previous timer and starts
+        a fresh one, so filtering only runs once typing settles.
+      */
+      searchInput.addEventListener('input', () => {
+        clearTimeout(searchDebounceTimer);
+        searchDebounceTimer = setTimeout(applyFilters, 150);
+      });
+
+      searchClearBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        searchInput.focus();
+        applyFilters();
+      });
+
+      sortSelect.addEventListener('change', () => {
+        currentSort = sortSelect.value;
+        renderAll();
+      });
+
+
+      /* =========================================================
+         LOAD GOOGLE SHEET
+         ---------------------------------------------------------
+         This is where everything kicks off. fetch() downloads the
+         sheet data in the background; each .then() runs once the
+         previous step finishes. If anything fails (no internet,
+         sheet not shared publicly, wrong ID), .catch() shows the
+         red error box instead.
+         ========================================================= */
+
+      if (!SHEET_ID) {
+        console.error('SHEET_URL does not look like a Google Sheets link:', SHEET_URL);
+      }
+
+      fetch(FULL_URL)
+        .then(res => res.text())
+        .then(text => {
+          /*
+            Google doesn't send plain JSON. It wraps it like this:
+              /*O_o*\/
+              google.visualization.Query.setResponse({ ...data... });
+            substr(47) chops off the first 47 characters (the wrapper
+            start) and slice(0, -2) chops off the ending ");",
+            leaving just the { ...data... } part to parse.
+          */
+          const json = JSON.parse(text.substr(47).slice(0, -2));
+
+          if (!json.table.rows || json.table.rows.length === 0) {
+            container.innerHTML =
+              '<div class="no-results" style="display:block;">No projects found in the spreadsheet.</div>';
+            return;
+          }
+
+          /*
+            json.table.rows is a list of rows. In each row, row.c is the
+            list of cells (c[0] = column A, c[1] = column B, ...) and
+            .v is the cell's value. Empty cells come back as null, which
+            is why the code uses "?." and "??" — they fall back to ''
+            instead of crashing.
+
+            Rows with no Project name return null and get dropped by
+            .filter(Boolean) at the end — that's how all the blank rows
+            under the data are ignored.
+
+            To add a new column later: add it to the object below
+            using cell(<column number>), counting A as 0.
+          */
+          // First pass over column C: learn which cells are whole category names
+          const standaloneCats = findStandaloneCategories(
+            json.table.rows.map(row => row.c[0]?.v ? row.c[2]?.v : '')
+          );
+
+          allProjects = json.table.rows
+            .map(row => {
+              const cell = i => (row.c[i]?.v ?? '').toString().trim();
+
+              const title = cell(0);
+              if (!title) return null;
+
+              const featuredVal = row.c[3]?.v;
+              const featured =
+                featuredVal === true || String(featuredVal).toUpperCase() === 'TRUE';
+
+              const project = {
+                title,
+                maker: cell(1),
+                categories: splitCategories(row.c[2]?.v, standaloneCats),
+                featured,
+                overview: cell(4),
+                scope: cell(5),
+                materials: cell(6),
+                fabrication: cell(7),
+                outcome: cell(8),
+                photoUrls: parseUrls(row.c[9]?.v),
+                pageUrl: cell(10),
+                slug: slugify(title)
+              };
+
+              project.score = contentScore(project);
+              return project;
+            })
+            .filter(Boolean);
+
+          /*
+            Collect each unique category once for the filter dropdown.
+            Keys are lowercase so "robotics" and "Robotics" count as the
+            same category; the value keeps the first spelling seen for
+            the checkbox label.
+          */
+          const displayCats = new Map();
+          allProjects.forEach(p => {
+            p.categories.forEach(c => {
+              if (!displayCats.has(c.toLowerCase())) displayCats.set(c.toLowerCase(), c);
+            });
+          });
+
+          renderCategoryOptions(displayCats.values());
+          renderFeatured(); // featured row at the top
+          renderAll();      // main grid
+        })
+        .catch(err => {
+          container.innerHTML =
+            '<div class="error-state">Unable to load project data. ' +
+            'Please make sure the Google Sheet is shared with &ldquo;Anyone with the link.&rdquo;</div>';
+          console.error(err);
+        });
+
+    })();
+  </script>
+
+</body>
+
+</html>

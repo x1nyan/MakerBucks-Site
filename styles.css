@@ -1,0 +1,14 @@
+/* Card Container Layout */
+.card-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 16px;
+  width: 100%;
+}
+
+/* Individual Card Styling */
+.card {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
