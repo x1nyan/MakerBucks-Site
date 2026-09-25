@@ -478,9 +478,15 @@
     if (!back || !content) return;
 
     const styles = getComputedStyle(back);
-    const availableHeight = back.clientHeight -
-      parseFloat(styles.paddingTop) - parseFloat(styles.paddingBottom);
-    const scale = Math.min(1, availableHeight / content.scrollHeight);
+    const paddingX = parseFloat(styles.paddingLeft) + parseFloat(styles.paddingRight);
+    const paddingY = parseFloat(styles.paddingTop) + parseFloat(styles.paddingBottom);
+    const availableWidth = Math.max(0, back.clientWidth - paddingX);
+    const availableHeight = Math.max(0, back.clientHeight - paddingY);
+
+    const targetScaleY = availableHeight > 0 ? availableHeight / content.scrollHeight : 1;
+    const targetScaleX = availableWidth > 0 ? availableWidth / Math.max(content.scrollWidth, 1) : 1;
+    const minScale = 0.8;
+    const scale = Math.min(1, Math.max(minScale, Math.min(targetScaleX, targetScaleY, 1)));
 
     content.style.transform = `scale(${scale})`;
     content.style.width = `${100 / scale}%`;

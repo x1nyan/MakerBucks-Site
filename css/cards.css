@@ -198,6 +198,8 @@ select:focus-visible {
 
 .back-content {
   transform-origin: top left;
+  max-width: 100%;
+  display: block;
 }
 
 .expanded-card .card-back > * {
@@ -327,7 +329,7 @@ select:focus-visible {
 .back-header { margin-bottom: 24px; }
 
 .back-title {
-  font-size: 26px;
+  font-size: 24px;
   font-weight: 700;
   color: var(--accent);
   margin: 0 0 4px;
@@ -335,7 +337,7 @@ select:focus-visible {
 
 .back-meta {
   color: var(--ink-soft);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   margin: 0 0 6px;
 }
@@ -373,7 +375,7 @@ select:focus-visible {
 .back-section { margin-bottom: 22px; }
 .back-section:last-child { margin-bottom: 0; }
 .back-section .section-label { margin-top: 0; }
-.card-back .section-text { font-size: 15px; line-height: 1.6; }
+.card-back .section-text { font-size: 14px; line-height: 1.55; }
 
 .back-empty {
   color: var(--ink-faint);
