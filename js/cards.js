@@ -477,9 +477,13 @@
     const content = back && back.querySelector('.back-content');
     if (!back || !content) return;
 
-    // Keep the back text at its designed size; long details scroll inside the face.
-    content.style.transform = 'none';
-    content.style.width = '100%';
+    const styles = getComputedStyle(back);
+    const availableHeight = back.clientHeight -
+      parseFloat(styles.paddingTop) - parseFloat(styles.paddingBottom);
+    const scale = Math.min(1, availableHeight / content.scrollHeight);
+
+    content.style.transform = `scale(${scale})`;
+    content.style.width = `${100 / scale}%`;
   }
 
   /*
@@ -638,7 +642,9 @@
   // If the window is resized while open, re-center the card
   window.addEventListener('resize', () => {
     if (!openState || busy) return;
-    setBox(openState.expanded, getTargetBox(openState.card.project, 0));
+    const target = getTargetBox(openState.card.project, 0);
+    setBox(openState.expanded, target);
+    fitBackContent(openState.expanded);
   });
 
 

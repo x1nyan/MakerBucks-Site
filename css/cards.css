@@ -193,12 +193,11 @@ select:focus-visible {
   background: #fff;
   border-color: var(--accent-light);
   padding: 32px;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 .back-content {
-  width: 100%;
+  transform-origin: top left;
 }
 
 .expanded-card .card-back > * {
