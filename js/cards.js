@@ -347,19 +347,21 @@
   function buildBackHTML(project) {
     return `
       <div class="card-face card-back">
-        <div class="back-header">
-          <div class="back-title">${escapeHtml(project.title)}</div>
-          ${project.maker ? `<p class="back-meta">By: ${escapeHtml(project.maker)}</p>` : ''}
-          <p class="back-hint">Click anywhere to close</p>
-        </div>
-
-        <div class="back-columns">
-          <div>
-            ${backSection('Materials', project.materials, 'No materials listed.')}
-            ${backSection('Outcome', project.outcome, '')}
+        <div class="back-content">
+          <div class="back-header">
+            <div class="back-title">${escapeHtml(project.title)}</div>
+            ${project.maker ? `<p class="back-meta">By: ${escapeHtml(project.maker)}</p>` : ''}
+            <p class="back-hint">Click anywhere to close</p>
           </div>
-          <div>
-            ${backSection('Fabrication Steps', project.fabrication, 'No fabrication steps listed.')}
+
+          <div class="back-columns">
+            <div>
+              ${backSection('Materials', project.materials, 'No materials listed.')}
+              ${backSection('Outcome', project.outcome, '')}
+            </div>
+            <div>
+              ${backSection('Fabrication Steps', project.fabrication, 'No fabrication steps listed.')}
+            </div>
           </div>
         </div>
       </div>`;
@@ -469,6 +471,20 @@
     el.style.height = box.height + 'px';
   }
 
+  function fitBackContent(expanded, targetHeight) {
+    const back = expanded.querySelector('.card-back');
+    const content = back && back.querySelector('.back-content');
+    if (!back || !content) return;
+
+    const styles = getComputedStyle(back);
+    const availableHeight = targetHeight -
+      parseFloat(styles.paddingTop) - parseFloat(styles.paddingBottom);
+    const scale = Math.min(1, availableHeight / content.scrollHeight);
+
+    content.style.transform = `scale(${scale})`;
+    content.style.width = `${100 / scale}%`;
+  }
+
   /*
     Stop the page behind from scrolling while a card is open.
     Hiding the scrollbar would make the page jump sideways, so
@@ -521,6 +537,7 @@
 
     overlay.classList.add('show');
     setBox(expanded, target);
+    fitBackContent(expanded, target.height);
     expanded.classList.remove('settled');
     expanded.classList.add('flipped');
 

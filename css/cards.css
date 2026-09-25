@@ -193,8 +193,11 @@ select:focus-visible {
   background: #fff;
   border-color: var(--accent-light);
   padding: 32px;
-  overflow-y: auto; /* only a fallback for very long projects on small screens */
-  overscroll-behavior: contain;
+  overflow: hidden;
+}
+
+.back-content {
+  transform-origin: top left;
 }
 
 .expanded-card .card-back > * {
@@ -207,11 +210,6 @@ select:focus-visible {
   opacity: 1;
   visibility: visible;
 }
-
-.card-back { scrollbar-width: thin; scrollbar-color: var(--accent-light) transparent; }
-.card-back::-webkit-scrollbar { width: 6px; }
-.card-back::-webkit-scrollbar-thumb { background: var(--accent-light); border-radius: 3px; }
-
 
 /* =========================================================
  CARD TEXT
