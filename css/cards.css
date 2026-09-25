@@ -24,7 +24,7 @@
   --panel: #ffffff;
   --page-bg: #eceeec;
   --radius: 12px;
-  --card-pad: 24px; /* inner spacing of each card face */
+  --card-pad: 28px; /* inner spacing of each card face */
 }
 
 * { box-sizing: border-box; }
@@ -213,7 +213,7 @@ select:focus-visible {
  ========================================================= */
 
 .card-title {
-  font-size: 21px;
+  font-size: 28px;
   font-weight: 700;
   color: var(--ink);
   margin: 0 0 12px 0;
@@ -243,7 +243,7 @@ select:focus-visible {
   display: block;
   margin-top: 5px;
   color: var(--ink-faint);
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
 }
 
@@ -269,7 +269,7 @@ select:focus-visible {
   text-overflow: ellipsis;
   background: #f6dfd2;
   color: #9b431f;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 600;
   padding: 4px 9px;
   border-radius: 4px;
@@ -279,19 +279,19 @@ select:focus-visible {
 
 .maker-tag {
   color: #666;
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 600;
 }
 
 .card-desc {
   color: #444;
-  font-size: 15px;
+  font-size: 18px;
   line-height: 1.6;
   margin: 0 0 14px;
 }
 
 .section-label {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--accent);
   text-transform: uppercase;
@@ -301,9 +301,14 @@ select:focus-visible {
 
 .section-text {
   color: #555;
-  font-size: 14px;
+  font-size: 17px;
   line-height: 1.6;
   white-space: pre-line; /* keeps the line breaks from the sheet */
+}
+
+.scope-text {
+  font-size: 19px;
+  line-height: 1.55;
 }
 
 

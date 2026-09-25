@@ -4,14 +4,14 @@
    Used by both featured.js and showcase.js. Load it AFTER config.js.
 
    What's in here:
-     - helpers that clean up sheet data (categories, photo links, ...)
+      - helpers that clean up CSV data (categories, photo links, ...)
      - building a card's HTML (front + back)
      - the enlarged flip view (click a card -> it flips and grows)
      - the photo carousel arrows/dots
-     - loading and parsing the Google Sheet
+    - loading and parsing the local CSV
 
    It adds these to window.MB for the page scripts to use:
-     MB.loadProjects()   download + parse the sheet (returns a Promise)
+    MB.loadProjects()   download + parse the CSV (returns a Promise)
      MB.makeCardEl(p)    build a card element for one project
      MB.LOAD_ERROR_HTML  the red "couldn't load" message
    Everything else stays private inside this file.
@@ -20,7 +20,7 @@
 (function () {
   'use strict';
 
-  const { FULL_URL, SHEET_ID, MULTI_WORD_CATEGORIES } = MB.config;
+  const { CSV_URL, PHOTO_ROOT, MULTI_WORD_CATEGORIES } = MB.config;
 
 
   /* =========================================================
@@ -42,17 +42,23 @@
   }
 
   /*
-    parseUrls: reads the Photos cell. You can put several image
-    links in one cell, separated by commas or new lines, and each
-    becomes a slide in the carousel. Anything that isn't a web
-    link (http/https) is ignored.
+    parseUrls: reads the Photos cell. You can put several URLs or
+    local filenames in one cell, separated by commas or new lines.
+    Local filenames resolve inside the project's photo folder.
   */
-  function parseUrls(cellValue) {
+  function parseUrls(cellValue, projectSlug) {
     if (!cellValue) return [];
     return String(cellValue)
       .split(/[\n,]+/)
-      .map(s => s.trim())
-      .filter(s => s.startsWith('http://') || s.startsWith('https://'));
+      .map(value => value.trim())
+      .filter(Boolean)
+      .map(value => {
+        if (value.startsWith('http://') || value.startsWith('https://')) return value;
+        const filename = value.replace(/^[/\\]+/, '');
+        return `${PHOTO_ROOT}/${projectSlug}/${filename}`
+          .split(' ')
+          .join('%20');
+      });
   }
 
   /*
@@ -137,9 +143,8 @@
   }
 
   /*
-    slugify: "ABV Meter" -> "abv-meter". Not used on screen yet;
-    it's stored on each project so you can later give each one
-    a link/anchor (e.g. showcase.html#abv-meter).
+    slugify: "ABV Meter" -> "abv-meter". The slug names each
+    project's local photo folder.
   */
   function slugify(str) {
     return String(str)
@@ -272,7 +277,7 @@
 
     const frontScope = project.scope
       ? `<div class="section-label">Scope</div>
-         <div class="section-text">${escapeHtml(project.scope)}</div>`
+        <div class="section-text scope-text">${escapeHtml(project.scope)}</div>`
       : '';
 
     return `
@@ -634,18 +639,18 @@
   });
 
 
-  /* =========================================================
-     LOAD PROJECTS FROM THE SHEET
+    /* =========================================================
+      LOAD PROJECTS FROM THE CSV
      ---------------------------------------------------------
      MB.loadProjects() downloads the sheet and turns every row
-     into a project object. featured.js and showcase.js each call
+    into project objects. featured.js and showcase.js each call
      it and decide what to show.
 
      It returns a "Promise": the page writes
        MB.loadProjects().then(projects => { ... })
      and the code inside .then() runs once the data arrives.
-     If anything fails (no internet, sheet not shared publicly,
-     bad link), the page's .catch() runs instead.
+    If the CSV cannot be fetched or parsed, the page's .catch()
+    runs instead.
      ========================================================= */
 
   /*
@@ -660,67 +665,82 @@
     return loadPromise;
   }
 
-  function fetchProjects() {
-    if (!SHEET_ID) {
-      console.error('SHEET_URL does not look like a Google Sheets link:', MB.config.SHEET_URL);
+  function parseCsv(text) {
+    const rows = [];
+    let row = [];
+    let field = '';
+    let inQuotes = false;
+
+    for (let index = 0; index < text.length; index++) {
+      const character = text[index];
+
+      if (inQuotes) {
+        if (character === '"' && text[index + 1] === '"') {
+          field += '"';
+          index++;
+        } else if (character === '"') {
+          inQuotes = false;
+        } else {
+          field += character;
+        }
+      } else if (character === '"') {
+        inQuotes = true;
+      } else if (character === ',') {
+        row.push(field);
+        field = '';
+      } else if (character === '\n') {
+        row.push(field.replace(/\r$/, ''));
+        rows.push(row);
+        row = [];
+        field = '';
+      } else {
+        field += character;
+      }
     }
 
-    return fetch(FULL_URL)
-      .then(res => res.text())
+    if (field || row.length) {
+      row.push(field.replace(/\r$/, ''));
+      rows.push(row);
+    }
+
+    return rows;
+  }
+
+  function fetchProjects() {
+    return fetch(CSV_URL)
+      .then(res => {
+        if (!res.ok) throw new Error(`Could not load ${CSV_URL}`);
+        return res.text();
+      })
       .then(text => {
-        /*
-          Google doesn't send plain JSON. It wraps it like this:
-            /*O_o*\/
-            google.visualization.Query.setResponse({ ...data... });
-          substr(47) chops off the first 47 characters (the wrapper
-          start) and slice(0, -2) chops off the ending ");",
-          leaving just the { ...data... } part to parse.
-        */
-        const json = JSON.parse(text.substr(47).slice(0, -2));
-        const rows = json.table.rows || [];
-
-        /*
-          In each row, row.c is the list of cells (c[0] = column A,
-          c[1] = column B, ...) and .v is the cell's value. Empty
-          cells come back as null, which is why the code uses "?."
-          and "??" — they fall back to '' instead of crashing.
-
-          Rows with no Project name return null and get dropped by
-          .filter(Boolean) — that's how blank rows are ignored.
-
-          To add a new column later: add it to the object below
-          using cell(<column number>), counting A as 0.
-        */
-
-        // First pass over column C: learn which cells are whole category names
+        const rows = parseCsv(text.replace(/^\uFEFF/, ''));
+        const headers = rows.shift().map(header => header.trim().toLowerCase());
+        const column = name => headers.indexOf(name.toLowerCase());
+        const records = rows.map(row => name => row[column(name)] || '');
         const standaloneCats = findStandaloneCategories(
-          rows.map(row => row.c[0]?.v ? row.c[2]?.v : '')
+          records.map(get => get('project') ? get('category') : '')
         );
 
-        return rows
-          .map(row => {
-            const cell = i => (row.c[i]?.v ?? '').toString().trim();
-
-            const title = cell(0);
+        return records
+          .map(get => {
+            const title = get('project').trim();
             if (!title) return null;
 
-            const featuredVal = row.c[3]?.v;
-            const featured =
-              featuredVal === true || String(featuredVal).toUpperCase() === 'TRUE';
-
+            const slug = slugify(title);
+            const featuredValue = get('featured');
             const project = {
               title,
-              maker: cell(1),
-              categories: splitCategories(row.c[2]?.v, standaloneCats),
-              featured,
-              overview: cell(4),
-              scope: cell(5),
-              materials: cell(6),
-              fabrication: cell(7),
-              outcome: cell(8),
-              photoUrls: parseUrls(row.c[9]?.v),
-              pageUrl: cell(10),
-              slug: slugify(title)
+              maker: get('maker(s)'),
+              categories: splitCategories(get('category'), standaloneCats),
+              featured: String(featuredValue).toUpperCase() === 'TRUE',
+              overview: get('overview'),
+              scope: get('scope'),
+              materials: get('materials'),
+              fabrication: get('fabrication steps'),
+              outcome: get('outcome'),
+              photoUrls: parseUrls(get('photos'), slug),
+              pageUrl: get('url'),
+              slug
             };
 
             project.score = contentScore(project);
@@ -735,7 +755,7 @@
   */
   const LOAD_ERROR_HTML =
     '<div class="error-state">Unable to load project data. ' +
-    'Please make sure the Google Sheet is shared with &ldquo;Anyone with the link.&rdquo;</div>';
+    'Please make sure the local CSV file is available next to index.html.</div>';
 
 
 

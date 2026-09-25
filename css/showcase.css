@@ -212,9 +212,9 @@
 
 
 /* =========================================================
- GRID — 4 CARDS PER ROW
+ GRID — 3 CARDS PER ROW
  ---------------------------------------------------------
- "repeat(4, minmax(0, 1fr))" = 4 equal columns. The
+ "repeat(3, minmax(0, 1fr))" = 3 equal columns. The
  minmax(0, ...) stops long words from stretching a column.
  Grid rows automatically make every card in the same row
  as tall as the tallest one, so rows line up neatly.
@@ -224,7 +224,7 @@
 
 .project-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 34px;
   margin-left: 28px;
   margin-right: 28px;
@@ -312,8 +312,8 @@
   .project-grid .loading,
   .project-grid .error-state { flex: 1 0 100%; }
 
-  :root { --card-pad: 16px; }
-  .card-title { font-size: 19px; }
+  :root { --card-pad: 20px; }
+  .card-title { font-size: 24px; }
   .controls { padding: 14px 16px; }
   .results-summary { margin-left: 16px; margin-right: 16px; }
 }
