@@ -34,6 +34,11 @@ folder path. Upload the image files to that exact repository folder, using a
 filename that starts with `cover` for the main image. Rows missing required
 content or a readable cover image are skipped automatically.
 
+After adding or removing images, run `update-photo-manifest.ps1` from the
+repository root and commit the updated `photo-manifest.json`. GitHub Pages
+cannot list folder contents by itself, so the manifest lets the carousel find
+every image.
+
 ## Title banner
 Set the title and background photos in `BANNER` at the bottom of `js/config.js`.
 The header logo is configured in `HEADER_LOGO`. Images can be paths in this repo
