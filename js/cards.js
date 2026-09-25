@@ -368,7 +368,7 @@
     buildBackHTML: the details side, only built when a card is
     opened in the enlarged view.
       header: title, maker, "click to close" hint
-      left column:  Materials, Outcome
+      left column:  Overview, Scope, Materials, Outcome
       right column: Fabrication Steps
   */
   function buildBackHTML(project) {
@@ -384,6 +384,8 @@
 
           <div class="back-columns">
             <div>
+              ${backSection('Overview', project.overview, '')}
+              ${backSection('Scope', project.scope, '')}
               ${backSection('Materials', project.materials, 'No materials listed.')}
               ${backSection('Outcome', project.outcome, '')}
             </div>

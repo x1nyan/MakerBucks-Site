@@ -319,6 +319,21 @@ select:focus-visible {
   line-height: 1.55;
 }
 
+@media (min-width: 1001px) {
+  .project-grid .carousel-container,
+  .project-grid .no-photo { aspect-ratio: 5 / 4; }
+
+  .project-grid .card-front > .section-label,
+  .project-grid .card-front .scope-text { display: none; }
+
+  .project-grid .card-front .card-desc {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+  }
+}
+
 
 /* =========================================================
  BACK OF CARD (enlarged view)
