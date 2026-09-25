@@ -461,9 +461,9 @@
   function getTargetBox(project, startHeight) {
     const vw = window.innerWidth;
     const vh = window.innerHeight;
-    const margin = vw <= 700 ? 12 : 32;
+    const margin = vw <= 700 ? 12 : 24;
 
-    const width = Math.min(900, vw - margin * 2);
+    const width = Math.min(1100, vw - margin * 2);
 
     const measure = document.createElement('div');
     measure.innerHTML = buildBackHTML(project);
@@ -588,14 +588,14 @@
 
     overlay.classList.add('show');
     setBox(expanded, target);
-    fitBackContent(expanded);
     expanded.classList.remove('settled');
     expanded.classList.add('flipped');
 
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const revealDelay = prefersReducedMotion ? 0 : 260;
+    const revealDelay = prefersReducedMotion ? 0 : 320;
 
     window.setTimeout(() => {
+      fitBackContent(expanded);
       expanded.classList.add('settled');
       expanded.querySelector('.back-close')?.focus({ preventScroll: true });
     }, revealDelay);

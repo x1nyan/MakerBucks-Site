@@ -40,13 +40,14 @@
   Project photos live in the folder named by each row's Image Folder Path.
   =====================================================================
 -->
-<html lang="en">
+<html lang="en" data-theme="light">
 
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>WPI MakerBucks Showroom</title>
 
+  <script src="js/theme.js"></script>
   <link rel="stylesheet" href="css/cards.css">
   <link rel="stylesheet" href="css/showcase.css">
   <link rel="stylesheet" href="css/featured.css">
@@ -61,7 +62,6 @@
      ========================================================= -->
 
   <div class="site-header">
-    <img class="site-logo" id="siteLogo" alt="" hidden>
     <nav class="header-links" aria-label="MakerBucks links">
       <a class="header-link" href="https://www.wpi.edu/about/ie/%20innovation-studio/makerspace/makerbucks"
         target="_blank" rel="noopener noreferrer">WPI Site</a>
@@ -70,6 +70,13 @@
       <a class="header-link" id="projectSubmissionLink" target="_blank"
         rel="noopener noreferrer" hidden>Submit a project</a>
     </nav>
+    <img class="site-logo" id="siteLogo" alt="" hidden>
+    <button class="theme-toggle" id="themeToggle" type="button" role="switch"
+      aria-label="Dark theme" aria-checked="false" title="Switch to dark theme">
+      <span class="theme-toggle-icon" aria-hidden="true">&#9728;</span>
+      <span class="theme-toggle-thumb" aria-hidden="true"></span>
+      <span class="theme-toggle-icon" aria-hidden="true">&#9790;</span>
+    </button>
   </div>
 
   <header class="banner">

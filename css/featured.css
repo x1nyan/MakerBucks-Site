@@ -66,7 +66,7 @@
   height: 34px;
   border-radius: 50%;
   border: 1px solid var(--accent-light);
-  background: #fff;
+  background: var(--panel);
   color: var(--accent);
   font-size: 16px;
   font-weight: 700;
@@ -79,7 +79,7 @@
 .scroll-btn:hover:not(:disabled) {
   background: var(--accent);
   border-color: var(--accent);
-  color: #fff;
+  color: var(--accent-contrast);
 }
 
 .scroll-btn:disabled {
@@ -113,7 +113,7 @@
   flex: 1 0 100%;
   padding: 40px 10px;
   text-align: center;
-  color: #666;
+  color: var(--ink-soft);
   font-size: 15px;
 }
 

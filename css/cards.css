@@ -14,17 +14,71 @@
   --accent is the burnt orange used for buttons, labels, and highlights.
 */
 :root {
+  color-scheme: light;
   --accent: #c05a2b;
   --accent-light: #e4ae94;
   --accent-bg: #fff5ef;
+  --accent-contrast: #ffffff;
   --ink: #2e3032;
   --ink-soft: #5f6366;
   --ink-faint: #7a7f82;
   --line: #d4d6d3;
   --panel: #ffffff;
   --page-bg: #e7eae8;
+  --surface-muted: #f5f6f4;
+  --control-bg: #f1f3f1;
+  --control-border: #c6cac7;
+  --surface-hover: #cfd3d0;
+  --header-bg: #dfe2df;
+  --header-border: #c5c9c6;
+  --tag-bg: #f6dfd2;
+  --tag-ink: #9b431f;
+  --body-copy: #444444;
+  --photo-bg: #e9e9e6;
+  --stripe-a: #f0f0f0;
+  --stripe-b: #e9e9e9;
+  --empty-bg: #f9f9f9;
+  --error-bg: #fff5ef;
+  --error-border: #e4ae94;
+  --error-ink: #843b20;
+  --page-background:
+    radial-gradient(ellipse at 50% -12%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.5) 28%, rgba(255, 255, 255, 0) 58%),
+    linear-gradient(180deg, #f1f3f2 0%, var(--page-bg) 48%, #dde1df 100%);
   --radius: 12px;
   --card-pad: 22px; /* inner spacing of each card face */
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --accent: #f08a58;
+  --accent-light: #96664e;
+  --accent-bg: #35271f;
+  --accent-contrast: #1b211d;
+  --ink: #edf2ee;
+  --ink-soft: #c2ccc5;
+  --ink-faint: #9ba79f;
+  --line: #46514a;
+  --panel: #252e29;
+  --page-bg: #1a211d;
+  --surface-muted: #202824;
+  --control-bg: #29322d;
+  --control-border: #566259;
+  --surface-hover: #39443d;
+  --header-bg: #202824;
+  --header-border: #46514a;
+  --tag-bg: #49352b;
+  --tag-ink: #f2b28b;
+  --body-copy: #d9e0db;
+  --photo-bg: #151a17;
+  --stripe-a: #252d28;
+  --stripe-b: #303a33;
+  --empty-bg: #222a25;
+  --error-bg: #382722;
+  --error-border: #83533c;
+  --error-ink: #f0b48f;
+  --page-background:
+    radial-gradient(ellipse at 50% -12%, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 28%, rgba(255, 255, 255, 0) 58%),
+    linear-gradient(180deg, #252d29 0%, var(--page-bg) 48%, #151b17 100%);
 }
 
 * {
@@ -33,9 +87,7 @@
 
 html, body {
   margin: 0;
-  background:
-    radial-gradient(ellipse at 50% -12%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.5) 28%, rgba(255, 255, 255, 0) 58%),
-    linear-gradient(180deg, #f1f3f2 0%, var(--page-bg) 48%, #dde1df 100%);
+  background: var(--page-background);
   background-attachment: fixed;
   color: var(--ink);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -191,7 +243,7 @@ select:focus-visible {
 
 .card-back {
   transform: rotateY(180deg);
-  background: #fff;
+  background: var(--panel);
   border-color: var(--accent-light);
   padding: 32px;
   overflow: hidden;
@@ -275,8 +327,8 @@ select:focus-visible {
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
-  background: #f6dfd2;
-  color: #9b431f;
+  background: var(--tag-bg);
+  color: var(--tag-ink);
   font-size: 11px;
   font-weight: 600;
   padding: 4px 9px;
@@ -286,13 +338,13 @@ select:focus-visible {
 }
 
 .maker-tag {
-  color: #666;
+  color: var(--ink-soft);
   font-size: 13px;
   font-weight: 600;
 }
 
 .card-desc {
-  color: #444;
+  color: var(--body-copy);
   font-size: 15px;
   line-height: 1.6;
   margin: 0 0 14px;
@@ -308,7 +360,7 @@ select:focus-visible {
 }
 
 .section-text {
-  color: #555;
+  color: var(--ink-soft);
   font-size: 14px;
   line-height: 1.6;
   white-space: pre-line; /* keeps the line breaks from the sheet */
@@ -381,7 +433,7 @@ select:focus-visible {
 
 .back-close:hover {
   background: var(--accent);
-  color: #fff;
+  color: var(--accent-contrast);
 }
 
 .back-columns {
@@ -443,7 +495,7 @@ select:focus-visible {
 .carousel-container {
   position: relative;
   overflow: hidden;
-  background: #e9e9e6;
+  background: var(--photo-bg);
 }
 
 /* Blurred copy of the photo that fills the frame behind it */
@@ -522,11 +574,11 @@ select:focus-visible {
  ========================================================= */
 
 .no-photo {
-  background: repeating-linear-gradient(45deg, #f0f0f0, #f0f0f0 10px, #e9e9e9 10px, #e9e9e9 20px);
+  background: repeating-linear-gradient(45deg, var(--stripe-a), var(--stripe-a) 10px, var(--stripe-b) 10px, var(--stripe-b) 20px);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #999;
+  color: var(--ink-faint);
   font-size: 13px;
   font-weight: 600;
   text-align: center;
@@ -542,7 +594,7 @@ select:focus-visible {
 .no-results {
   grid-column: 1 / -1;
   font-size: 15px;
-  color: #666;
+  color: var(--ink-soft);
   padding: 40px 10px;
   text-align: center;
 }
@@ -555,8 +607,8 @@ select:focus-visible {
 }
 
 .no-results {
-  background: #f9f9f9;
-  border: 1px dashed #ccc;
+  background: var(--empty-bg);
+  border: 1px dashed var(--line);
   border-radius: 8px;
   display: none;
   width: 100%;
@@ -566,9 +618,9 @@ select:focus-visible {
 
 .error-state {
   grid-column: 1 / -1;
-  background: #fff5ef;
-  border: 1px solid #e4ae94;
-  color: #843b20;
+  background: var(--error-bg);
+  border: 1px solid var(--error-border);
+  color: var(--error-ink);
   border-radius: 8px;
   padding: 16px;
 }
