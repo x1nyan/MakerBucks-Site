@@ -33,6 +33,9 @@
   const intervalMs = Number(BANNER.intervalMs) || 5000;
   const fadeMs = Number(BANNER.fadeMs) || 2200;
 
+  photo.style.transition = `opacity ${fadeMs}ms ease-in-out`;
+  photoNext.style.transition = `opacity ${fadeMs}ms ease-in-out`;
+
   let currentIndex = 0;
   let timerId = null;
   let activePhoto = photo;
@@ -70,8 +73,6 @@
     nextImage.onload = () => {
       nextPhoto.src = nextSrc;
       nextPhoto.hidden = false;
-      nextPhoto.style.transition = `opacity ${fadeMs}ms ease-in-out`;
-      activePhoto.style.transition = `opacity ${fadeMs}ms ease-in-out`;
 
       nextPhoto.style.opacity = '1';
       activePhoto.style.opacity = '0';

@@ -117,8 +117,8 @@ window.MB = window.MB || {};
       'images/baner3.JPG', 
       'images/baner4.JPG',
     ],
-    intervalMs: 2000,
-    fadeMs: 1000
+    intervalMs: 7000,
+    fadeMs: 3500
   };
 
   const HEADER_LOGO = {

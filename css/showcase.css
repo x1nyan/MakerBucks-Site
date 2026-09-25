@@ -329,7 +329,7 @@
   height: 100%;
   object-fit: cover;
   opacity: 1;
-  transition: opacity 1.6s ease-in-out;
+  transition: opacity 3.5s ease-in-out;
   z-index: 0;
   will-change: opacity;
 }
