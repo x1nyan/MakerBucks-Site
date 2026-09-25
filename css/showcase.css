@@ -261,21 +261,10 @@
 
 
 /* =========================================================
- PHONE — SIDE-SCROLLING CARDS
+ PHONE — VERTICAL CARD LIST
  ---------------------------------------------------------
- On narrow screens the grid turns into one horizontal row
- you swipe through, one card at a time:
-
-   display: flex + overflow-x: auto   -> a sideways row
-   scroll-snap-type: x mandatory      -> each swipe lands
-                                         neatly on a card
-   flex: 0 0 86%                      -> each card is 86% of
-                                         the screen, so the
-                                         next one peeks in
-                                         from the edge
-   align-items: flex-start            -> each card keeps its
-                                         own height instead of
-                                         matching the tallest
+ On narrow screens the project cards stack in one column and
+ use the page's normal vertical scrolling.
  ========================================================= */
 
 @media (max-width: 700px) {
@@ -286,29 +275,18 @@
   .filter-toggle { width: 100%; justify-content: space-between; }
   .filter-panel { left: 0; right: 0; width: auto; }
 
-  .swipe-hint { display: block; }
+  .swipe-hint { display: none; }
 
   .project-grid {
-    display: flex;
-    align-items: flex-start;
-    gap: 14px;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    padding: 10px 10px 10px;
-    margin: 0;                 /* the page is already edge to edge */
-    padding-left: 20px;
-    padding-right: 20px;
-    scroll-padding-left: 12px;
-  }
-
-  .project-grid .card {
-    flex: 0 0 80%;
-    scroll-snap-align: start;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+    padding: 10px 16px;
+    margin: 0;
   }
 
   .project-grid .loading,
-  .project-grid .error-state { flex: 1 0 100%; }
+  .project-grid .error-state { grid-column: 1 / -1; }
 
   :root { --card-pad: 16px; }
   .card-title { font-size: 20px; }
@@ -361,6 +339,8 @@
   text-decoration: none;
   white-space: nowrap;
 }
+
+.header-link[hidden] { display: none; }
 
 .header-link:hover {
   background: #cfd3d0;
@@ -439,6 +419,8 @@
 
   .site-header {
     min-height: 76px;
+    width: 100%;
+    margin-left: 0;
     padding: 8px 10px;
   }
 
@@ -452,6 +434,8 @@
 
   .banner {
     min-height: 220px;
+    width: 100%;
+    margin-left: 0;
     padding: 28px 16px;
   }
 

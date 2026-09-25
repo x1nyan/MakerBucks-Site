@@ -173,6 +173,7 @@ select:focus-visible {
 }
 
 .expanded-card.flipped .card-inner { transform: rotateY(180deg); }
+.expanded-card.flipped .card-front { pointer-events: none; }
 
 .expanded-card .card-face {
   position: absolute;

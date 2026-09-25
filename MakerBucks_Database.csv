@@ -35,7 +35,7 @@ ABV Meter,Leo Shraybman,"Electronics & Hardware, Science & Sensors",FALSE,"Porta
  9. Assemble all components into the housing, paying close attention to wire routing and internal space (wires take up more room than expected).
  10. Wire the assembly to a portable USB power bank for standalone, battery-powered operation.
  11. Build a calibration graph relating measured capacitance to known ABV values, and implement that calibration curve in the Arduino's C++ code.","Delivered a working portable ABV measurement device, with future plans to consolidate electronics onto a custom PCB for a more compact design.",images/Project 2026/ABV Meter,,
-Battlebots for Competition,"Kekoto Maane, Azura Simsek & Klejvi Gjoni",Robotics,Fasle,"Competition combat robot developed with WPI MakerBucks support for entry into the National Havoc Robot League (NHRL), built as part of an MQP.","Iterative design brainstorming, parts sourcing, in-house part fabrication, robot assembly, and pre-competition testing.","• UHMW (ultra-high-molecular-weight polyethylene) structural material
+Battlebots for Competition,"Kekoto Maane, Azura Simsek & Klejvi Gjoni",Robotics,FALSE,"Competition combat robot developed with WPI MakerBucks support for entry into the National Havoc Robot League (NHRL), built as part of an MQP.","Iterative design brainstorming, parts sourcing, in-house part fabrication, robot assembly, and pre-competition testing.","• UHMW (ultra-high-molecular-weight polyethylene) structural material
  • AR500 steel (armor/structural plate)
  • Bolts and lock-nuts
  • Batteries

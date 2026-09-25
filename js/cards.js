@@ -62,31 +62,56 @@
   }
 
   async function listFolderImagePaths(folderPath) {
-    const folder = normalizePath(folderPath).replace(/^\.\//, '').replace(/\/+$/, '');
-    if (!folder) return [];
+    const value = normalizePath(folderPath).replace(/^\.\//, '').replace(/\/+$/, '');
+    if (!value) return [];
+
+    if (IMAGE_EXTENSIONS.test(value)) {
+      return [value];
+    }
 
     try {
-      const response = await fetch(`${folder}/`);
-      if (!response.ok) return [];
+      const response = await fetch(`${value}/`);
+      if (response.ok) {
+        const html = await response.text();
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        const paths = [...doc.querySelectorAll('a[href]')]
+          .map(link => link.getAttribute('href'))
+          .filter(Boolean)
+          .filter(href => IMAGE_EXTENSIONS.test(href))
+          .map(href => `${value}/${decodeURIComponent(href).split('/').pop()}`);
 
-      const html = await response.text();
-      const doc = new DOMParser().parseFromString(html, 'text/html');
-      const paths = [...doc.querySelectorAll('a[href]')]
-        .map(link => link.getAttribute('href'))
-        .filter(Boolean)
-        .filter(href => IMAGE_EXTENSIONS.test(href))
-        .map(href => `${folder}/${decodeURIComponent(href).split('/').pop()}`);
-
-      if (paths.length) return sortPhotoPaths(paths);
+        if (paths.length) return sortPhotoPaths(paths);
+      }
     } catch (error) {
       // A static server may not expose directory listings; we keep the rest of the code working.
     }
 
+    const coverExtensions = [
+      'jpg', 'JPG', 'png', 'PNG', 'jpeg', 'JPEG',
+      'jfif', 'JFIF', 'webp', 'WEBP', 'avif', 'AVIF',
+      'gif', 'GIF', 'bmp', 'BMP', 'svg', 'SVG'
+    ];
+    for (const extension of coverExtensions) {
+      const coverPath = `${value}/Cover.${extension}`;
+      try {
+        const response = await fetch(coverPath, { method: 'HEAD' });
+        if (response.ok) return [coverPath];
+      } catch (error) {
+        // Continue trying supported cover image extensions.
+      }
+    }
     return [];
   }
 
   async function parsePhotoFolder(folderPath) {
-    return listFolderImagePaths(folderPath);
+    const value = normalizePath(folderPath);
+    if (!value) return [];
+
+    if (IMAGE_EXTENSIONS.test(value)) {
+      return [value];
+    }
+
+    return listFolderImagePaths(value);
   }
 
   const REQUIRED_PROJECT_FIELDS = [
