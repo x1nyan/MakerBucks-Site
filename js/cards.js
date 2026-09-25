@@ -20,7 +20,7 @@
 (function () {
   'use strict';
 
-  const { CSV_URL, PHOTO_MANIFEST_URL, MULTI_WORD_CATEGORIES } = MB.config;
+  const { CSV_URL, MULTI_WORD_CATEGORIES } = MB.config;
 
 
   /* =========================================================
@@ -43,8 +43,11 @@
 
   const IMAGE_EXTENSIONS = /\.(png|jpe?g|gif|webp|avif|jfif|bmp|svg)(\?.*)?$/i;
 
-  /* Photo folders are mapped in a committed manifest because GitHub Pages
-     does not expose directory listings. */
+  /*
+    Photo folders are relative to index.html. The static server exposes
+    each folder as a small directory listing, so the carousel can use
+    every image without storing remote URLs in the CSV.
+  */
   function normalizePath(value) {
     return String(value || '').trim().replace(/\\/g, '/');
   }
@@ -58,34 +61,25 @@
     });
   }
 
-  let photoManifestPromise = null;
-
-  function loadPhotoManifest() {
-    if (!photoManifestPromise) {
-      photoManifestPromise = fetch(PHOTO_MANIFEST_URL)
-        .then(response => {
-          if (!response.ok) throw new Error(`Could not load ${PHOTO_MANIFEST_URL}`);
-          return response.json();
-        });
-    }
-    return photoManifestPromise;
-  }
-
-  function encodePath(path) {
-    return path.split('/').map(segment => encodeURIComponent(segment)).join('/');
-  }
-
   async function listFolderImagePaths(folderPath) {
     const folder = normalizePath(folderPath).replace(/^\.\//, '').replace(/\/+$/, '');
     if (!folder) return [];
 
     try {
-      const filenames = (await loadPhotoManifest())[folder] || [];
-      return sortPhotoPaths(filenames
-        .filter(filename => IMAGE_EXTENSIONS.test(filename))
-        .map(filename => encodePath(`${folder}/${filename}`)));
+      const response = await fetch(`${folder}/`);
+      if (!response.ok) return [];
+
+      const html = await response.text();
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+      const paths = [...doc.querySelectorAll('a[href]')]
+        .map(link => link.getAttribute('href'))
+        .filter(Boolean)
+        .filter(href => IMAGE_EXTENSIONS.test(href))
+        .map(href => `${folder}/${decodeURIComponent(href).split('/').pop()}`);
+
+      if (paths.length) return sortPhotoPaths(paths);
     } catch (error) {
-      console.error(error);
+      // A static server may not expose directory listings; we keep the rest of the code working.
     }
 
     return [];
