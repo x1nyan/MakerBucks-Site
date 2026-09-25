@@ -7,6 +7,7 @@ import argparse
 import csv
 import io
 import json
+import os
 import re
 import sys
 import unicodedata
@@ -249,10 +250,10 @@ def build() -> None:
     temporary_path = CSV_PATH.with_suffix(".csv.tmp")
     try:
         buffer = io.StringIO(newline="")
-        writer = csv.DictWriter(buffer, fieldnames=CSV_FIELDS, lineterminator="\r\n")
+        writer = csv.DictWriter(buffer, fieldnames=CSV_FIELDS, lineterminator=os.linesep)
         writer.writeheader()
         writer.writerows(rows)
-        csv_text = buffer.getvalue().removesuffix("\r\n")
+        csv_text = buffer.getvalue().removesuffix(os.linesep)
 
         with temporary_path.open("w", encoding="utf-8", newline="") as output:
             output.write(csv_text)

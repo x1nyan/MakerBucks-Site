@@ -36,7 +36,7 @@ jobs:
         env:
           BRANCH_NAME: ${{ github.ref_name }}
         run: |
-          if git diff --quiet -- MakerBucks_Database.csv; then
+          if git diff --ignore-space-at-eol --quiet -- MakerBucks_Database.csv; then
             echo "MakerBucks_Database.csv is already up to date."
             exit 0
           fi
