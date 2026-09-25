@@ -1,0 +1,17 @@
+{
+  "order": 1,
+  "categories": [
+    "Robotics"
+  ],
+  "featured": false,
+  "title": "3lb Combat Robot for NHRL",
+  "maker": "Lucas Dion",
+  "overview": "Lightweight competition combat robot developed with WPI MakerBucks support, engineered through CAD modeling and finite element analysis for NHRL competition.",
+  "scope": "Concept development, CAD modeling, material selection and simulation, manufacturing and assembly, and pre-competition testing.",
+  "materials": "• Structural and mechanical components selected and validated through FEA\n • Drive motors and a weapon motor\n • Electronic speed controllers (ESCs)\n • Batteries (carefully rated to match motor/ESC requirements)\n • Wiring and electrical insulation",
+  "fabricationSteps": "1. Define the concept: competition weight class, safety requirements, and general design approach.\n 2. Model the complete robot in CAD.\n 3. Run simulation and finite element analysis (FEA) to guide material selection and validate structural strength under expected combat loads.\n 4. Manufacture components and assemble the robot.\n 5. Test the assembled robot's drive and weapon systems, and prepare for competition.",
+  "outcome": "Delivered a fully operational 3lb combat robot with functioning drivetrain and weapon system, ready for NHRL competition.",
+  "imageFolderPath": "images/Project 2026/Development of a 3lb Combat Robot for NHRL Competition",
+  "url": "",
+  "notes": ""
+}

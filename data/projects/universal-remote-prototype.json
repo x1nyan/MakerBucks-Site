@@ -1,0 +1,18 @@
+{
+  "order": 22,
+  "categories": [
+    "Electronics & Hardware",
+    "Robotics"
+  ],
+  "featured": false,
+  "title": "Universal Remote Prototype",
+  "maker": "Joseph Nixon",
+  "overview": "Custom universal remote control prototype developed with WPI MakerBucks support, focusing on functional enclosure design, rapid prototyping, and cost-conscious material selection.",
+  "scope": "Hardware enclosure design, component integration, and prototype testing for universal remote functionality.",
+  "materials": "• 3D-printed PETG enclosure (switched from nylon for cost reasons)\n • Remote-control electronics/components (IR emitter, microcontroller, buttons — per the enclosure's internal layout)\n • Fasteners for enclosure assembly",
+  "fabricationSteps": "1. Define the functional requirements for the universal remote (buttons, IR range, form factor).\n 2. Design the enclosure in CAD, planning internal component layout and clearances.\n 3. Select an initial print material (nylon) and evaluate cost against the project budget.\n 4. Switch the print material to PETG after nylon proved too costly to sustain through design iterations.\n 5. 3D print the enclosure and iterate on fit and durability.\n 6. Integrate and wire the internal electronics into the printed enclosure.\n 7. Test the assembled remote for functionality and document with photos and a video demonstration.",
+  "outcome": "Working prototype completed with documented media assets and a video demonstration for the WPI MakerBucks Showcase.",
+  "imageFolderPath": "images/Project 2026/Universal Remote",
+  "url": "",
+  "notes": ""
+}

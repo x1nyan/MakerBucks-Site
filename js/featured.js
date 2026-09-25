@@ -4,7 +4,7 @@
    Load order in index.html: config.js -> cards.js -> featured.js
 
    Fills the "Featured Projects" section near the top of index.html
-   with projects marked TRUE in the sheet's Featured column, in a
+  with projects marked TRUE in the generated CSV's Featured column, in a
    side-scrolling row with arrow buttons. The section hides itself if
    nothing is featured. Search and filters only affect the main grid,
    not this row.
@@ -19,7 +19,7 @@
   /* =========================================================
      STATE + DOM
      ---------------------------------------------------------
-     allProjects holds every row from the sheet; only the ones
+    allProjects holds every project loaded from the generated CSV; only ones
      with featured === true are shown.
      ========================================================= */
 
@@ -35,7 +35,7 @@
   /* =========================================================
      RENDER FEATURED
      ---------------------------------------------------------
-     Keeps only projects whose Featured cell is TRUE, puts the
+    Keeps only projects whose Featured value is TRUE, puts the
      most detailed ones first (same content score as the main
      page), and builds a card for each into the scrolling row.
      ========================================================= */
@@ -89,7 +89,7 @@
   /* =========================================================
      START
      ---------------------------------------------------------
-     Load the sheet (see MB.loadProjects in cards.js), then fill
+    Load the generated CSV (see MB.loadProjects in cards.js), then fill
      the row with the featured projects.
      ========================================================= */
 

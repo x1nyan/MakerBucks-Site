@@ -1,0 +1,17 @@
+{
+  "order": 21,
+  "categories": [
+    "Design & Fabrication"
+  ],
+  "featured": false,
+  "title": "Truck Tent Prototype",
+  "maker": "Jakob Sperry",
+  "overview": "Custom truck tent prototype focused on outdoor gear design, practical spatial fitting, material selection, and structural support for vehicle-integrated shelter.",
+  "scope": "Custom enclosure design, vehicle fitting, material sourcing, and budget allocation for structural supplies and fabrication.",
+  "materials": "• Tent fabric/material (weather-resistant)\n • Structural supports (poles or frame members)\n • Fasteners and attachment hardware for mounting to the truck bed\n • Seam-sealing or weatherproofing supplies",
+  "fabricationSteps": "1. Measure the target truck bed and cab clearance to establish the tent's dimensions.\n 2. Design the tent's shape and structural support layout for a vehicle-integrated fit.\n 3. Source tent fabric and structural support materials.\n 4. Cut and sew (or otherwise assemble) the tent body.\n 5. Build and attach the structural supports.\n 6. Mount and test-fit the tent on the truck bed.\n 7. Weatherproof seams and document with photos and video.",
+  "outcome": "Delivered a completed working prototype with photo documentation and a video submission.",
+  "imageFolderPath": "images/Project 2026/Truck Tent",
+  "url": "",
+  "notes": ""
+}

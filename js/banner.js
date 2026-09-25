@@ -3,10 +3,10 @@
    ---------------------------------------------------------------------
    Load order in index.html: config.js -> banner.js (-> the rest)
 
-   Fills the banner at the top of index.html using the settings in
-   js/config.js (MB.config.BANNER): the background photo, the logo in
-   the corner, and the title text. Edit config.js to change them;
-   nothing in this file needs to change.
+  Fills the banner at the top of index.html using BANNER settings from
+  js/config.js: the rotating background photo and title text. The logo
+  is loaded separately by logo.js into the centered header. Edit
+  config.js to change banner settings; nothing in this file needs to change.
    ===================================================================== */
 
 (function () {

@@ -4,16 +4,15 @@
    Used by both featured.js and showcase.js. Load it AFTER config.js.
 
    What's in here:
-      - helpers that clean up CSV data (categories, photo folders, ...)
-     - building a card's HTML (front + back)
-     - the enlarged flip view (click a card -> it flips and grows)
-     - the photo carousel arrows/dots
-    - loading and parsing the local CSV
+     - project/category/photo helpers
+     - card HTML for the front and expanded back
+     - expanded flip behavior and photo carousel controls
+     - generated CSV loading and parsing
 
    It adds these to window.MB for the page scripts to use:
-    MB.loadProjects()   download + parse the CSV (returns a Promise)
-     MB.makeCardEl(p)    build a card element for one project
-     MB.LOAD_ERROR_HTML  the red "couldn't load" message
+    MB.loadProjects()   fetch and parse the CSV (returns a Promise)
+    MB.makeCardEl(p)    build a card element for one project
+    MB.LOAD_ERROR_HTML  project-data load error message
    Everything else stays private inside this file.
    ===================================================================== */
 
@@ -28,7 +27,7 @@
      ========================================================= */
 
   /*
-    escapeHtml: makes sheet text safe to insert into the page.
+    escapeHtml: makes CSV project text safe to insert into the page.
     Without this, a cell containing "<" or a quote could break
     the HTML (or inject code). It swaps those characters for
     their harmless "&...;" versions, which display the same.
@@ -44,9 +43,9 @@
   const IMAGE_EXTENSIONS = /\.(png|jpe?g|gif|webp|avif|jfif|bmp|svg)(\?.*)?$/i;
 
   /*
-    Photo folders are relative to index.html. The static server exposes
-    each folder as a small directory listing, so the carousel can use
-    every image without storing remote URLs in the CSV.
+    Photo folders are relative to index.html. Hosts that expose folder
+    listings provide every carousel image; otherwise, probe the expected
+    Cover filename so the main photo still works on static hosting.
   */
   function normalizePath(value) {
     return String(value || '').trim().replace(/\\/g, '/');
@@ -139,9 +138,8 @@
   /*
     CATEGORIES — READ STRAIGHT FROM THE CATEGORY COLUMN
     ---------------------------------------------------------
-    The filter dropdown lists exactly the categories that appear
-    in column C. Add, rename, or remove a category in the sheet
-    and the dropdown changes to match on the next page load.
+    The filter dropdown lists categories parsed from the generated
+    CSV. Update the CMS options and CSV converter when adding one.
 
     The tricky part: one cell can hold several categories
     separated by commas ("Robotics, Electronics & Hardware"), but
@@ -298,14 +296,13 @@
   /* =========================================================
      CARD HTML
      ---------------------------------------------------------
-     These functions build the inside of each card as text
-     (an HTML "template string" using backticks and ${...}).
-     Every value from the sheet goes through escapeHtml first.
+    These functions build card markup from template strings.
+    Every project value from the CSV goes through escapeHtml first.
      ========================================================= */
 
   /*
     backSection: one labeled block on the back of the card.
-    If the sheet cell is empty, it shows emptyText in italics
+    If a project value is empty, it shows emptyText in italics
     instead — or nothing at all if emptyText is ''.
   */
   function backSection(label, value, emptyText) {
@@ -325,9 +322,9 @@
   }
 
   /*
-    buildFrontHTML: what shows in the grid.
-      photo, category tags, maker, title, overview, scope
-    Sections with no content are simply left out.
+    buildFrontHTML creates the tile face: photo, categories, maker,
+    title, overview, and scope. Desktop CSS compacts this preview.
+    Sections with no content are left out.
   */
   function buildFrontHTML(project) {
     const catTags = project.categories
@@ -404,12 +401,12 @@
      Wraps the card HTML in a real <div class="card"> element
      and attaches "data-" attributes to it. These are little
      labels stored on the element that the filter code reads
-     later, so filtering never has to look at the sheet again:
+    later, so filtering never has to look at the CSV again:
 
        data-categories  "robotics|electronics & hardware"
        data-featured    "1" or "0"
-       data-search-text every text field, lowercase, joined
-                        together — the search box just checks
+      data-search-text every project text field, lowercase, joined
+             together — the search box just checks
                         whether this contains what you typed
      ========================================================= */
 
@@ -451,7 +448,7 @@
     getTargetBox: works out how big the enlarged card should be
     and where it goes (centered on screen).
 
-    Width:  up to 900px, but never wider than the screen.
+    Width:  up to 1100px, but never wider than the screen.
     Height: exactly what the back needs to fit ALL its text.
             To find that out, the back is built invisibly
             off-screen at the target width and measured.
@@ -758,7 +755,7 @@
     /* =========================================================
       LOAD PROJECTS FROM THE CSV
      ---------------------------------------------------------
-     MB.loadProjects() downloads the sheet and turns every row
+    MB.loadProjects() downloads the generated CSV and turns every row
     into project objects. featured.js and showcase.js each call
      it and decide what to show.
 
@@ -772,7 +769,7 @@
   /*
     Both featured.js and showcase.js call MB.loadProjects(). The first
     call starts the download and saves the Promise here; the second
-    call gets the same Promise back, so the sheet is only fetched once.
+    call gets the same Promise back, so the CSV is only fetched once.
   */
   let loadPromise = null;
 
@@ -900,7 +897,7 @@
   }
 
   /*
-    Shown by a page when the sheet can't be loaded.
+    Shown by a page when project data can't be loaded.
   */
   const LOAD_ERROR_HTML =
     '<div class="error-state">Unable to load project data. ' +

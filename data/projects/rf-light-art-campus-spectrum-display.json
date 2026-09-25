@@ -1,0 +1,18 @@
+{
+  "order": 13,
+  "categories": [
+    "Electronics & Hardware",
+    "Props, Costumes & Art"
+  ],
+  "featured": true,
+  "title": "RF Light Art (Campus Spectrum Display)",
+  "maker": "Mary S.",
+  "overview": "Real-time electromagnetic spectrum visualization installation developed with WPI MakerBucks support, translating invisible campus radio activity into a glowing LED light display.",
+  "scope": "Software-defined radio signal capture, custom driver development, FFT-based signal processing, and LED matrix hardware integration.",
+  "materials": "• RTL-SDR Blog V4 software-defined radio receiver\n • Raspberry Pi 4\n • Adafruit RGB Matrix Bonnet\n • HUB75 LED matrix panel\n • Frosted acrylic panel (light diffuser)\n • A PC for initial development (WSL2 with USB passthrough)",
+  "fabricationSteps": "1. Research software-defined radio options and select the RTL-SDR Blog V4 as the receiver hardware.\n 2. Set up a WSL2 environment on Windows with USB passthrough, to develop and test the SDR software pipeline before the Raspberry Pi arrived.\n 3. Build custom V4 drivers from source, since the stock librtlsdr library lacked V4-specific functions — this required manually patching pyrtlsdr.\n 4. Implement an FFT (Fast Fourier Transform) pipeline in Python (NumPy) to extract per-frequency-band power levels from the raw radio samples.\n 5. Add per-band relative normalization so weak signals (e.g., ADS-B aircraft transponders, EMS/emergency-pager bands) stay visible on the display alongside much stronger signals (e.g., FM radio).\n 6. Apply exponential smoothing to the processed signal to eliminate LED flicker caused by noisy raw FFT output.\n 7. Wire an Adafruit RGB Matrix Bonnet to a Raspberry Pi 4 and connect a HUB75 LED matrix panel.\n 8. Work around broken Python bindings for the rpi-rgb-led-matrix library by writing a custom C program that acts as a \"pixel server,\" accepting pixel data over stdin.\n 9. Build a circular glow-rendering system where each frequency band renders as a colored circle whose radius and brightness scale with that band's live signal strength, mounted behind a frosted acrylic diffuser panel.",
+  "outcome": "Delivered a functioning, continuously updating light art installation reflecting real-time campus radio activity, with plans to find it a permanent home in the ECE building.",
+  "imageFolderPath": "images/Project 2026/RF Light Art",
+  "url": "",
+  "notes": ""
+}

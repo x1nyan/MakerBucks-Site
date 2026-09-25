@@ -1,0 +1,18 @@
+{
+  "order": 12,
+  "categories": [
+    "Science & Sensors",
+    "Engineering & Testing"
+  ],
+  "featured": false,
+  "title": "Permanent Magnet Levitation",
+  "maker": "Irakli Bakuradze",
+  "overview": "Experimental permanent-magnet levitation platform developed with WPI MakerBucks support, investigating the physical limits of static magnetic levitation.",
+  "scope": "Magnetic layout design, force modeling and optimization in Python, and physical prototyping of magnet arrays and support frames.",
+  "materials": "• Neodymium magnets\n • Cardboard (for the initial test array)\n • A 3D-printed triangular holder frame (PLA)\n • A Python environment (for simulation and optimization)",
+  "fabricationSteps": "1. Study the magnetic surface-charge force model as a more intuitive alternative to working directly with Maxwell's equations.\n 2. Hand-design several candidate magnet array layouts on paper.\n 3. Build a simple physical prototype — a cardboard array of neodymium magnets — to build real intuition for how the magnets actually behave (a step worth doing earlier next time).\n 4. Write a Python simulation of the repulsive forces between magnets, and run a gradient-descent optimizer to search for a stable, levitating layout.\n 5. Interpret the simulation results: they didn't predict free levitation, since for this type of layout the net force integrated over all positions works out to zero — meaning a floating platform would need to be constrained to specific regions rather than fully free-floating.\n 6. Design and 3D print a triangular holder frame based on the simulated layout.\n 7. Test the physical setup: as predicted, free-float levitation was not achieved, but the platform did levitate once a few degrees of freedom were mechanically constrained.",
+  "outcome": "Confirmed that free-floating levitation is not achievable with this configuration, consistent with Earnshaw's theorem, while constrained-motion levitation was demonstrated successfully.",
+  "imageFolderPath": "images/Project 2026/Permanent Magnet Levitation",
+  "url": "",
+  "notes": ""
+}

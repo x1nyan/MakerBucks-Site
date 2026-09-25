@@ -1,0 +1,17 @@
+{
+  "order": 3,
+  "categories": [
+    "Robotics"
+  ],
+  "featured": false,
+  "title": "Battlebots for Competition",
+  "maker": "Kekoto Maane, Azura Simsek & Klejvi Gjoni",
+  "overview": "Competition combat robot developed with WPI MakerBucks support for entry into the National Havoc Robot League (NHRL), built as part of an MQP.",
+  "scope": "Iterative design brainstorming, parts sourcing, in-house part fabrication, robot assembly, and pre-competition testing.",
+  "materials": "• UHMW (ultra-high-molecular-weight polyethylene) structural material\n • AR500 steel (armor/structural plate)\n • Bolts and lock-nuts\n • Batteries\n • Motors and weapon-system hardware (drive and weapon motors, speed controllers, per typical combat-robot builds)",
+  "fabricationSteps": "1. Brainstorm candidate robot designs as a team, meeting several times a week to iterate.\n 2. Refine the design through multiple iterations until it's finalized.\n 3. Order parts and materials, including UHMW, AR500, bolts, lock-nuts, and batteries.\n 4. Machine custom parts in-house using campus machine shop tools, rather than outsourcing, to keep costs down.\n 5. Assemble the complete 12lb combat robot.\n 6. Test the robot's drive system and weapon.\n 7. Iron out issues found during testing ahead of competition day.",
+  "outcome": "Delivered a fully assembled 12lb combat robot ready for competition at the NHRL, with in-house fabrication helping the team stay within budget.",
+  "imageFolderPath": "images/Project 2026/Battlebots for Competition",
+  "url": "",
+  "notes": ""
+}

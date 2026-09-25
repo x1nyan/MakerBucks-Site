@@ -1,0 +1,18 @@
+{
+  "order": 19,
+  "categories": [
+    "Props, Costumes & Art",
+    "Design & Fabrication"
+  ],
+  "featured": true,
+  "title": "Suitcase Maze Game",
+  "maker": "Benjamin Levy",
+  "overview": "Interactive cooperative art game developed with WPI MakerBucks support, transforming a vintage suitcase into a maze-navigation experience.",
+  "scope": "Prototyping and gameplay design, laser-cutting and hand-assembly of a maze enclosure, and integration of the suitcase's wheels as a communication interface.",
+  "materials": "• Plywood and acrylic sheet (laser-cut)\n • Wood glue and epoxy\n • A vintage suitcase (repurposed for its built-in wheels)\n • A magnet and a metal ball (the maze \"piece\")\n • A clip-on light (to highlight the suitcase wheel mechanism)\n • A rotary tool (Dremel)\n • Printed rule sheets and envelopes (for player-specific instructions)",
+  "fabricationSteps": "1. Build a rough cardboard-and-paper prototype first, to validate that the core two-player, communication-limited gameplay concept was actually fun and workable.\n 2. Attend a Makerspace design consultation to settle on final materials and construction methods (plywood and acrylic, both laser-cuttable, light and cheap).\n 3. Laser-cut the maze box's base panel and wall segments; when flipping the base panel to engrave the second side caused misalignment, switch to hand-drawing that grid with graphite and a ruler instead of engraving it.\n 4. Glue the wall segments to the base panel by hand — the wall geometry made clamping impossible, so each wall was aligned and held by hand during gluing (a slow process, roughly 6 hours).\n 5. Seal the top of the maze box with a clear acrylic panel, glued on with epoxy.\n 6. Laser-cut and hand-assemble a stand for the maze box using the same cut-and-glue method as the walls, then attach the stand to the box.\n 7. Modify the suitcase: use a rotary tool to cut a hole exposing the suitcase's built-in wheels from behind, then mount a clip-on light aimed at the wheel to draw attention to it as the game's communication interface.\n 8. Write and print separate rule sheets for the Observer and Controller roles, sealing each in its own envelope so players can't accidentally read the other role's instructions ahead of time.",
+  "outcome": "Completed \"Wayne Can't Make the Journey Alone,\" a fully functional cooperative game showcased at three public exhibitions.",
+  "imageFolderPath": "images/Project 2026/Suitcase Maze Game",
+  "url": "",
+  "notes": ""
+}

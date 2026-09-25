@@ -363,7 +363,7 @@ select:focus-visible {
   color: var(--ink-soft);
   font-size: 14px;
   line-height: 1.6;
-  white-space: pre-line; /* keeps the line breaks from the sheet */
+  white-space: pre-line; /* preserves CSV project line breaks */
 }
 
 .scope-text {

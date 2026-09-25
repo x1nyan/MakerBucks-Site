@@ -1,0 +1,17 @@
+{
+  "order": 9,
+  "categories": [
+    "Engineering & Testing"
+  ],
+  "featured": false,
+  "title": "Engine Dynamometer Test Rig",
+  "maker": "Harrison Brown",
+  "overview": "Engine dynamometer prototype designed to collect engine performance data for future experimental projects, including development of a hybrid-electric go-kart.",
+  "scope": "Hardware design, material sourcing, structural fabrication, and data collection setup for small engine testing.",
+  "materials": "• Structural materials for the rig frame\n • Hardware (fasteners, mounts) to secure the test engine\n • Data-collection components/sensors for measuring engine output",
+  "fabricationSteps": "1. Design the dynamometer frame and mounting layout for the target test engine.\n 2. Source structural materials and hardware.\n 3. Fabricate the frame and mounting points.\n 4. Install the load/braking mechanism used to apply resistance to the engine.\n 5. Integrate sensors and a data-collection setup to record engine performance metrics.\n 6. Mount the test engine to the rig and run initial calibration tests.\n 7. Collect and document engine performance data.",
+  "outcome": "Delivered a functional dynamometer testing rig with media assets and invoice documentation.",
+  "imageFolderPath": "images/Project 2026/Engine Dynamometer Test Rig",
+  "url": "",
+  "notes": ""
+}

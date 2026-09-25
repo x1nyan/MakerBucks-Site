@@ -5,11 +5,11 @@
   =====================================================================
 
   From top to bottom the page shows:
-    1. Title banner      (photo, logo, and title set in js/config.js)
-    2. Featured Projects (side-scrolling row of projects marked TRUE
-                          in the sheet's Featured column)
-    3. Search / filter / sort bar
-    4. The grid of all projects
+    1. Header             (centered logo, site links, theme switch)
+    2. Banner             (rotating photo and title)
+    3. Featured Projects  (side-scrolling row marked TRUE in the CSV)
+    4. Search / filter / sort controls
+    5. Main project grid  (three desktop columns, vertical on phones)
 
   The code is split into a few files so each one stays readable:
 
@@ -19,25 +19,25 @@
     css/showcase.css    title banner, search/filter bar, and the grid
     css/featured.css    the Featured Projects row
 
-    js/config.js        SETTINGS: the local CSV path + banner images
+    js/theme.js         applies and saves the light/dark theme
+    js/config.js        SETTINGS: generated CSV path + banner images
+    js/project-data.js  embedded CSV fallback for file:// or fetch failure
     js/banner.js        fills in the title banner
     js/cards.js         building cards, flip view, loading the CSV
     js/featured.js      the Featured Projects row + its arrows
     js/showcase.js      search, filters, sort, and the grid
 
-  How it runs:
-    At the bottom of this file the scripts load IN ORDER:
-      config.js   -> settings (sheet link, banner images)
-      banner.js   -> fills in the title banner
-      cards.js    -> adds the shared card tools
-      featured.js -> fills the Featured row
-      showcase.js -> fills the main grid
-    config.js and cards.js must come first, because the other two
-    use what they set up. The sheet is only downloaded once; both
-    sections share the same data.
+  Data workflow:
+    Pages CMS edits one JSON file per project in data/projects/.
+    A GitHub Action regenerates MakerBucks_Database.csv for the site.
+    Do not edit the generated CSV directly.
 
-  To edit the content, edit MakerBucks_Database.csv.
-  Project photos live in the folder named by each row's Image Folder Path.
+  Scripts in the head load theme.js before the stylesheets. The scripts
+  at the bottom load config.js, project-data.js, logo.js, banner.js,
+  cards.js, featured.js, then showcase.js. Both project sections share
+  the cached CSV load from cards.js.
+
+  Project photos live in the folder named by each form's Image Folder Path.
   =====================================================================
 -->
 <html lang="en" data-theme="light">
@@ -88,7 +88,7 @@
   <!-- =========================================================
      FEATURED PROJECTS
      Filled in by js/featured.js with every project marked TRUE
-     in the sheet's Featured column. Hides itself if none are.
+    in the generated CSV's Featured column. Hides if none are.
      ========================================================= -->
 
   <section class="featured-section" id="featuredSection" aria-labelledby="featuredTitle">
@@ -122,10 +122,8 @@
         <button class="search-clear" id="searchClearBtn" type="button" aria-label="Clear search">&times;</button>
       </div>
 
-      <!-- Filter dropdown: button + hidden panel of checkboxes.
-           The category checkboxes are added by JavaScript once the
-           sheet loads (inside #categoryOptions), using whatever
-           categories are in the sheet's Category column. -->
+       <!-- Filter dropdown: button + hidden panel of checkboxes.
+         JavaScript fills #categoryOptions from generated CSV values. -->
       <div class="filter-dropdown" id="filterDropdown">
         <button class="filter-toggle" id="filterToggle" type="button"
           aria-haspopup="true" aria-expanded="false" aria-controls="filterPanel">

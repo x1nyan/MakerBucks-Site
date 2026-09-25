@@ -1,7 +1,7 @@
 /* =====================================================================
   config.js — SHARED SITE SETTINGS
    ---------------------------------------------------------------------
-    This is the settings file for the local CSV data and banner.
+    This is the settings file for the generated project CSV and banner.
 
    It creates one global object, window.MB ("MakerBucks"), that the
    other scripts read from:
@@ -19,19 +19,19 @@ window.MB = window.MB || {};
   /* =========================================================
      CONFIG
      ---------------------------------------------------------
-     CSV_URL points to the project data file next to index.html.
-    Project image folders are listed in the CSV Image Folder Path
-    column.
+    CSV_URL points to the generated project data file next to index.html.
+      Pages CMS project forms are the editable source; a GitHub Action
+      rebuilds this CSV from data/projects/.
      ========================================================= */
 
   const CSV_URL = 'MakerBucks_Database.csv';
 
-  // Paste the Google Form link here when the submission form is ready.
+  // Optional external submission link; project editing is handled in Pages CMS.
   const PROJECT_SUBMISSION_FORM_URL = '';
   /*
     OPTIONAL manual override for category names that contain a
     comma. You normally DON'T need to touch this: the page works
-    these out from the Category column on its own (see
+    these out from the generated CSV's Category field (see
     splitCategories below). Only add a name here if the automatic
     detection ever splits a category the wrong way.
   */

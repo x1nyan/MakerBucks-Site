@@ -1,0 +1,17 @@
+{
+  "order": 16,
+  "categories": [
+    "Robotics"
+  ],
+  "featured": false,
+  "title": "Singing Wineglass Robot",
+  "maker": "Kyle Mitchell",
+  "overview": "Automated robot exploring acoustic robotics and mechanical tuning by driving controlled friction across wineglass rims to produce musical tones.",
+  "scope": "Acoustic iteration, mechanical design, and tuning of sponge pressure, moisture levels, air density, and structural rigidity.",
+  "materials": "• Wineglasses (tuned by fill level or size, one per note)\n • Mechanical drive components for rim-friction actuation\n • Sponge or contact material for the rim interface\n • Structural frame/components for rigidity",
+  "fabricationSteps": "1. Select wineglasses and determine their individual resonant notes.\n 2. Design and build a mechanism that drives a sponge or contact material around each glass's rim with controlled pressure.\n 3. Mount the mechanism(s) in a rigid frame — structural rigidity strongly affects tone quality.\n 4. Tune each glass individually: adjust sponge pressure, sponge dampness, rim dampness, and the air density/volume ratio inside the glass until it reliably sings its note.\n 5. Attempt to run multiple glasses simultaneously and identify cross-glass interference or timing issues.\n 6. Document which combinations of pressure/moisture/rigidity settings produced the most reliable single-glass tone, for future multi-glass tuning work.",
+  "outcome": "Successfully demonstrated pitch control across individual glasses with complete media documentation and technical reflections.",
+  "imageFolderPath": "images/Project 2026/Singing Wineglass Robot",
+  "url": "",
+  "notes": ""
+}

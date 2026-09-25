@@ -1,0 +1,18 @@
+{
+  "order": 4,
+  "categories": [
+    "Design & Fabrication",
+    "Electronics & Hardware"
+  ],
+  "featured": true,
+  "title": "Custom Door Handle Flashlight",
+  "maker": "Kaden L.",
+  "overview": "Door handle with an integrated flashlight developed with WPI MakerBucks support, combining custom electronics with compact mechanical packaging.",
+  "scope": "Electronics housing design, rotary-encoder-based lighting controls, component stacking and integration, and functional testing.",
+  "materials": "• A 3D-printed PLA sleeve (electronics housing)\n • A rotary encoder (for on/off click and brightness dimming)\n • A single 18650 lithium-ion cell\n • A microcontroller\n • An LED ring (attempted; not fully functional in v1)\n • A capacitive touch sensor (attempted; not fully functional in v1)\n • A donor door handle (for reference and final mounting)",
+  "fabricationSteps": "1. Research how a standard flashlight is put together (components and layout) to establish a working reference design.\n 2. Design the internal electronics housing to fit inside a door-handle form factor.\n 3. Choose a rotary encoder to serve double duty: click for on/off, twist for brightness dimming.\n 4. Stack all electronics — microcontroller, driver circuitry, main LED, ring light, and battery holder — inside a single 3D-printed PLA sleeve.\n 5. Wire a single 18650 cell to power the microcontroller, main light, and LED ring.\n 6. Press-fit and glue the stacked components together inside the sleeve for the version-1 build.\n 7. Test all functions: the main light and dimming worked as intended; the ring light and capacitive touch sensor did not work reliably in this version.",
+  "outcome": "Delivered a working proof-of-concept flashlight handle, with an aluminum-machined version planned to improve durability and thermal performance.",
+  "imageFolderPath": "images/Project 2026/Custom Door handle",
+  "url": "",
+  "notes": ""
+}

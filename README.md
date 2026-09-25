@@ -1,58 +1,75 @@
 # MakerBucks Showcase
 
-Project cards for WPI MakerBucks, loaded from a local CSV file.
-Everything runs from `index.html`, which shows, top to bottom:
-
-1. A title banner with a background photo, a logo in the corner, and the title
-2. **Featured Projects**: a side-scrolling row of projects marked **TRUE** in the Featured column
-3. Search, category filter, and sort
-4. A grid of all projects
+Static project gallery for WPI MakerBucks. The page includes a centered logo,
+a persistent light/dark theme switch, a featured-project carousel, search and
+filters, and project cards. The main grid has three columns on desktop, two on
+tablet, and one vertically scrolling column on phones.
 
 For complete architecture, data, styling, and maintenance details, see
 [`MASTER_DOCUMENTATION.md`](MASTER_DOCUMENTATION.md).
 
-## Changing the content
-New projects should be submitted through the Google Form. Once the URL is set
-in `js/config.js`, a **Submit a project** link appears in the site header.
+## Editing projects in Pages CMS
+Connect this repository in [Pages CMS](https://app.pagescms.org/). Its `Projects`
+collection edits one JSON form per project under `data/projects/`, with separate
+multiline fields, a Featured toggle, and a category multi-select.
 
-Current placeholder:
-`PASTE_GOOGLE_FORM_LINK_HERE`
+The JSON forms are the source of truth. Saving a form triggers the **Build
+projects CSV** GitHub Action, which regenerates `MakerBucks_Database.csv` for
+the website. Do not edit the CSV directly; the next build will replace it. Wait
+for the Action to finish before checking the live site, and run `git pull` before
+starting local edits.
 
-The site maintainer reviews the submission, uploads the submitted photo to the
-repository, and adds the resulting CSV row. In `js/config.js`, replace the
-empty `PROJECT_SUBMISSION_FORM_URL` value with the form link when it is ready.
-The page reads `MakerBucks_Database.csv` every time it loads.
+Both repository workflows need GitHub Actions to have contents write
+permission, and branch rules must allow the Actions bot to push generated files.
+
+The migration and verification commands are:
+
+```powershell
+py scripts/showcase_data.py migrate
+py scripts/showcase_data.py check
+```
+
+`migrate` creates forms from the current CSV and refuses to overwrite an
+existing non-empty forms directory. `check` compares every project value with
+the CSV. To regenerate the CSV locally, run `py scripts/showcase_data.py build`.
 
 ## Project photos
-Set each row's `Image Folder Path` to a relative folder such as
-`images/Project 2026/ABV Meter`. The folder must contain a `cover` image;
-all other supported image files in the folder are added to that project's
-carousel automatically.
+Set the form's `Image Folder Path` to a repository-relative folder such as
+`images/Project 2026/ABV Meter`. Name the cover image `Cover` with a supported
+extension. Hosts that expose directory listings can populate the full photo
+carousel; on hosts without listings, the site probes for the cover image and
+shows that photo alone.
 
-The form should collect every required project field and the relative image
-folder path. Upload the image files to that exact repository folder, using a
-filename that starts with `cover` for the main image. Rows missing required
-content or a readable cover image are skipped automatically.
+Upload photos into the exact repository folder in the form. Rows missing
+required content or a readable cover image are skipped automatically.
 
-## Title banner
-Set the title and background photos in `BANNER` at the bottom of `js/config.js`.
-The header logo is configured in `HEADER_LOGO`. Images can be paths in this repo
-or full GitHub image links.
+The **Resize uploaded images** GitHub Action processes new or changed JPEG, PNG,
+and WebP files under `images/`. It caps the longest dimension at 2400 pixels and
+removes EXIF metadata. SVG and animated GIF files are left unchanged.
 
-## Files
+## Run locally
+From the repository root, serve the site over HTTP:
+
+```powershell
+py -m http.server 8000
 ```
-index.html        the page (runs everything)
-css/cards.css     shared: colors, cards, flip view, photos
-css/showcase.css  title banner, search/filter bar, grid
-css/featured.css  Featured Projects row
-js/config.js      settings: CSV path, banner images, and logo
-js/banner.js      fills in the title banner
-js/cards.js       card building, flip view, loading the CSV
-js/featured.js    Featured Projects row + arrows
-js/showcase.js    search, filters, sort, grid
-images/
-  Banner.jfif     banner background photo
-  Gears-05.png    header logo
-  Project 2026/   one local photo folder per project
-```
-Scripts load in this order in `index.html`: `config.js`, `banner.js`, `cards.js`, `featured.js`, `showcase.js`.
+
+Open `http://localhost:8000/`. Do not use a `file://` URL; the site fetches the
+CSV and local photos over HTTP.
+
+## Site settings
+- Banner title and rotating images: `BANNER` in `js/config.js`.
+- Header logo and alternative text: `HEADER_LOGO` in `js/config.js`.
+- Light/dark theme: use the header switch; the preference is saved in browser storage.
+- Main card layout and colors: `css/showcase.css` and `css/cards.css`.
+- Featured carousel layout: `css/featured.css` and `js/featured.js`.
+- CMS fields and category options: `.pages.yml` and `scripts/showcase_data.py`.
+
+## Key files
+- `index.html`: page markup and script loading order.
+- `MakerBucks_Database.csv`: generated site data; do not edit directly.
+- `data/projects/*.json`: editable Pages CMS project forms.
+- `scripts/showcase_data.py`: migrate, build, and verify project data.
+- `scripts/resize_images.py`: optimize supported uploaded photos.
+- `.github/workflows/`: CSV rebuild and image optimization automation.
+- `MASTER_DOCUMENTATION.md`: full architecture and maintenance guide.

@@ -29,7 +29,7 @@
      Every filter/sort function reads from them.
      ========================================================= */
 
-  // allProjects:         every project loaded from the sheet
+  // allProjects:         every project loaded from the generated CSV
   // selectedCategories:  lowercase names of checked categories
   //                      (a Set, so each name appears only once)
   // featuredOnly:        true when "★ Featured only" is checked
@@ -71,7 +71,7 @@
      FILTER DROPDOWN
      ---------------------------------------------------------
      renderCategoryOptions: creates one checkbox per category
-     actually found in the sheet (alphabetical) inside the
+    actually found in the generated CSV (alphabetical) inside the
      dropdown panel. Checking a box adds that category to
      selectedCategories; unchecking removes it. Multiple can
      be checked at once, and a card shows if it matches ANY
@@ -271,10 +271,6 @@
     searchClearBtn.classList.toggle('visible', query.length > 0);
     updateFilterLabel();
 
-    // On phones (side-scrolling row), jump back to the first card
-    // so a new search/filter doesn't leave you staring at empty space.
-    container.scrollLeft = 0;
-
     resultsSummary.textContent = allProjects.length
       ? `Showing ${visibleCount} of ${allProjects.length} projects`
       : '';
@@ -333,7 +329,7 @@
   /* =========================================================
      START
      ---------------------------------------------------------
-     Load the sheet (see MB.loadProjects in cards.js), then build
+    Load the generated CSV (see MB.loadProjects in cards.js), then build
      the category checkboxes and the grid.
      ========================================================= */
 
@@ -343,7 +339,7 @@
 
       if (allProjects.length === 0) {
         container.innerHTML =
-          '<div class="empty-state">No projects found in the spreadsheet.</div>';
+          '<div class="empty-state">No projects found.</div>';
         return;
       }
 

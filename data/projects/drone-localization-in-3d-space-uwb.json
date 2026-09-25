@@ -1,0 +1,18 @@
+{
+  "order": 7,
+  "categories": [
+    "Robotics",
+    "Electronics & Hardware"
+  ],
+  "featured": true,
+  "title": "Drone Localization in 3D Space (UWB)",
+  "maker": "Tair Kareneyev",
+  "overview": "Ultra-wideband (UWB) indoor localization system developed with WPI MakerBucks support, proving out real-time 3D tracking as a foundation for future drone swarm applications.",
+  "scope": "UWB anchor network setup and calibration, wireless telemetry development, real-time trilateration software, and signal-filtering optimization.",
+  "materials": "• 4x ESP32 microcontrollers (one per anchor)\n • 4x DW1000 UWB anchor modules\n • 1x ESP32 + DW1000 UWB tag module (the object being localized)\n • A local WiFi network (for UDP telemetry from the tag)\n • A laptop or PC running a custom Python backend",
+  "fabricationSteps": "1. Set up a 4-anchor, 1-tag UWB network using ESP32 microcontrollers paired with DW1000 modules.\n 2. Switch the UWB radios into a high-speed, high-frequency polling mode for rapid distance measurements.\n 3. Manually calibrate each anchor's antenna delay offset over a known 6-meter reference distance, reducing per-anchor ranging error to under 5 cm.\n 4. Program the tag to transmit raw distance readings wirelessly to a laptop over UDP via WiFi.\n 5. Write a Python backend (using SciPy's least-squares solver) to compute the tag's real-time 3D position via trilateration from the four anchor distances.\n 6. Apply a two-stage filter to the position output — a median filter to reject RF multipath spikes, followed by an exponential moving average — to smooth the tracked trajectory.\n 7. Arrange the four anchors in a diagonal zig-zag pattern (two on the floor, two elevated, on opposite diagonals) to stabilize vertical (Z-axis) position estimates.\n 8. Build a real-time 3D dashboard to visualize the tracked position.",
+  "outcome": "Achieved real-time 3D tracking accurate to roughly 12 cm in the horizontal plane and 30 cm vertically, validating the concept ahead of planned outdoor and drone-mounted testing.",
+  "imageFolderPath": "images/Project 2026/Drone localization in 3d space",
+  "url": "",
+  "notes": ""
+}

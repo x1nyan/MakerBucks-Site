@@ -8,9 +8,81 @@ media:
 content:
   - name: projects
     label: Projects
-    type: file
-    path: MakerBucks_Database.csv
-    format: datagrid
+    type: collection
+    path: data/projects
+    format: json
+    filename:
+      template: "{title}.json"
+      field: create
+    view:
+      fields: [title, maker, featured]
+      primary: title
+      sort: [title]
+      default:
+        sort: title
+        order: asc
+    fields:
+      - name: title
+        label: Project
+        type: string
+        required: true
+      - name: maker
+        label: Maker(s)
+        type: string
+        required: true
+      - name: categories
+        label: Categories
+        type: select
+        required: true
+        options:
+          multiple: true
+          values:
+            - Design & Fabrication
+            - Electronics & Hardware
+            - Engineering & Testing
+            - Props, Costumes & Art
+            - Robotics
+            - Science & Sensors
+      - name: featured
+        label: Featured
+        type: boolean
+        default: false
+      - name: overview
+        label: Overview
+        type: text
+        required: true
+      - name: scope
+        label: Scope
+        type: text
+        required: true
+      - name: materials
+        label: Materials
+        type: text
+        required: true
+      - name: fabricationSteps
+        label: Fabrication Steps
+        type: text
+        required: true
+      - name: outcome
+        label: Outcome
+        type: text
+        required: true
+      - name: imageFolderPath
+        label: Image Folder Path
+        type: string
+        required: true
+        description: Relative path to this project's images folder, for example images/Project 2026/ABV Meter.
+      - name: url
+        label: Project URL
+        type: string
+      - name: notes
+        label: Notes
+        type: text
+      - name: order
+        label: false
+        type: number
+        hidden: true
+        readonly: true
     operations:
       delete: false
 

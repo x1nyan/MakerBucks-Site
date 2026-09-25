@@ -1,0 +1,17 @@
+{
+  "order": 20,
+  "categories": [
+    "Design & Fabrication"
+  ],
+  "featured": false,
+  "title": "Thunderhawk Transporter",
+  "maker": "Anthony P.",
+  "overview": "Large-scale 3D-printed Warhammer 40k model developed with WPI MakerBucks support, focusing on multi-part print scaling and structural assembly.",
+  "scope": "Digital model scaling and slicing, multi-part print segmentation, support removal and finishing, and structural assembly.",
+  "materials": "• 3D-printed plastic parts (model split into 4 separate prints)\n • Gorilla Glue (structural adhesive for assembly)\n • Duct tape (temporary bracing during glue cure)\n • Tweezers and hobby tools (support removal)\n • Sandpaper and hobby knives (for future finishing/cleanup)",
+  "fabricationSteps": "1. Source a digital 3D model of the vehicle and scale it in slicing software (Bambu Studio) to match the proportions of existing miniatures.\n 2. Split the model into four separate parts to fit the printer's build plate, given the model's overall size.\n 3. Re-slice and reassign the correct printer profile after discovering the initial file was generated for a different printer model.\n 4. Get the print approved for overnight printing given its size, then queue and run the print.\n 5. Once printed, remove support structures using tweezers and hobby tools.\n 6. Assemble the four printed parts using Gorilla Glue, taping and bracing the large, bulky pieces against a wall and table for 2–3 hours while the glue set (assembled in two stages to make handling easier).\n 7. Use a temporary stand-in (a cup) for a flight stand until a dedicated one is designed and built.",
+  "outcome": "Completed the largest model in the maker's personal collection, successfully assembled and used in a live tabletop gaming session.",
+  "imageFolderPath": "images/Project 2026/Thunderhawk Transporter",
+  "url": "",
+  "notes": ""
+}

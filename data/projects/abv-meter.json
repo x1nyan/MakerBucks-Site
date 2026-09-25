@@ -1,0 +1,18 @@
+{
+  "order": 2,
+  "categories": [
+    "Electronics & Hardware",
+    "Science & Sensors"
+  ],
+  "featured": false,
+  "title": "ABV Meter",
+  "maker": "Leo Shraybman",
+  "overview": "Portable alcohol-by-volume (ABV) meter developed with WPI MakerBucks support, combining a custom capacitive sensor with a 3D-printed enclosure.",
+  "scope": "Capacitance-based sensing circuit design, custom coaxial capacitor fabrication, microcontroller integration, and enclosure design for portability.",
+  "materials": "• Arduino Uno R3\n • A custom coaxial capacitor (3D-printed frame plus cut sheet metal), used as the sensing element\n • Heat-shrink tubing (to waterproof the capacitor's inner rod) and a heat gun\n • A small OLED display\n • 3D-printed enclosure/housing\n • A portable USB power bank\n • Breadboard, jumper wires, and basic RC-circuit components (resistor/capacitor) for the capacitance-sensing circuit",
+  "fabricationSteps": "1. Build a simple capacitance-measurement circuit on a small breadboard, sized to eventually fit inside a portable 3D-printed housing.\n 2. Attempt to use a dedicated capacitance-measurement chip; abandon it after finding its pins too fine-pitched to hand-solder reliably.\n 3. Fall back to a simpler approach: test both a 555-oscillator circuit and a basic RC circuit for capacitance sensing — the RC circuit proves more effective for this use case.\n 4. Fabricate a custom coaxial capacitor via 3D printing and metal cutting, sized to be dipped into a liquid sample.\n 5. Waterproof the capacitor's inner rod with heat-shrink tubing (applied with a heat gun) so it can be safely submerged in liquid.\n 6. Interface the capacitor and RC circuit with an Arduino Uno R3, and write C++ code to read the measurement.\n 7. Design and 3D print a housing for all the electronics.\n 8. Add a small OLED display, interfaced with the Arduino, to show the calculated ABV reading.\n 9. Assemble all components into the housing, paying close attention to wire routing and internal space (wires take up more room than expected).\n 10. Wire the assembly to a portable USB power bank for standalone, battery-powered operation.\n 11. Build a calibration graph relating measured capacitance to known ABV values, and implement that calibration curve in the Arduino's C++ code.",
+  "outcome": "Delivered a working portable ABV measurement device, with future plans to consolidate electronics onto a custom PCB for a more compact design.",
+  "imageFolderPath": "images/Project 2026/ABV Meter",
+  "url": "",
+  "notes": ""
+}

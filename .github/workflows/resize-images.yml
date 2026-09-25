@@ -1,0 +1,63 @@
+name: Resize uploaded images
+
+on:
+  push:
+    paths:
+      - 'images/**'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: content-maintenance-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  resize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out current branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref_name }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Pillow
+        run: python -m pip install Pillow
+
+      - name: Optimize changed images
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+          AFTER_SHA: ${{ github.sha }}
+          BRANCH_NAME: ${{ github.ref_name }}
+        shell: bash
+        run: |
+          if [[ "$BEFORE_SHA" =~ ^0+$ ]]; then
+            mapfile -d '' image_files < <(git ls-tree -r --name-only -z "$AFTER_SHA" -- images/)
+          else
+            mapfile -d '' image_files < <(git diff --name-only --diff-filter=AM -z "$BEFORE_SHA" "$AFTER_SHA" -- images/)
+          fi
+
+          if [ "${#image_files[@]}" -eq 0 ]; then
+            echo "No added or modified images to optimize."
+            exit 0
+          fi
+
+          python scripts/resize_images.py "${image_files[@]}"
+          git add -- "${image_files[@]}"
+          if git diff --cached --quiet; then
+            echo "Images are already optimized."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore: optimize uploaded images"
+          git fetch origin "$BRANCH_NAME"
+          git rebase "origin/$BRANCH_NAME"
+          git push origin "HEAD:$BRANCH_NAME"

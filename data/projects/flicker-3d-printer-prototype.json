@@ -1,0 +1,17 @@
+{
+  "order": 10,
+  "categories": [
+    "Design & Fabrication"
+  ],
+  "featured": false,
+  "title": "FLICKER 3D Printer Prototype",
+  "maker": "Jakub Jandus",
+  "overview": "Custom 3D printer prototype exploring printer architecture, open-frame electronics testing, and structural trade-offs in rapid prototyping.",
+  "scope": "Custom 3D printer build, open-frame systems verification, electronics integration, and planned acrylic enclosure expansion.",
+  "materials": "• 3D-printed and structural frame components\n • Printer electronics (mainboard, stepper motors, drivers — implied by a custom 3D printer build)\n • Planned (not yet installed) acrylic panels for a future enclosure",
+  "fabricationSteps": "1. Design the printer's frame and motion system architecture.\n 2. Source or fabricate structural components for the open frame.\n 3. Install and wire the electronics (mainboard, steppers, drivers, hotend/bed electronics).\n 4. Verify all systems (motion, heating, electronics) function correctly in the open-frame configuration.\n 5. Calibrate and run test prints to validate printer performance.\n 6. Document the printer's current open-frame state and note enclosure panels as a planned future addition once systems are fully verified and acrylic funding is secured.",
+  "outcome": "Delivered a functional 3D printer prototype operating in an open-frame configuration with photo assets and a video demonstration.",
+  "imageFolderPath": "images/Project 2026/Flickers",
+  "url": "",
+  "notes": ""
+}

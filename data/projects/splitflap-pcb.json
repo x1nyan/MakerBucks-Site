@@ -1,0 +1,17 @@
+{
+  "order": 17,
+  "categories": [
+    "Electronics & Hardware"
+  ],
+  "featured": false,
+  "title": "Splitflap PCB",
+  "maker": "Kaden Ly",
+  "overview": "Custom-designed PCB for a split-flap display module, developed with WPI MakerBucks support, covering schematic design, board layout, and assembly.",
+  "scope": "Circuit prototyping, PCB schematic and layout design in KiCad, component sourcing, board assembly, and multi-unit soldering and integration.",
+  "materials": "• Custom PCB, matte black finish (ordered from JLCPCB)\n • Electronic components sourced from Digikey (microcontroller, motor driver components, screw terminals)\n • Small motors to drive the flap mechanism (one per board)\n • JST connectors (for inter-board/component communication)\n • Basic soldering tools and supplies",
+  "fabricationSteps": "1. Prototype the split-flap driver circuit on a breadboard to confirm the concept works.\n 2. Turn the proven breadboard circuit into a schematic in KiCad.\n 3. Lay out the PCB in KiCad's PCB editor, selecting final components and footprints.\n 4. Order the boards from JLCPCB with a matte black finish.\n 5. Source the remaining components from Digikey.\n 6. Solder together a single PCB first, and test that the microcontroller can properly drive the motor before committing to the full batch.\n 7. Once verified, solder the remaining boards (eight total), laying them out together for efficient assembly.\n 8. Crimp JST connectors for inter-board and component communication.\n 9. Mount each finished PCB to the back of its corresponding flap unit to drive the motor, and assemble the full set.",
+  "outcome": "Successfully assembled and tested eight custom PCBs to drive split-flap motor units, completing a functional custom electronics build.",
+  "imageFolderPath": "images/Project 2026/Splitflap PCB",
+  "url": "",
+  "notes": ""
+}

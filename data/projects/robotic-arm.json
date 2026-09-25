@@ -1,0 +1,18 @@
+{
+  "order": 14,
+  "categories": [
+    "Robotics",
+    "Electronics & Hardware"
+  ],
+  "featured": true,
+  "title": "Robotic Arm",
+  "maker": "Kaden Ly",
+  "overview": "Custom 3D-printed robotic arm developed with WPI MakerBucks support, focusing on iterative CAD design, precision tolerancing, and stepper-driven joint actuation.",
+  "scope": "Iterative prototyping of arm joints, clearance and tolerance testing, stepper motor integration, and development of forward-kinematics control software.",
+  "materials": "• 3D-printed structural/joint components (from CAD)\n • Stepper motors (one or more per joint)\n • Stepper motor drivers (1/8 microstepping)\n • Gear reduction hardware (roughly 50:1 reduction at the joints)\n • Microcontroller and wiring for motor control",
+  "fabricationSteps": "1. Design the arm and its joints in CAD, including the gear reduction (roughly 50:1) needed at each joint.\n 2. 3D print individual parts and test clearance, tolerance, and overall size before committing to a full build.\n 3. Expect (and plan for) multiple print iterations — small CAD tweaks can mean a full 5–6 hour reprint each time tolerances need adjusting.\n 4. Assemble and test the first complete joint (Joint 2) for range of motion.\n 5. Install stepper motors and 1/8-microstep drivers at each joint.\n 6. Wire the motors to a microcontroller and write basic motor-control code.\n 7. Test full-arm movement, including lifting and presenting a small object (e.g., a soda can).\n 8. Diagnose and address stepper \"slip\" under high torque when the arm is fully extended, which can cause the calculated end-effector position to drift from its real position.\n 9. Implement forward kinematics so the arm can be commanded to specific joint angles.\n 10. (Next step) Add computer vision and inverse kinematics so the arm can operate more autonomously.",
+  "outcome": "Functional multi-joint arm capable of lifting and presenting objects under forward-kinematics control, with inverse kinematics and vision integration planned as next steps.",
+  "imageFolderPath": "images/Project 2026/Robotic Arm",
+  "url": "",
+  "notes": ""
+}

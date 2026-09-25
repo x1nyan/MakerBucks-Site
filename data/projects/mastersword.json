@@ -1,0 +1,18 @@
+{
+  "order": 11,
+  "categories": [
+    "Props, Costumes & Art",
+    "Electronics & Hardware"
+  ],
+  "featured": true,
+  "title": "Mastersword",
+  "maker": "Peter Story & Team",
+  "overview": "Custom LED-illuminated sword prop developed with WPI MakerBucks support, combining CAD-designed 3D-printed components with gyroscope-reactive lighting effects.",
+  "scope": "Three-layer blade design and fabrication, custom PCB development for LED control, gyroscope/accelerometer integration, and hilt finishing and detailing.",
+  "materials": "• PLA filament (outer blade shell)\n • TPU filament (inner blade core, holds and cushions the LED strip)\n • Polycarbonate tubing, 3/4\" outer diameter (middle alignment layer)\n • Individually addressable LED strip\n • MPU6050 gyroscope/accelerometer module\n • Arduino Pro Mini\n • Custom PCB (ordered from JLCPCB, purple soldermask to match the hilt)\n • Purple gloss spray paint (e.g., Rustoleum 2X Gloss, \"Grape\")\n • Gold acrylic paint\n • Clear matte topcoat (e.g., Rustoleum Clear Matte)\n • Shoelaces (for the handle wrap detail) and superglue",
+  "fabricationSteps": "1. Design the blade and hilt in CAD (Onshape), planning a three-layer blade cross-section: PLA shell, polycarbonate middle tube, TPU inner core.\n 2. Segment the blade and hilt into printable sections sized to fit both personal and Makerspace printers; print the hilt as a single piece where possible.\n 3. Design a custom PCB to host the Arduino Pro Mini and MPU6050 gyroscope/accelerometer, optimizing for compact electronics space; order it from JLCPCB in a color matching the hilt.\n 4. Program the Arduino Pro Mini to read motion data from the gyroscope/accelerometer and drive individually addressable LEDs with motion-reactive effects (e.g., a flicker effect tied to swing motion, plus a rainbow cycle mode).\n 5. Prime and paint the hilt: a purple gloss base coat, hand-painted gold acrylic accents on the gem and handle end (painted separately from the blade connector to avoid sticking), then a clear matte topcoat to seal the finish.\n 6. Add the handle's wrap detail: cut shoelaces to length, seal the cut ends with a lighter to prevent fraying, then lattice-wrap and superglue them around the hilt.\n 7. Final-assemble the blade layers, electronics, and finished hilt into the complete sword.",
+  "outcome": "Completed a fully assembled, motion-reactive illuminated sword prop with custom electronics and refined cosmetic finishing.",
+  "imageFolderPath": "images/Project 2026/Masterswords",
+  "url": "",
+  "notes": ""
+}

@@ -1,0 +1,18 @@
+{
+  "order": 6,
+  "categories": [
+    "Props, Costumes & Art",
+    "Electronics & Hardware"
+  ],
+  "featured": false,
+  "title": "DEA Makers Lightsaber Prototype",
+  "maker": "Peter Story & Alex Knox",
+  "overview": "Custom functional lightsaber replica developed with WPI MakerBucks support, focusing on prop design, hardware integration, and rapid prototyping.",
+  "scope": "Custom hilt design, component integration, assembly, and allocation of funds for materials and 3D printing.",
+  "materials": "• Custom 3D-printed hilt components\n • Integrated electronic components (likely LED and/or sound elements, based on typical lightsaber-prop builds)\n • Fasteners and internal mounting hardware",
+  "fabricationSteps": "1. Design the hilt in CAD, planning internal space for electronics.\n 2. 3D print the hilt components.\n 3. Source and integrate the electronic hardware (lighting/sound, per design).\n 4. Assemble the electronics into the printed hilt.\n 5. Finish and detail the hilt's exterior.\n 6. Test the completed prop and document with photos and video.",
+  "outcome": "Successfully constructed a functional prototype with visual documentation and a video demonstration.",
+  "imageFolderPath": "images/Project 2026/Lightsaber",
+  "url": "",
+  "notes": ""
+}

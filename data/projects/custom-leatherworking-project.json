@@ -1,0 +1,17 @@
+{
+  "order": 5,
+  "categories": [
+    "Props, Costumes & Art"
+  ],
+  "featured": false,
+  "title": "Custom Leatherworking Project",
+  "maker": "Philip Miu",
+  "overview": "Custom leather goods project focused on hand craftsmanship, material sourcing, and developing practical leatherworking techniques.",
+  "scope": "Material selection, leather craft, design execution, and allocation of funding for supplies and tooling.",
+  "materials": "• Leather (hide, cut to pattern)\n • Leatherworking tools (cutting, stitching, edge-finishing tools)\n • Hardware/fasteners as needed for the specific piece (rivets, buckles, thread)",
+  "fabricationSteps": "1. Choose the leather good to make and sketch or pattern its design.\n 2. Source appropriate leather and confirm quantity/quality against the pattern.\n 3. Cut the leather pieces to the pattern.\n 4. Stitch and assemble the piece by hand, using appropriate leatherworking tools.\n 5. Finish edges and add any hardware (rivets, buckles, etc.).\n 6. Inspect the finished piece and document with photos and video.",
+  "outcome": "Completed functional custom leather pieces with photo documentation and a video project showcase.",
+  "imageFolderPath": "images/Project 2026/Custom Leatherworking Project",
+  "url": "",
+  "notes": ""
+}

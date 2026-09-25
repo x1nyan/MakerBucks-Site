@@ -1,0 +1,18 @@
+{
+  "order": 15,
+  "categories": [
+    "Robotics",
+    "Engineering & Testing"
+  ],
+  "featured": false,
+  "title": "ROV Submarine Chassis",
+  "maker": "Zirun Yang",
+  "overview": "Competition-grade ROV submarine chassis developed with WPI MakerBucks support for the team's first entry into the international MATE ROV underwater robotics competition.",
+  "scope": "Design and fabrication of a pressure-resistant hull and mechanical chassis, power distribution board development, and control system programming.",
+  "materials": "• 3D-printed pressure-bearing hull and chassis components\n • A custom power distribution board (PDB) and associated electronics\n • Control system hardware (microcontroller/computer, per the ROV's RBE/CS control stack)\n • Waterproofing/sealing hardware for the hull\n • A test tank or pool for water testing",
+  "fabricationSteps": "1. Design the pressure-resistant hull and mechanical chassis in CAD.\n 2. Select 3D-printing parameters — notably infill rate — to balance pressure resistance against weight and print time.\n 3. 3D print the hull and chassis components.\n 4. Design and build a power distribution board (PDB) to manage the ROV's onboard electrical system.\n 5. Develop the ROV's control system software.\n 6. Assemble the hull, chassis, PDB, and control electronics into a complete unit, sealing all pressure-critical joints.\n 7. Conduct prototype water testing to confirm the hull withstands water pressure and the full system operates as intended.",
+  "outcome": "Successfully completed prototype water testing, with the chassis withstanding water pressure as designed.",
+  "imageFolderPath": "images/Project 2026/ROV Submarine -- Chassis",
+  "url": "",
+  "notes": ""
+}

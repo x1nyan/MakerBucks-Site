@@ -1,0 +1,17 @@
+{
+  "order": 8,
+  "categories": [
+    "Engineering & Testing"
+  ],
+  "featured": false,
+  "title": "Electric Motor Spinner Heat Vent",
+  "maker": "John Cassell",
+  "overview": "Experimental electric aircraft motor developed with WPI MakerBucks support, exploring heat dissipation through a specially designed vented spinner.",
+  "scope": "Motor and spinner design for improved thermal venting, fabrication and assembly, and thermal performance testing.",
+  "materials": "• Motor components (stator, rotor, and standard motor hardware)\n • A custom-fabricated, vented spinner geometry\n • Supporting mounting hardware",
+  "fabricationSteps": "1. Design a spinner geometry with venting intended to actively move heat away from the motor.\n 2. Fabricate the custom spinner and integrate it with the motor assembly.\n 3. Assemble the complete motor with the vented spinner installed.\n 4. Run the motor under load and measure/observe temperature behavior, comparing against a standard (non-vented) spinner if possible.\n 5. Document the venting performance on video.",
+  "outcome": "Successfully demonstrated effective heat venting through the spinner design, with future work planned around vapor chambers and alternate spinner geometries.",
+  "imageFolderPath": "images/Project 2026/Electric motor that vents heat through its spinner to reduce heat drag in electric aircraft",
+  "url": "",
+  "notes": ""
+}
