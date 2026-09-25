@@ -367,6 +367,30 @@
   border-color: #adb3af;
 }
 
+.site-footer {
+  width: 100%;
+  margin-top: 56px;
+  padding: 34px 28px 42px;
+  border-top: 1px solid #c5c9c6;
+  background: rgba(223, 226, 223, 0.72);
+  color: var(--ink-soft);
+  text-align: center;
+}
+
+.site-footer p {
+  max-width: 860px;
+  margin: 0 auto;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.footer-support {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.footer-donor { margin-top: 10px !important; }
+
 .site-logo {
   display: block;
   order: 2;
