@@ -20,7 +20,7 @@
 (function () {
   'use strict';
 
-  const { CSV_URL, PHOTO_MANIFEST_URL, MULTI_WORD_CATEGORIES } = MB.config;
+  const { CSV_URL, MULTI_WORD_CATEGORIES } = MB.config;
 
 
   /* =========================================================
@@ -43,8 +43,11 @@
 
   const IMAGE_EXTENSIONS = /\.(png|jpe?g|gif|webp|avif|jfif|bmp|svg)(\?.*)?$/i;
 
-  /* Photo folders are mapped in a committed manifest because GitHub Pages
-     does not expose directory listings. */
+  /*
+    Photo folders are relative to index.html. The static server exposes
+    each folder as a small directory listing, so the carousel can use
+    every image without storing remote URLs in the CSV.
+  */
   function normalizePath(value) {
     return String(value || '').trim().replace(/\\/g, '/');
   }
@@ -58,34 +61,25 @@
     });
   }
 
-  let photoManifestPromise = null;
-
-  function loadPhotoManifest() {
-    if (!photoManifestPromise) {
-      photoManifestPromise = fetch(PHOTO_MANIFEST_URL)
-        .then(response => {
-          if (!response.ok) throw new Error(`Could not load ${PHOTO_MANIFEST_URL}`);
-          return response.json();
-        });
-    }
-    return photoManifestPromise;
-  }
-
-  function encodePath(path) {
-    return path.split('/').map(segment => encodeURIComponent(segment)).join('/');
-  }
-
   async function listFolderImagePaths(folderPath) {
     const folder = normalizePath(folderPath).replace(/^\.\//, '').replace(/\/+$/, '');
     if (!folder) return [];
 
     try {
-      const filenames = (await loadPhotoManifest())[folder] || [];
-      return sortPhotoPaths(filenames
-        .filter(filename => IMAGE_EXTENSIONS.test(filename))
-        .map(filename => encodePath(`${folder}/${filename}`)));
+      const response = await fetch(`${folder}/`);
+      if (!response.ok) return [];
+
+      const html = await response.text();
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+      const paths = [...doc.querySelectorAll('a[href]')]
+        .map(link => link.getAttribute('href'))
+        .filter(Boolean)
+        .filter(href => IMAGE_EXTENSIONS.test(href))
+        .map(href => `${folder}/${decodeURIComponent(href).split('/').pop()}`);
+
+      if (paths.length) return sortPhotoPaths(paths);
     } catch (error) {
-      console.error(error);
+      // A static server may not expose directory listings; we keep the rest of the code working.
     }
 
     return [];
@@ -111,7 +105,9 @@
       .filter(([field]) => !String(project[field] || '').trim())
       .map(([, label]) => label);
 
-    if (!project.photoUrls.length) missing.push('cover image');
+    if (!project.photoUrls.length && window.location.protocol !== 'file:') {
+      missing.push('cover image');
+    }
     return missing;
   }
 
@@ -358,6 +354,7 @@
             <div class="back-title">${escapeHtml(project.title)}</div>
             ${project.maker ? `<p class="back-meta">By: ${escapeHtml(project.maker)}</p>` : ''}
             <p class="back-hint">Click anywhere to close</p>
+            <button class="back-close" type="button">Close details</button>
           </div>
 
           <div class="back-columns">
@@ -477,16 +474,34 @@
     el.style.height = box.height + 'px';
   }
 
-  function fitBackContent(expanded, targetHeight) {
+  function fitBackContent(expanded) {
     const back = expanded.querySelector('.card-back');
     const content = back && back.querySelector('.back-content');
     if (!back || !content) return;
 
     const styles = getComputedStyle(back);
-    const availableHeight = targetHeight -
-      parseFloat(styles.paddingTop) - parseFloat(styles.paddingBottom);
-    const scale = Math.min(1, availableHeight / content.scrollHeight);
+    const paddingX = parseFloat(styles.paddingLeft) + parseFloat(styles.paddingRight);
+    const paddingY = parseFloat(styles.paddingTop) + parseFloat(styles.paddingBottom);
+    const availableWidth = Math.max(0, back.clientWidth - paddingX);
+    const availableHeight = Math.max(0, back.clientHeight - paddingY);
 
+    const targetScaleY = availableHeight > 0 ? availableHeight / Math.max(content.scrollHeight, 1) : 1;
+    const targetScaleX = availableWidth > 0 ? availableWidth / Math.max(content.scrollWidth, 1) : 1;
+    const readableMinScale = 0.9;
+    const scale = Math.min(1, Math.min(targetScaleX, targetScaleY, 1));
+
+    const needsScroll = scale < readableMinScale;
+
+    back.style.overflowY = needsScroll ? 'auto' : 'hidden';
+    back.style.overflowX = 'hidden';
+
+    if (needsScroll) {
+      content.style.transform = 'none';
+      content.style.width = '100%';
+      return;
+    }
+
+    content.style.setProperty('--detail-scale', scale.toFixed(3));
     content.style.transform = `scale(${scale})`;
     content.style.width = `${100 / scale}%`;
   }
@@ -540,10 +555,13 @@
 
     card.classList.add('is-open');
     lockScroll();
+    const pageElements = [...document.body.children]
+      .filter(element => element !== overlay && element !== expanded);
+    pageElements.forEach(element => { element.inert = true; });
 
     overlay.classList.add('show');
     setBox(expanded, target);
-    fitBackContent(expanded, target.height);
+    fitBackContent(expanded);
     expanded.classList.remove('settled');
     expanded.classList.add('flipped');
 
@@ -552,12 +570,13 @@
 
     window.setTimeout(() => {
       expanded.classList.add('settled');
+      expanded.querySelector('.back-close')?.focus({ preventScroll: true });
     }, revealDelay);
 
     const titleButton = card.querySelector('.flip-title');
     if (titleButton) titleButton.setAttribute('aria-expanded', 'true');
 
-    openState = { card, expanded, overlay };
+    openState = { card, expanded, overlay, pageElements };
     busy = false;
     expanded.focus({ preventScroll: true });
   }
@@ -566,7 +585,7 @@
     if (!openState || busy) return;
     busy = true;
 
-    const { card, expanded, overlay } = openState;
+    const { card, expanded, overlay, pageElements } = openState;
 
     // Shrink back to wherever the original card is now, while flipping back.
     // Leave the expanded copy in place until the reverse transition completes,
@@ -584,6 +603,7 @@
       expanded.remove();
       overlay.remove();
       card.classList.remove('is-open');
+      pageElements.forEach(element => { element.inert = false; });
       unlockScroll();
 
       const titleButton = card.querySelector('.flip-title');
@@ -630,12 +650,21 @@
   // Escape key closes an open card
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && openState) closeCard();
+    if (e.key === 'Tab' && openState) {
+      const closeButton = openState.expanded.querySelector('.back-close');
+      if (closeButton) {
+        e.preventDefault();
+        closeButton.focus();
+      }
+    }
   });
 
   // If the window is resized while open, re-center the card
   window.addEventListener('resize', () => {
     if (!openState || busy) return;
-    setBox(openState.expanded, getTargetBox(openState.card.project, 0));
+    const target = getTargetBox(openState.card.project, 0);
+    setBox(openState.expanded, target);
+    fitBackContent(openState.expanded);
   });
 
 
@@ -766,55 +795,80 @@
     return rows;
   }
 
+  function processCsvText(text) {
+    const rows = parseCsv(text.replace(/^\uFEFF/, ''));
+    if (!rows.length) return Promise.resolve([]);
+
+    const headers = rows.shift().map(header => header.trim().toLowerCase());
+    const column = name => headers.indexOf(name.toLowerCase());
+    const records = rows.map(row => name => row[column(name)] || '');
+    const standaloneCats = findStandaloneCategories(
+      records.map(get => get('project') ? get('category') : '')
+    );
+
+    return Promise.all(
+      records.map(async (get, index) => {
+        const title = get('project').trim();
+        if (!title) return null;
+
+        const featuredValue = get('featured');
+        const imageFolderPath = get('image folder path').trim();
+        const project = {
+          title,
+          maker: get('maker(s)'),
+          categories: splitCategories(get('category'), standaloneCats),
+          featured: String(featuredValue).toUpperCase() === 'TRUE',
+          overview: get('overview'),
+          scope: get('scope'),
+          materials: get('materials'),
+          fabrication: get('fabrication steps'),
+          outcome: get('outcome'),
+          imageFolderPath,
+          photoUrls: await parsePhotoFolder(imageFolderPath)
+        };
+
+        const missingFields = getMissingProjectFields(project);
+        if (missingFields.length) {
+          console.warn(
+            `Skipping incomplete CSV row ${index + 2} (${title}): ` +
+            missingFields.join(', ')
+          );
+          return null;
+        }
+
+        project.score = contentScore(project);
+        return project;
+      })
+    ).then(items => items.filter(Boolean));
+  }
+
   function fetchProjects() {
+    const embeddedCsv = window.MB && typeof window.MB.rawCsv === 'string'
+      ? window.MB.rawCsv.trim()
+      : '';
+
+    if (window.location.protocol === 'file:' && embeddedCsv) {
+      return processCsvText(embeddedCsv);
+    }
+
     return fetch(CSV_URL)
       .then(res => {
-        if (!res.ok) throw new Error(`Could not load ${CSV_URL}`);
+        if (!res.ok) {
+          if (embeddedCsv) return processCsvText(embeddedCsv);
+          throw new Error(`Could not load ${CSV_URL}`);
+        }
         return res.text();
       })
       .then(text => {
-        const rows = parseCsv(text.replace(/^\uFEFF/, ''));
-        const headers = rows.shift().map(header => header.trim().toLowerCase());
-        const column = name => headers.indexOf(name.toLowerCase());
-        const records = rows.map(row => name => row[column(name)] || '');
-        const standaloneCats = findStandaloneCategories(
-          records.map(get => get('project') ? get('category') : '')
-        );
-
-        return Promise.all(
-          records.map(async (get, index) => {
-            const title = get('project').trim();
-            if (!title) return null;
-
-            const featuredValue = get('featured');
-            const imageFolderPath = get('image folder path').trim();
-            const project = {
-              title,
-              maker: get('maker(s)'),
-              categories: splitCategories(get('category'), standaloneCats),
-              featured: String(featuredValue).toUpperCase() === 'TRUE',
-              overview: get('overview'),
-              scope: get('scope'),
-              materials: get('materials'),
-              fabrication: get('fabrication steps'),
-              outcome: get('outcome'),
-              imageFolderPath,
-              photoUrls: await parsePhotoFolder(imageFolderPath)
-            };
-
-            const missingFields = getMissingProjectFields(project);
-            if (missingFields.length) {
-              console.warn(
-                `Skipping incomplete CSV row ${index + 2} (${title}): ` +
-                missingFields.join(', ')
-              );
-              return null;
-            }
-
-            project.score = contentScore(project);
-            return project;
-          })
-        ).then(items => items.filter(Boolean));
+        if (!text || !text.trim()) {
+          if (embeddedCsv) return processCsvText(embeddedCsv);
+          return [];
+        }
+        return processCsvText(text);
+      })
+      .catch(err => {
+        if (embeddedCsv) return processCsvText(embeddedCsv);
+        throw err;
       });
   }
 

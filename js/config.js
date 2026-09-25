@@ -25,7 +25,6 @@ window.MB = window.MB || {};
      ========================================================= */
 
   const CSV_URL = 'MakerBucks_Database.csv';
-  const PHOTO_MANIFEST_URL = 'photo-manifest.json';
 
   // Paste the Google Form link here when the submission form is ready.
   const PROJECT_SUBMISSION_FORM_URL = '';
@@ -62,7 +61,6 @@ window.MB = window.MB || {};
     // images/banner/2.jpg,
     // images/banner/3.jpg
     
-    //fix later won't interates too fast, want a slower fade in and out
     imageUrls: [
       'images/Banner Photos/Banner.jfif',
       'images/Banner Photos/baner2.JPG',
@@ -82,7 +80,6 @@ window.MB = window.MB || {};
     BANNER,
     HEADER_LOGO,
     CSV_URL,
-    PHOTO_MANIFEST_URL,
     PROJECT_SUBMISSION_FORM_URL,
     MULTI_WORD_CATEGORIES
   };
