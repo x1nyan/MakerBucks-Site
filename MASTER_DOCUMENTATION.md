@@ -35,7 +35,7 @@ The site loads project data when the page starts. Both the Featured section and 
 
 ```text
 index.html
-Makerbucks Database - Sheet1.csv
+MakerBucks_Database.csv
 MASTER_DOCUMENTATION.md
 README.md
 
@@ -58,7 +58,7 @@ images/
   baner3.JPG      Optional banner image.
   baner4.JPG      Optional banner image.
   Gears-05.png    Header logo.
-  projects/       Local project-photo folders.
+  Project 2026/   Local project-photo folders.
 ```
 
 ## 4. Script Load Order
@@ -79,8 +79,7 @@ Scripts are loaded at the bottom of `index.html` in this order:
 Configuration lives in `js/config.js`:
 
 ```javascript
-const CSV_URL = 'Makerbucks Database - Sheet1.csv';
-const PHOTO_ROOT = 'images/projects';
+const CSV_URL = 'MakerBucks_Database.csv';
 ```
 
 `BANNER` contains:
@@ -116,7 +115,7 @@ Important fields:
 - `Materials`: expanded-card materials section.
 - `Fabrication Steps`: expanded-card fabrication section.
 - `Outcome`: expanded-card outcome section.
-- `Photos`: local filenames or full HTTP/HTTPS image URLs.
+- `Image Folder Path`: relative folder containing the project's images.
 - `Url`: retained as source data but not currently displayed by the UI.
 - `Notes`: available in the CSV but not currently displayed by the UI.
 
@@ -124,41 +123,42 @@ The parser supports quoted fields containing commas and line breaks, which is re
 
 ## 7. Project Photo Folders
 
-Each project has a slug-named folder below `images/projects/`.
-
-The slug algorithm:
-
-- Converts text to lowercase.
-- Replaces runs of non-letter/non-number characters with `-`.
-- Removes leading and trailing hyphens.
-
-Example:
+Set the `Image Folder Path` to the project's relative image folder. The folder
+must contain a supported image whose filename starts with `cover`; all other
+supported images are discovered and added to the carousel in filename order.
+For example:
 
 ```text
-Project: 3lb Combat Robot for NHRL
-Folder: images/projects/3lb-combat-robot-for-nhrl/
+Image Folder Path: images/Project 2026/ABV Meter
+  Cover.jpg
+  72A36A92-B1B8-41D6-A9C8-8332A74370C1.jpeg
 ```
 
-Put the image files in that folder and list their filenames in the CSV `Photos` cell:
+The site must be served through HTTP so it can read the folder's directory
+listing. Remote photo URLs are not used.
 
-```text
-cover.jpg, side.jpg
-```
+## 8. New Project Submission Workflow
 
-This resolves to:
+The Google Form link should be configured in `js/config.js` as
+`PROJECT_SUBMISSION_FORM_URL`. The current placeholder is:
+`PASTE_GOOGLE_FORM_LINK_HERE`.
 
-```text
-images/projects/3lb-combat-robot-for-nhrl/cover.jpg
-images/projects/3lb-combat-robot-for-nhrl/side.jpg
-```
+The form should collect the required project fields and the relative
+`Image Folder Path`. After reviewing a submission:
 
-Full remote URLs in the `Photos` cell remain supported. The browser cannot automatically enumerate arbitrary files in a folder, so local filenames must be listed in the CSV.
+1. Upload the submitted image files to that exact folder in the repository.
+2. Name the main image `cover` with a supported image extension.
+3. Add the approved row to `MakerBucks_Database.csv` using the form values.
+4. Serve the site through HTTP and reload it.
 
-## 8. Data Flow
+Rows missing required content or a readable cover image are skipped and do not
+create tiles or error cards. Optional fields are `Featured`, `Url`, and `Notes`.
+
+## 9. Data Flow
 
 ```text
 config.js
-  -> CSV_URL and PHOTO_ROOT
+  -> CSV_URL
 
 cards.js
   -> fetch CSV
@@ -312,8 +312,8 @@ Featured section layout, horizontal track, arrows, whole-card snapping, and resp
 
 1. Add a row to the CSV using the existing header order.
 2. Use `TRUE` in `Featured` if it belongs in Featured Projects.
-3. Create its slug-named photo folder.
-4. Add local filenames to the `Photos` cell.
+3. Create its image folder and add a `cover` image plus any carousel images.
+4. Set the row's `Image Folder Path` to that folder.
 5. Serve the site through HTTP and reload.
 
 ### Change the banner
@@ -339,15 +339,14 @@ Edit the CSV parser and project construction in `js/cards.js`.
 ### Cards do not load
 
 - Confirm the site is running through HTTP, not `file://`.
-- Confirm `Makerbucks Database - Sheet1.csv` is beside `index.html`.
+- Confirm `MakerBucks_Database.csv` is beside `index.html`.
 - Check the browser console for a failed CSV request.
 
 ### A local photo does not load
 
-- Confirm the filename exactly matches the CSV `Photos` cell.
-- Confirm the folder name matches the project slug.
-- Check capitalization and file extension.
-- Confirm the image is inside `images/projects/<slug>/`.
+- Confirm the CSV `Image Folder Path` points to the correct relative folder.
+- Confirm the folder contains a supported image named `cover`.
+- Check capitalization and file extensions.
 
 ### A project is missing from Featured Projects
 

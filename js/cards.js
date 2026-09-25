@@ -4,7 +4,7 @@
    Used by both featured.js and showcase.js. Load it AFTER config.js.
 
    What's in here:
-      - helpers that clean up CSV data (categories, photo links, ...)
+      - helpers that clean up CSV data (categories, photo folders, ...)
      - building a card's HTML (front + back)
      - the enlarged flip view (click a card -> it flips and grows)
      - the photo carousel arrows/dots
@@ -20,7 +20,7 @@
 (function () {
   'use strict';
 
-  const { CSV_URL, PHOTO_ROOT, MULTI_WORD_CATEGORIES } = MB.config;
+  const { CSV_URL, MULTI_WORD_CATEGORIES } = MB.config;
 
 
   /* =========================================================
@@ -41,29 +41,19 @@
       .replace(/"/g, '&quot;');
   }
 
+  const IMAGE_EXTENSIONS = /\.(png|jpe?g|gif|webp|avif|jfif|bmp|svg)(\?.*)?$/i;
+
   /*
-    parseUrls: reads the Photos cell. You can put several URLs,
-    local filenames, or a repo folder path in one cell, separated by
-    commas or new lines. If a folder path is used, the app fetches the
-    folder listing and sorts the cover image first so the carousel can
-    start from that cover image.
+    Photo folders are relative to index.html. The static server exposes
+    each folder as a small directory listing, so the carousel can use
+    every image without storing remote URLs in the CSV.
   */
   function normalizePath(value) {
     return String(value || '').trim().replace(/\\/g, '/');
   }
 
-  function isHttpUrl(value) {
-    return /^https?:\/\//i.test(value);
-  }
-
-  function looksLikeFolderPath(value) {
-    const path = normalizePath(value);
-    if (!path || isHttpUrl(path) || path.startsWith('data:')) return false;
-    return !/\.(png|jpe?g|gif|webp|avif|jfif|bmp|svg)(\?.*)?$/i.test(path);
-  }
-
-  function sortPhotoUrls(urls) {
-    return [...new Set(urls)].sort((a, b) => {
+  function sortPhotoPaths(paths) {
+    return [...new Set(paths)].sort((a, b) => {
       const aCover = /(?:^|\/|\\)cover\.[^/\\]+$/i.test(a);
       const bCover = /(?:^|\/|\\)cover\.[^/\\]+$/i.test(b);
       if (aCover !== bCover) return aCover ? -1 : 1;
@@ -71,45 +61,23 @@
     });
   }
 
-  function resolveLocalImageUrl(value, projectSlug) {
-    const path = normalizePath(value).replace(/^[/\\]+/, '');
-    if (!path) return '';
-    if (isHttpUrl(path) || path.startsWith('data:')) return path;
-
-    const cleanPath = path.startsWith(`${PHOTO_ROOT}/`)
-      ? path
-      : path.startsWith('/')
-        ? path.replace(/^\//, '')
-        : path.includes('/')
-          ? path
-          : `${PHOTO_ROOT}/${projectSlug}/${path}`;
-
-    return cleanPath.split(' ').join('%20');
-  }
-
-  async function listFolderImageUrls(folderPath) {
-    const folder = normalizePath(folderPath).replace(/\/+$/, '');
-    if (!folder || !looksLikeFolderPath(folder)) return [];
-
-    const folderUrl = isHttpUrl(folder)
-      ? folder
-      : folder.startsWith('/')
-        ? folder
-        : `/${folder.replace(/^\.?\//, '')}`;
+  async function listFolderImagePaths(folderPath) {
+    const folder = normalizePath(folderPath).replace(/^\.\//, '').replace(/\/+$/, '');
+    if (!folder) return [];
 
     try {
-      const response = await fetch(folderUrl);
+      const response = await fetch(`${folder}/`);
       if (!response.ok) return [];
 
       const html = await response.text();
       const doc = new DOMParser().parseFromString(html, 'text/html');
-      const urls = [...doc.querySelectorAll('a[href]')]
+      const paths = [...doc.querySelectorAll('a[href]')]
         .map(link => link.getAttribute('href'))
         .filter(Boolean)
-        .map(href => new URL(href, folderUrl).href)
-        .filter(url => /\.(png|jpe?g|gif|webp|avif|jfif|bmp|svg)(\?.*)?$/i.test(url));
+        .filter(href => IMAGE_EXTENSIONS.test(href))
+        .map(href => `${folder}/${decodeURIComponent(href).split('/').pop()}`);
 
-      if (urls.length) return sortPhotoUrls(urls);
+      if (paths.length) return sortPhotoPaths(paths);
     } catch (error) {
       // A static server may not expose directory listings; we keep the rest of the code working.
     }
@@ -117,37 +85,28 @@
     return [];
   }
 
-  async function parseUrls(cellValue, projectSlug) {
-    if (!cellValue) return [];
+  async function parsePhotoFolder(folderPath) {
+    return listFolderImagePaths(folderPath);
+  }
 
-    const values = String(cellValue)
-      .split(/[\n,]+/)
-      .map(value => value.trim())
-      .filter(Boolean);
+  const REQUIRED_PROJECT_FIELDS = [
+    ['title', 'Project'],
+    ['maker', 'Maker(s)'],
+    ['overview', 'Overview'],
+    ['scope', 'Scope'],
+    ['materials', 'Materials'],
+    ['fabrication', 'Fabrication Steps'],
+    ['outcome', 'Outcome'],
+    ['imageFolderPath', 'Image Folder Path']
+  ];
 
-    if (!values.length) return [];
+  function getMissingProjectFields(project) {
+    const missing = REQUIRED_PROJECT_FIELDS
+      .filter(([field]) => !String(project[field] || '').trim())
+      .map(([, label]) => label);
 
-    const resolved = [];
-
-    for (const value of values) {
-      if (isHttpUrl(value)) {
-        resolved.push(value);
-        continue;
-      }
-
-      if (looksLikeFolderPath(value)) {
-        const folderUrls = await listFolderImageUrls(value);
-        if (folderUrls.length) {
-          resolved.push(...folderUrls);
-          continue;
-        }
-      }
-
-      const localUrl = resolveLocalImageUrl(value, projectSlug);
-      if (localUrl) resolved.push(localUrl);
-    }
-
-    return sortPhotoUrls(resolved);
+    if (!project.photoUrls.length) missing.push('cover image');
+    return missing;
   }
 
   /*
@@ -229,18 +188,6 @@
     // Remove accidental duplicates within one cell
     const unique = [...new Map(found.map(c => [c.toLowerCase(), c])).values()];
     return unique.length ? unique : ['General'];
-  }
-
-  /*
-    slugify: "ABV Meter" -> "abv-meter". The slug names each
-    project's local photo folder.
-  */
-  function slugify(str) {
-    return String(str)
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/(^-|-$)/g, '');
   }
 
   /*
@@ -812,12 +759,12 @@
         );
 
         return Promise.all(
-          records.map(async get => {
+          records.map(async (get, index) => {
             const title = get('project').trim();
             if (!title) return null;
 
-            const slug = slugify(title);
             const featuredValue = get('featured');
+            const imageFolderPath = get('image folder path').trim();
             const project = {
               title,
               maker: get('maker(s)'),
@@ -828,8 +775,18 @@
               materials: get('materials'),
               fabrication: get('fabrication steps'),
               outcome: get('outcome'),
-              photoUrls: await parseUrls(get('photos'), slug)
+              imageFolderPath,
+              photoUrls: await parsePhotoFolder(imageFolderPath)
             };
+
+            const missingFields = getMissingProjectFields(project);
+            if (missingFields.length) {
+              console.warn(
+                `Skipping incomplete CSV row ${index + 2} (${title}): ` +
+                missingFields.join(', ')
+              );
+              return null;
+            }
 
             project.score = contentScore(project);
             return project;

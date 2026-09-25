@@ -20,13 +20,14 @@ window.MB = window.MB || {};
      CONFIG
      ---------------------------------------------------------
      CSV_URL points to the project data file next to index.html.
-     PHOTO_ROOT is the folder containing one slug-named folder per
-     project, with filenames listed in the CSV Photos column.
+    Project image folders are listed in the CSV Image Folder Path
+    column.
      ========================================================= */
 
-  const CSV_URL = 'Makerbucks Database - Sheet1.csv';
-  const PHOTO_ROOT = 'images/Project 2026';
+  const CSV_URL = 'MakerBucks_Database.csv';
 
+  // Paste the Google Form link here when the submission form is ready.
+  const PROJECT_SUBMISSION_FORM_URL = '';
   /*
     OPTIONAL manual override for category names that contain a
     comma. You normally DON'T need to touch this: the page works
@@ -80,7 +81,7 @@ window.MB = window.MB || {};
     BANNER,
     HEADER_LOGO,
     CSV_URL,
-    PHOTO_ROOT,
+    PROJECT_SUBMISSION_FORM_URL,
     MULTI_WORD_CATEGORIES
   };
 })();

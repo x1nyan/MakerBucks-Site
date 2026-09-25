@@ -14,6 +14,13 @@
 
   const { makeCardEl } = MB;
 
+  const projectSubmissionLink = document.getElementById('projectSubmissionLink');
+  const submissionFormUrl = MB.config.PROJECT_SUBMISSION_FORM_URL;
+  if (projectSubmissionLink && submissionFormUrl) {
+    projectSubmissionLink.href = submissionFormUrl;
+    projectSubmissionLink.hidden = false;
+  }
+
 
   /* =========================================================
      STATE
