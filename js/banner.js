@@ -15,31 +15,11 @@
   const { BANNER } = MB.config;
 
   const heading = document.getElementById('bannerTitle');
-  const banner = document.querySelector('.banner');
   const photo = document.getElementById('bannerImg');
-  let photoNext = document.getElementById('bannerImgNext');
-
-  if (!photoNext) {
-    photoNext = document.createElement('img');
-    photoNext.id = 'bannerImgNext';
-    photoNext.className = 'banner-img banner-img--next';
-    photoNext.alt = '';
-    banner.appendChild(photoNext);
-  }
 
   const imageUrls = Array.isArray(BANNER.imageUrls) && BANNER.imageUrls.length
     ? BANNER.imageUrls
     : [BANNER.imageUrl || 'images/Banner.jfif'];
-  const intervalMs = Number(BANNER.intervalMs) || 5000;
-  const fadeMs = Number(BANNER.fadeMs) || 2200;
-
-  photo.style.transition = `opacity ${fadeMs}ms ease-in-out`;
-  photoNext.style.transition = `opacity ${fadeMs}ms ease-in-out`;
-
-  let currentIndex = 0;
-  let timerId = null;
-  let activePhoto = photo;
-  let nextPhoto = photoNext;
 
   function toImageUrl(url) {
     const u = String(url || '').trim();
@@ -63,53 +43,12 @@
     img.hidden = false;
   }
 
-  function showSlide(index) {
-    const nextUrl = imageUrls[index % imageUrls.length];
-    const nextSrc = toImageUrl(nextUrl);
-
-    if (!nextSrc) return;
-
-    const nextImage = new Image();
-    nextImage.onload = () => {
-      nextPhoto.src = nextSrc;
-      nextPhoto.hidden = false;
-
-      nextPhoto.style.opacity = '1';
-      activePhoto.style.opacity = '0';
-
-      setTimeout(() => {
-        activePhoto.src = nextSrc;
-        activePhoto.style.opacity = '1';
-        nextPhoto.style.opacity = '0';
-
-        const temp = activePhoto;
-        activePhoto = nextPhoto;
-        nextPhoto = temp;
-      }, fadeMs);
-    };
-    nextImage.src = nextSrc;
-  }
-
-  function scheduleNext() {
-    clearInterval(timerId);
-    timerId = setInterval(() => {
-      currentIndex = (currentIndex + 1) % imageUrls.length;
-      showSlide(currentIndex);
-    }, intervalMs);
-  }
-
   if (BANNER.title) {
     heading.textContent = BANNER.title;
     document.title = BANNER.title;
   }
 
   if (imageUrls.length > 0) {
-    setImage(activePhoto, imageUrls[currentIndex]);
-    activePhoto.style.opacity = '1';
-    nextPhoto.style.opacity = '0';
-    scheduleNext();
+    setImage(photo, imageUrls[0]);
   }
-
-  banner.addEventListener('mouseenter', () => clearInterval(timerId));
-  banner.addEventListener('mouseleave', scheduleNext);
 })();

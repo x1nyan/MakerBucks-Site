@@ -326,7 +326,7 @@
                photo shows, add e.g. object-position: center 30%;
  ::after       a dark layer over the photo so the white title
                is readable on any picture
- .banner-logo  sits in the top-left corner, above the dark layer
+ .site-logo   sits in the header above the banner
  .banner-title centered in the middle of the banner
  ========================================================= */
 

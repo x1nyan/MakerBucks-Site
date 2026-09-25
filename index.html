@@ -21,7 +21,7 @@
 
     js/config.js        SETTINGS: the local CSV path + banner images
     js/banner.js        fills in the title banner
-    js/cards.js         building cards, flip view, loading the sheet
+    js/cards.js         building cards, flip view, loading the CSV
     js/featured.js      the Featured Projects row + its arrows
     js/showcase.js      search, filters, sort, and the grid
 
@@ -86,7 +86,7 @@
     <div class="featured-head">
       <div>
         <h2 class="featured-title" id="featuredTitle">★ Featured Projects</h2>
-        <p class="featured-sub" id="featuredSub">Click a project to see how it was made</p>
+        <p class="featured-sub">Click a project to see how it was made</p>
       </div>
 
       <div class="scroll-btns" id="scrollBtns" hidden>
@@ -155,7 +155,7 @@
   <p class="swipe-hint">Swipe sideways to see more projects →</p>
 
   <div class="project-grid" id="projectContainer">
-    <div class="loading" id="loadingState">Loading projects…</div>
+    <div class="loading">Loading projects…</div>
   </div>
 
   <div class="no-results" id="noResultsState">

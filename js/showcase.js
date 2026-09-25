@@ -5,7 +5,7 @@
 
    Handles everything specific to the main page:
      search box, filter dropdown, sort menu, and the project grid.
-   Card building, the flip view, and loading the sheet come from
+  Card building, the flip view, and loading the CSV come from
    cards.js (through window.MB).
    ===================================================================== */
 

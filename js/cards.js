@@ -376,8 +376,6 @@
      a double-click can't tangle things up.
      ========================================================= */
 
-  const ANIMATION_MS = 850; // let the flip finish before revealing the back
-
   let openState = null; // { card, expanded, overlay } while open
   let busy = false;
 
@@ -485,26 +483,24 @@
     card.classList.add('is-open');
     lockScroll();
 
-    // 3 + 4. Next frame: grow to the center AND flip.
-    // (Waiting one frame makes sure the browser has drawn the
-    //  starting position first, so there's something to animate from.)
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        overlay.classList.add('show');
-        setBox(expanded, target);
-        expanded.classList.add('flipped');
-      });
-    });
+    overlay.classList.add('show');
+    setBox(expanded, target);
+    expanded.classList.remove('settled');
+    expanded.classList.add('flipped');
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const revealDelay = prefersReducedMotion ? 0 : 700;
+
+    window.setTimeout(() => {
+      expanded.classList.add('settled');
+    }, revealDelay);
 
     const titleButton = card.querySelector('.flip-title');
     if (titleButton) titleButton.setAttribute('aria-expanded', 'true');
 
     openState = { card, expanded, overlay };
-    setTimeout(() => {
-      busy = false;
-      expanded.classList.add('settled');
-      expanded.focus({ preventScroll: true });
-    }, ANIMATION_MS);
+    busy = false;
+    expanded.focus({ preventScroll: true });
   }
 
   function closeCard() {
@@ -519,22 +515,19 @@
     expanded.classList.remove('flipped');
     setBox(expanded, end);
     overlay.classList.remove('show');
+    expanded.remove();
+    overlay.remove();
+    card.classList.remove('is-open');
+    unlockScroll();
 
-    setTimeout(() => {
-      expanded.remove();
-      overlay.remove();
-      card.classList.remove('is-open');
-      unlockScroll();
+    const titleButton = card.querySelector('.flip-title');
+    if (titleButton) {
+      titleButton.setAttribute('aria-expanded', 'false');
+      titleButton.focus({ preventScroll: true });
+    }
 
-      const titleButton = card.querySelector('.flip-title');
-      if (titleButton) {
-        titleButton.setAttribute('aria-expanded', 'false');
-        titleButton.focus({ preventScroll: true });
-      }
-
-      openState = null;
-      busy = false;
-    }, ANIMATION_MS);
+    openState = null;
+    busy = false;
   }
 
   /*
@@ -738,9 +731,7 @@
               materials: get('materials'),
               fabrication: get('fabrication steps'),
               outcome: get('outcome'),
-              photoUrls: parseUrls(get('photos'), slug),
-              pageUrl: get('url'),
-              slug
+              photoUrls: parseUrls(get('photos'), slug)
             };
 
             project.score = contentScore(project);

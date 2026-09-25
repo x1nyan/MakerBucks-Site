@@ -1,7 +1,7 @@
 /* =====================================================================
-   config.js — SETTINGS SHARED BY BOTH PAGES
+  config.js — SHARED SITE SETTINGS
    ---------------------------------------------------------------------
-  This is the settings file for the local CSV data and banner.
+    This is the settings file for the local CSV data and banner.
 
    It creates one global object, window.MB ("MakerBucks"), that the
    other scripts read from:
@@ -48,7 +48,7 @@ window.MB = window.MB || {};
          'https://raw.githubusercontent.com/<user>/<repo>/main/images/banner.jpg'
          or the github.com ".../blob/..." link from the file's page
          (the code adds "?raw=true" for you so it loads as an image).
-     Leave logoUrl as '' to show no logo.
+    The header logo is configured separately under HEADER_LOGO.
      ========================================================= */
 
   const BANNER = {
@@ -64,8 +64,7 @@ window.MB = window.MB || {};
     imageUrls: [
       'images/Banner.jfif'
     ],
-    intervalMs: 7000,
-    fadeMs: 3500
+    intervalMs: 7000
   };
 
   const HEADER_LOGO = {
