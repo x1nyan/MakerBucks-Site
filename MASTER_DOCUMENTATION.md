@@ -139,7 +139,11 @@ listing. Remote photo URLs are not used.
 
 ## 8. New Project Submission Workflow
 
-The designated Google Form should collect the required project fields and the relative
+The Google Form link should be configured in `js/config.js` as
+`PROJECT_SUBMISSION_FORM_URL`. The current placeholder is:
+`PASTE_GOOGLE_FORM_LINK_HERE`.
+
+The form should collect the required project fields and the relative
 `Image Folder Path`. After reviewing a submission:
 
 1. Upload the submitted image files to that exact folder in the repository.
