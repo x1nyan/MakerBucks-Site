@@ -352,6 +352,7 @@
             <div class="back-title">${escapeHtml(project.title)}</div>
             ${project.maker ? `<p class="back-meta">By: ${escapeHtml(project.maker)}</p>` : ''}
             <p class="back-hint">Click anywhere to close</p>
+            <button class="back-close" type="button">Close details</button>
           </div>
 
           <div class="back-columns">
@@ -471,18 +472,14 @@
     el.style.height = box.height + 'px';
   }
 
-  function fitBackContent(expanded, targetHeight) {
+  function fitBackContent(expanded) {
     const back = expanded.querySelector('.card-back');
     const content = back && back.querySelector('.back-content');
     if (!back || !content) return;
 
-    const styles = getComputedStyle(back);
-    const availableHeight = targetHeight -
-      parseFloat(styles.paddingTop) - parseFloat(styles.paddingBottom);
-    const scale = Math.min(1, availableHeight / content.scrollHeight);
-
-    content.style.transform = `scale(${scale})`;
-    content.style.width = `${100 / scale}%`;
+    // Keep the back text at its designed size; long details scroll inside the face.
+    content.style.transform = 'none';
+    content.style.width = '100%';
   }
 
   /*
@@ -534,10 +531,13 @@
 
     card.classList.add('is-open');
     lockScroll();
+    const pageElements = [...document.body.children]
+      .filter(element => element !== overlay && element !== expanded);
+    pageElements.forEach(element => { element.inert = true; });
 
     overlay.classList.add('show');
     setBox(expanded, target);
-    fitBackContent(expanded, target.height);
+    fitBackContent(expanded);
     expanded.classList.remove('settled');
     expanded.classList.add('flipped');
 
@@ -546,12 +546,13 @@
 
     window.setTimeout(() => {
       expanded.classList.add('settled');
+      expanded.querySelector('.back-close')?.focus({ preventScroll: true });
     }, revealDelay);
 
     const titleButton = card.querySelector('.flip-title');
     if (titleButton) titleButton.setAttribute('aria-expanded', 'true');
 
-    openState = { card, expanded, overlay };
+    openState = { card, expanded, overlay, pageElements };
     busy = false;
     expanded.focus({ preventScroll: true });
   }
@@ -560,7 +561,7 @@
     if (!openState || busy) return;
     busy = true;
 
-    const { card, expanded, overlay } = openState;
+    const { card, expanded, overlay, pageElements } = openState;
 
     // Shrink back to wherever the original card is now, while flipping back.
     // Leave the expanded copy in place until the reverse transition completes,
@@ -578,6 +579,7 @@
       expanded.remove();
       overlay.remove();
       card.classList.remove('is-open');
+      pageElements.forEach(element => { element.inert = false; });
       unlockScroll();
 
       const titleButton = card.querySelector('.flip-title');
@@ -624,6 +626,13 @@
   // Escape key closes an open card
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && openState) closeCard();
+    if (e.key === 'Tab' && openState) {
+      const closeButton = openState.expanded.querySelector('.back-close');
+      if (closeButton) {
+        e.preventDefault();
+        closeButton.focus();
+      }
+    }
   });
 
   // If the window is resized while open, re-center the card

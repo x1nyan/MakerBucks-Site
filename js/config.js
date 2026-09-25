@@ -61,7 +61,6 @@ window.MB = window.MB || {};
     // images/banner/2.jpg,
     // images/banner/3.jpg
     
-    //fix later won't interates too fast, want a slower fade in and out
     imageUrls: [
       'images/Banner Photos/Banner.jfif',
       'images/Banner Photos/baner2.JPG',

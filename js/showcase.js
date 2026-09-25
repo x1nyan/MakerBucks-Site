@@ -343,7 +343,7 @@
 
       if (allProjects.length === 0) {
         container.innerHTML =
-          '<div class="no-results" style="display:block;">No projects found in the spreadsheet.</div>';
+          '<div class="empty-state">No projects found in the spreadsheet.</div>';
         return;
       }
 
