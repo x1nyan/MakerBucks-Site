@@ -111,11 +111,10 @@ window.MB = window.MB || {};
     // images/banner/1.jpg,
     // images/banner/2.jpg,
     // images/banner/3.jpg
+    
+    //fix later won't interates too fast, want a slower fade in and out
     imageUrls: [
-      'images/Banner.jfif', 
-      'images/baner2.JPG', 
-      'images/baner3.JPG', 
-      'images/baner4.JPG',
+      'images/Banner.jfif'
     ],
     intervalMs: 7000,
     fadeMs: 3500

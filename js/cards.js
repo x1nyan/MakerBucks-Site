@@ -371,7 +371,7 @@
      a double-click can't tangle things up.
      ========================================================= */
 
-  const ANIMATION_MS = 650; // a bit longer than the CSS transitions
+  const ANIMATION_MS = 400; // a bit longer than the CSS transitions
 
   let openState = null; // { card, expanded, overlay } while open
   let busy = false;

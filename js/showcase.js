@@ -58,6 +58,7 @@
   const searchInput = document.getElementById('searchInput');
   const searchClearBtn = document.getElementById('searchClearBtn');
   const sortSelect = document.getElementById('sortSelect');
+  const shuffleBtn = document.getElementById('shuffleBtn');
 
 
   /* =========================================================
@@ -188,6 +189,9 @@
           a.title.localeCompare(b.title));
         break;
 
+      case 'shuffle':
+        break;
+
       case 'detail':
       default:
         // Most content first; thinner cards sink to the bottom
@@ -210,10 +214,20 @@
      hidden.
      ========================================================= */
 
-  function renderAll() {
+  function renderAll(animateShuffle = false) {
     container.innerHTML = '';
-    sortProjects(allProjects).forEach(project => {
-      container.appendChild(makeCardEl(project));
+    sortProjects(allProjects).forEach((project, index) => {
+      const card = makeCardEl(project);
+
+      if (animateShuffle) {
+        const shuffleTilt = Math.random() * 10 - 5;
+        card.classList.add('is-shuffling');
+        card.style.setProperty('--shuffle-delay', `${index * 35}ms`);
+        card.style.setProperty('--shuffle-tilt', `${shuffleTilt.toFixed(2)}deg`);
+        card.style.setProperty('--shuffle-settle-tilt', `${(-shuffleTilt * 0.35).toFixed(2)}deg`);
+      }
+
+      container.appendChild(card);
     });
     applyFilters();
   }
@@ -321,6 +335,20 @@
   sortSelect.addEventListener('change', () => {
     currentSort = sortSelect.value;
     renderAll();
+  });
+
+  shuffleBtn.addEventListener('click', () => {
+    const shuffled = allProjects.slice();
+
+    for (let index = shuffled.length - 1; index > 0; index--) {
+      const randomIndex = Math.floor(Math.random() * (index + 1));
+      [shuffled[index], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[index]];
+    }
+
+    allProjects = shuffled;
+    currentSort = 'shuffle';
+    sortSelect.value = 'shuffle';
+    renderAll(true);
   });
 
 

@@ -62,6 +62,12 @@
 
   <div class="site-header">
     <img class="site-logo" id="siteLogo" alt="" hidden>
+    <nav class="header-links" aria-label="MakerBucks links">
+      <a class="header-link" href="https://www.wpi.edu/about/ie/%20innovation-studio/makerspace/makerbucks"
+        target="_blank" rel="noopener noreferrer">MakerBucks</a>
+      <a class="header-link" href="https://forms.cloud.microsoft/pages/responsepage.aspx?id=9XacWBXK-UGIS1XsFaBnKriU7R5-K7pMspHSlPPbjQlUQlJMWVBYSDBQS001TUlRVk9GSFUyMVBKRy4u&amp;route=shorturl"
+        target="_blank" rel="noopener noreferrer">Apply</a>
+    </nav>
   </div>
 
   <header class="banner">
@@ -134,7 +140,10 @@
         <option value="az">Sort: A → Z</option>
         <option value="za">Sort: Z → A</option>
         <option value="maker">Sort: Maker A → Z</option>
+        <option value="shuffle">Random order</option>
       </select>
+
+      <button class="shuffle-btn" id="shuffleBtn" type="button">Shuffle cards</button>
 
       <button class="clear-filters-btn" id="clearFiltersBtn" type="button">Clear filters</button>
     </div>

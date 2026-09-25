@@ -27,8 +27,8 @@
 .featured-section {
   margin-bottom: 30px;
   background: var(--accent-bg);
-  border: 1px solid var(--accent-light);
-  border-radius: 16px;
+  border-top: 1px solid var(--accent-light);
+  border-bottom: 1px solid var(--accent-light);
   padding: 24px 0 10px;
 }
 
@@ -96,15 +96,13 @@
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
   padding: 8px 24px 22px;
-  scrollbar-width: thin;
-  scrollbar-color: var(--accent-light) transparent;
+  scrollbar-width: none;
 }
 
-.featured-track::-webkit-scrollbar { height: 6px; }
-.featured-track::-webkit-scrollbar-thumb { background: var(--accent-light); border-radius: 3px; }
+.featured-track::-webkit-scrollbar { display: none; }
 
 .featured-track .card {
-  flex: 0 0 clamp(280px, 30vw, 360px); /* same size as the main grid cards */
+  flex: 0 0 calc((100% - 48px) / 3); /* show three complete cards */
   min-width: 0; /* stop long tags from stretching a card wider than its size */
   scroll-snap-align: start;
 }
@@ -120,7 +118,7 @@
 .featured-track .error-state { flex: 1 0 100%; }
 
 @media (max-width: 700px) {
-  body { padding: 12px; }
+  body { padding: 0; }
   :root { --card-pad: 16px; }
 
   .featured-section { padding-top: 18px; }
@@ -134,5 +132,5 @@
     scroll-padding-left: 16px;
   }
 
-  .featured-track .card { flex-basis: 86%; } /* next card peeks in */
+  .featured-track .card { flex-basis: 100%; } /* show one complete card */
 }

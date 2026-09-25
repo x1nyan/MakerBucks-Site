@@ -15,9 +15,9 @@
 
 .controls {
   background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 16px;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 16px 28px;
   margin-bottom: 24px;
 }
 
@@ -75,6 +75,22 @@
   font-size: 13px;
   background: #fff;
   cursor: pointer;
+}
+
+.shuffle-btn {
+  min-height: 40px;
+  padding: 10px 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ink);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.shuffle-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .clear-filters-btn {
@@ -183,7 +199,7 @@
 .results-summary {
   font-size: 13px;
   color: var(--ink-faint);
-  margin: 0 0 18px 2px;
+  margin: 0 28px 18px;
 }
 
 /* Only shown on phones (see PHONE section below) */
@@ -196,9 +212,9 @@
 
 
 /* =========================================================
- GRID — 3 CARDS PER ROW
+ GRID — 4 CARDS PER ROW
  ---------------------------------------------------------
- "repeat(3, minmax(0, 1fr))" = 3 equal columns. The
+ "repeat(4, minmax(0, 1fr))" = 4 equal columns. The
  minmax(0, ...) stops long words from stretching a column.
  Grid rows automatically make every card in the same row
  as tall as the tallest one, so rows line up neatly.
@@ -208,10 +224,32 @@
 
 .project-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 34px;
-  margin-left: 12px;
-  margin-right: 12px;
+  margin-left: 28px;
+  margin-right: 28px;
+}
+
+.project-grid .card.is-shuffling {
+  animation: shuffle-card 650ms cubic-bezier(0.2, 0.8, 0.3, 1) var(--shuffle-delay, 0ms) both;
+  pointer-events: none;
+}
+
+@keyframes shuffle-card {
+  0% {
+    opacity: 0;
+    transform: translateY(-18px) rotate(var(--shuffle-tilt, 0deg));
+  }
+
+  55% {
+    opacity: 1;
+    transform: translateY(5px) rotate(var(--shuffle-settle-tilt, 0deg));
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) rotate(0deg);
+  }
 }
 
 
@@ -243,7 +281,7 @@
  ========================================================= */
 
 @media (max-width: 700px) {
-  body { padding: 16px; }
+  body { padding: 0; }
 
   .search-row { flex-direction: column; }
   .sort-select,
@@ -260,7 +298,7 @@
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
     padding: 10px 10px 10px;
-    margin: 0 -12px;           /* let the row run to the screen edges */
+    margin: 0;                 /* the page is already edge to edge */
     padding-left: 20px;
     padding-right: 20px;
     scroll-padding-left: 12px;
@@ -276,6 +314,8 @@
 
   :root { --card-pad: 16px; }
   .card-title { font-size: 19px; }
+  .controls { padding: 14px 16px; }
+  .results-summary { margin-left: 16px; margin-right: 16px; }
 }
 
 
@@ -294,16 +334,47 @@
 
 .site-header {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  margin: 6px 0 10px;
+  min-height: 92px;
+  width: 100vw;
+  margin: 0 0 0 calc(50% - 50vw);
+  padding: 10px 18px;
+  background: #e6e6e6;
+  border-bottom: 1px solid #d0d0d0;
+}
+
+.header-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  order: 1;
+}
+
+.header-link {
+  display: inline-block;
+  padding: 9px 12px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.header-link:hover {
+  background: #d6d6d6;
+  border-color: #b8b8b8;
 }
 
 .site-logo {
   display: block;
-  height: 110px;
+  order: 2;
+  height: 132px;
   width: auto;
-  max-width: 42%;
+  max-width: 48%;
   object-fit: contain;
   filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4));
 }
@@ -314,9 +385,9 @@
   align-items: center;
   justify-content: center;
   min-height: 500px;
-  margin-bottom: 28px;
+  width: 100vw;
+  margin: 0 0 28px calc(50% - 50vw);
   padding: 40px 24px;
-  border-radius: 16px;
   overflow: hidden;
   background: #2a2a2a; /* shows while the photo loads, or if it's missing */
   text-align: center;
@@ -362,18 +433,23 @@
 .banner [hidden] { display: none; }
 
 @media (max-width: 700px) {
+  body { padding: 0; }
+
   .site-header {
-    margin: 4px 0 8px;
+    min-height: 76px;
+    padding: 8px 10px;
   }
 
   .site-logo {
-    height: 64px;
-    max-width: 55%;
+    height: 78px;
+    max-width: 45%;
   }
+
+  .header-links { gap: 0; }
+  .header-link { padding: 7px 8px; font-size: 11px; }
 
   .banner {
     min-height: 200px;
     padding: 28px 16px;
-    border-radius: 12px;
   }
 }
