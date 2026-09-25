@@ -11,18 +11,18 @@
   COLOR + STYLE VARIABLES
   These are reused everywhere below as var(--name).
   Change a color here and it updates across the whole page.
-  --accent is the WPI red used for buttons, labels, and highlights.
+  --accent is the burnt orange used for buttons, labels, and highlights.
 */
 :root {
-  --accent: #ac2b37;
-  --accent-light: #f1b2b8;
-  --accent-bg: #fff8f8;
-  --ink: #1c1c1c;
-  --ink-soft: #555;
-  --ink-faint: #777;
-  --line: #e4e4e4;
+  --accent: #c05a2b;
+  --accent-light: #e4ae94;
+  --accent-bg: #fff5ef;
+  --ink: #2e3032;
+  --ink-soft: #5f6366;
+  --ink-faint: #7a7f82;
+  --line: #d4d6d3;
   --panel: #ffffff;
-  --page-bg: #f7f7f5;
+  --page-bg: #eceeec;
   --radius: 12px;
   --card-pad: 24px; /* inner spacing of each card face */
 }
@@ -50,7 +50,7 @@ a:focus-visible,
 button:focus-visible,
 input:focus-visible,
 select:focus-visible {
-  outline: 3px solid #1a73e8;
+  outline: 3px solid var(--accent);
   outline-offset: 2px;
 }
 
@@ -267,8 +267,8 @@ select:focus-visible {
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
-  background: #e8f0fe;
-  color: #1a73e8;
+  background: #f6dfd2;
+  color: #9b431f;
   font-size: 11px;
   font-weight: 600;
   padding: 4px 9px;
@@ -511,9 +511,9 @@ select:focus-visible {
 
 .error-state {
   grid-column: 1 / -1;
-  background: #fff4f4;
-  border: 1px solid #f3c2c2;
-  color: #7a1f1f;
+  background: #fff5ef;
+  border: 1px solid #e4ae94;
+  color: #843b20;
   border-radius: 8px;
   padding: 16px;
 }

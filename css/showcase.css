@@ -340,8 +340,8 @@
   width: 100vw;
   margin: 0 0 0 calc(50% - 50vw);
   padding: 10px 18px;
-  background: #e6e6e6;
-  border-bottom: 1px solid #d0d0d0;
+  background: #dfe2df;
+  border-bottom: 1px solid #c5c9c6;
 }
 
 .header-links {
@@ -353,20 +353,20 @@
 
 .header-link {
   display: inline-block;
-  padding: 9px 12px;
+  padding: 12px 16px;
   border: 1px solid transparent;
   border-radius: 6px;
   background: transparent;
   color: var(--ink);
-  font-size: 13px;
+  font-size: 22px;
   font-weight: 600;
   text-decoration: none;
   white-space: nowrap;
 }
 
 .header-link:hover {
-  background: #d6d6d6;
-  border-color: #b8b8b8;
+  background: #cfd3d0;
+  border-color: #adb3af;
 }
 
 .site-logo {
@@ -379,12 +379,17 @@
   filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4));
 }
 
+.site-logo-link {
+  display: block;
+  order: 2;
+}
+
 .banner {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 500px;
+  min-height: clamp(880px, 38vw, 440px);
   width: 100vw;
   margin: 0 0 28px calc(50% - 50vw);
   padding: 40px 24px;
@@ -420,14 +425,39 @@
 }
 
 .banner-title {
-  position: relative;
-  z-index: 2;
   margin: 0;
   color: #fff;
   font-size: clamp(38px, 6vw, 68px);
   line-height: 1.1;
   letter-spacing: 0.01em;
   text-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+}
+
+.banner-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+}
+
+.banner-apply {
+  display: inline-block;
+  padding: 12px 22px;
+  border: 2px solid var(--accent);
+  border-radius: 6px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.banner-apply:hover {
+  border-color: #e4ae94;
+  background: #9b431f;
 }
 
 .banner [hidden] { display: none; }
@@ -446,12 +476,14 @@
   }
 
   .header-links { gap: 0; }
-  .header-link { padding: 7px 8px; font-size: 15px; }
+  .header-link { padding: 9px 11px; font-size: 17px; }
 
   .banner {
-    min-height: 200px;
+    min-height: 220px;
     padding: 28px 16px;
   }
 
   .banner-title { font-size: clamp(34px, 8vw, 52px); }
+  .banner-content { gap: 16px; }
+  .banner-apply { padding: 10px 18px; font-size: 16px; }
 }
