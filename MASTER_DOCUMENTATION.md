@@ -134,8 +134,8 @@ Image Folder Path: images/Project 2026/ABV Meter
   72A36A92-B1B8-41D6-A9C8-8332A74370C1.jpeg
 ```
 
-The site uses `photo-manifest.json` because GitHub Pages does not expose folder
-directory listings. Remote photo URLs are not used.
+The site must be served through HTTP so it can read the folder's directory
+listing. Remote photo URLs are not used.
 
 ## 8. New Project Submission Workflow
 
@@ -148,14 +148,11 @@ The form should collect the required project fields and the relative
 
 1. Upload the submitted image files to that exact folder in the repository.
 2. Name the main image `cover` with a supported image extension.
-3. Run `update-photo-manifest.ps1` from the repository root.
-4. Add the approved row to `MakerBucks_Database.csv` using the form values.
-5. Commit and push the CSV, image files, and updated `photo-manifest.json`.
-6. Serve the site through HTTP and reload it.
+3. Add the approved row to `MakerBucks_Database.csv` using the form values.
+4. Serve the site through HTTP and reload it.
 
 Rows missing required content or a readable cover image are skipped and do not
 create tiles or error cards. Optional fields are `Featured`, `Url`, and `Notes`.
-The manifest must be regenerated whenever repository images change.
 
 ## 9. Data Flow
 
