@@ -21,6 +21,12 @@
     ? BANNER.imageUrls
     : [BANNER.imageUrl || 'images/Banner.jfif'];
 
+  function randomBannerImage() {
+    if (!imageUrls.length) return '';
+    const index = Math.floor(Math.random() * imageUrls.length);
+    return imageUrls[index];
+  }
+
   function toImageUrl(url) {
     const u = String(url || '').trim();
     if (/^https?:\/\/github\.com\/[^/]+\/[^/]+\/blob\//i.test(u) && !/[?&]raw=true/i.test(u)) {
@@ -49,6 +55,6 @@
   }
 
   if (imageUrls.length > 0) {
-    setImage(photo, imageUrls[0]);
+    setImage(photo, randomBannerImage());
   }
 })();

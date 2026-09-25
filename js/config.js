@@ -25,7 +25,7 @@ window.MB = window.MB || {};
      ========================================================= */
 
   const CSV_URL = 'Makerbucks Database - Sheet1.csv';
-  const PHOTO_ROOT = 'images/projects';
+  const PHOTO_ROOT = 'images/Project 2026';
 
   /*
     OPTIONAL manual override for category names that contain a
@@ -62,13 +62,16 @@ window.MB = window.MB || {};
     
     //fix later won't interates too fast, want a slower fade in and out
     imageUrls: [
-      'images/Banner.jfif'
+      'images/Banner Photos/Banner.jfif',
+      'images/Banner Photos/baner2.JPG',
+      'images/Banner Photos/baner3.JPG',
+      'images/Banner Photos/baner4.JPG'
     ],
     intervalMs: 7000
   };
 
   const HEADER_LOGO = {
-    logoUrl: 'images/Gears-05.png',
+    logoUrl: 'images/Website Assets/Gears-05.png',
     logoAlt: 'WPI MakerBucks logo'
   };
 

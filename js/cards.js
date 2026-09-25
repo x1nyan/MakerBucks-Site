@@ -42,23 +42,112 @@
   }
 
   /*
-    parseUrls: reads the Photos cell. You can put several URLs or
-    local filenames in one cell, separated by commas or new lines.
-    Local filenames resolve inside the project's photo folder.
+    parseUrls: reads the Photos cell. You can put several URLs,
+    local filenames, or a repo folder path in one cell, separated by
+    commas or new lines. If a folder path is used, the app fetches the
+    folder listing and sorts the cover image first so the carousel can
+    start from that cover image.
   */
-  function parseUrls(cellValue, projectSlug) {
+  function normalizePath(value) {
+    return String(value || '').trim().replace(/\\/g, '/');
+  }
+
+  function isHttpUrl(value) {
+    return /^https?:\/\//i.test(value);
+  }
+
+  function looksLikeFolderPath(value) {
+    const path = normalizePath(value);
+    if (!path || isHttpUrl(path) || path.startsWith('data:')) return false;
+    return !/\.(png|jpe?g|gif|webp|avif|jfif|bmp|svg)(\?.*)?$/i.test(path);
+  }
+
+  function sortPhotoUrls(urls) {
+    return [...new Set(urls)].sort((a, b) => {
+      const aCover = /(?:^|\/|\\)cover\.[^/\\]+$/i.test(a);
+      const bCover = /(?:^|\/|\\)cover\.[^/\\]+$/i.test(b);
+      if (aCover !== bCover) return aCover ? -1 : 1;
+      return a.localeCompare(b);
+    });
+  }
+
+  function resolveLocalImageUrl(value, projectSlug) {
+    const path = normalizePath(value).replace(/^[/\\]+/, '');
+    if (!path) return '';
+    if (isHttpUrl(path) || path.startsWith('data:')) return path;
+
+    const cleanPath = path.startsWith(`${PHOTO_ROOT}/`)
+      ? path
+      : path.startsWith('/')
+        ? path.replace(/^\//, '')
+        : path.includes('/')
+          ? path
+          : `${PHOTO_ROOT}/${projectSlug}/${path}`;
+
+    return cleanPath.split(' ').join('%20');
+  }
+
+  async function listFolderImageUrls(folderPath) {
+    const folder = normalizePath(folderPath).replace(/\/+$/, '');
+    if (!folder || !looksLikeFolderPath(folder)) return [];
+
+    const folderUrl = isHttpUrl(folder)
+      ? folder
+      : folder.startsWith('/')
+        ? folder
+        : `/${folder.replace(/^\.?\//, '')}`;
+
+    try {
+      const response = await fetch(folderUrl);
+      if (!response.ok) return [];
+
+      const html = await response.text();
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+      const urls = [...doc.querySelectorAll('a[href]')]
+        .map(link => link.getAttribute('href'))
+        .filter(Boolean)
+        .map(href => new URL(href, folderUrl).href)
+        .filter(url => /\.(png|jpe?g|gif|webp|avif|jfif|bmp|svg)(\?.*)?$/i.test(url));
+
+      if (urls.length) return sortPhotoUrls(urls);
+    } catch (error) {
+      // A static server may not expose directory listings; we keep the rest of the code working.
+    }
+
+    return [];
+  }
+
+  async function parseUrls(cellValue, projectSlug) {
     if (!cellValue) return [];
-    return String(cellValue)
+
+    const values = String(cellValue)
       .split(/[\n,]+/)
       .map(value => value.trim())
-      .filter(Boolean)
-      .map(value => {
-        if (value.startsWith('http://') || value.startsWith('https://')) return value;
-        const filename = value.replace(/^[/\\]+/, '');
-        return `${PHOTO_ROOT}/${projectSlug}/${filename}`
-          .split(' ')
-          .join('%20');
-      });
+      .filter(Boolean);
+
+    if (!values.length) return [];
+
+    const resolved = [];
+
+    for (const value of values) {
+      if (isHttpUrl(value)) {
+        resolved.push(value);
+        continue;
+      }
+
+      if (looksLikeFolderPath(value)) {
+        const folderUrls = await listFolderImageUrls(value);
+        if (folderUrls.length) {
+          resolved.push(...folderUrls);
+          continue;
+        }
+      }
+
+      const localUrl = resolveLocalImageUrl(value, projectSlug);
+      if (localUrl) resolved.push(localUrl);
+    }
+
+    return sortPhotoUrls(resolved);
   }
 
   /*
@@ -489,7 +578,7 @@
     expanded.classList.add('flipped');
 
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const revealDelay = prefersReducedMotion ? 0 : 700;
+    const revealDelay = prefersReducedMotion ? 0 : 260;
 
     window.setTimeout(() => {
       expanded.classList.add('settled');
@@ -509,25 +598,33 @@
 
     const { card, expanded, overlay } = openState;
 
-    // Shrink back to wherever the original card is now, while flipping back
+    // Shrink back to wherever the original card is now, while flipping back.
+    // Leave the expanded copy in place until the reverse transition completes,
+    // otherwise the browser cancels the animation before it can play.
     const end = card.getBoundingClientRect();
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const closeDelay = prefersReducedMotion ? 0 : 300;
+
     expanded.classList.remove('settled');
     expanded.classList.remove('flipped');
     setBox(expanded, end);
     overlay.classList.remove('show');
-    expanded.remove();
-    overlay.remove();
-    card.classList.remove('is-open');
-    unlockScroll();
 
-    const titleButton = card.querySelector('.flip-title');
-    if (titleButton) {
-      titleButton.setAttribute('aria-expanded', 'false');
-      titleButton.focus({ preventScroll: true });
-    }
+    window.setTimeout(() => {
+      expanded.remove();
+      overlay.remove();
+      card.classList.remove('is-open');
+      unlockScroll();
 
-    openState = null;
-    busy = false;
+      const titleButton = card.querySelector('.flip-title');
+      if (titleButton) {
+        titleButton.setAttribute('aria-expanded', 'false');
+        titleButton.focus({ preventScroll: true });
+      }
+
+      openState = null;
+      busy = false;
+    }, closeDelay);
   }
 
   /*
@@ -714,8 +811,8 @@
           records.map(get => get('project') ? get('category') : '')
         );
 
-        return records
-          .map(get => {
+        return Promise.all(
+          records.map(async get => {
             const title = get('project').trim();
             if (!title) return null;
 
@@ -731,13 +828,13 @@
               materials: get('materials'),
               fabrication: get('fabrication steps'),
               outcome: get('outcome'),
-              photoUrls: parseUrls(get('photos'), slug)
+              photoUrls: await parseUrls(get('photos'), slug)
             };
 
             project.score = contentScore(project);
             return project;
           })
-          .filter(Boolean);
+        ).then(items => items.filter(Boolean));
       });
   }
 
