@@ -1,0 +1,19 @@
+media:
+  - name: photos
+    label: Project photos
+    input: images
+    output: images
+    categories: [image]
+
+content:
+  - name: projects
+    label: Projects
+    type: file
+    path: MakerBucks_Database.csv
+    format: datagrid
+    operations:
+      delete: false
+
+settings:
+  commit:
+    identity: user
