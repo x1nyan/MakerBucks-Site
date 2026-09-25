@@ -25,24 +25,24 @@
 .featured-section[hidden] { display: none; }
 
 .featured-section {
-  margin-bottom: 30px;
+  margin-bottom: 22px;
   background: var(--accent-bg);
   border-top: 1px solid var(--accent-light);
   border-bottom: 1px solid var(--accent-light);
-  padding: 24px 0 10px;
+  padding: 16px 0 6px;
 }
 
 .featured-head {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 18px;
-  padding: 0 24px;
-  margin-bottom: 18px;
+  gap: 14px;
+  padding: 0 84px;
+  margin-bottom: 12px;
 }
 
 .featured-title {
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 700;
   color: var(--accent);
   margin: 0;
@@ -62,8 +62,8 @@
 .scroll-btns[hidden] { display: none; }
 
 .scroll-btn {
-  width: 40px;
-  height: 40px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   border: 1px solid var(--accent-light);
   background: #fff;
@@ -89,22 +89,24 @@
 
 .featured-track {
   display: flex;
-  gap: 24px;
+  gap: 18px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
-  scroll-padding-left: 24px;
+  overscroll-behavior-x: contain;
+  scroll-padding-left: 84px;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
-  padding: 8px 24px 22px;
+  padding: 4px 84px 12px;
   scrollbar-width: none;
 }
 
 .featured-track::-webkit-scrollbar { display: none; }
 
 .featured-track .card {
-  flex: 0 0 calc((100% - 48px) / 3); /* show three complete cards */
+  flex: 0 0 calc((100% - 36px) / 3); /* show three complete cards */
   min-width: 0; /* stop long tags from stretching a card wider than its size */
   scroll-snap-align: start;
+  scroll-snap-stop: always;
 }
 
 .featured-track .loading {
@@ -117,18 +119,27 @@
 
 .featured-track .error-state { flex: 1 0 100%; }
 
+@media (max-width: 1000px) and (min-width: 701px) {
+  .featured-head { padding-left: 52px; padding-right: 52px; }
+  .featured-track {
+    padding-left: 52px;
+    padding-right: 52px;
+    scroll-padding-left: 52px;
+  }
+}
+
 @media (max-width: 700px) {
   body { padding: 0; }
   :root { --card-pad: 16px; }
 
-  .featured-section { padding-top: 18px; }
+  .featured-section { padding-top: 12px; }
   .featured-head { padding: 0 16px; }
-  .featured-title { font-size: 21px; }
+  .featured-title { font-size: 19px; }
   .scroll-btns { display: none; } /* just swipe on phones */
 
   .featured-track {
-    gap: 14px;
-    padding: 6px 16px 18px;
+    gap: 12px;
+    padding: 4px 16px 12px;
     scroll-padding-left: 16px;
   }
 

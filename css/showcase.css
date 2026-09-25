@@ -14,7 +14,7 @@
  ========================================================= */
 
 .controls {
-  background: var(--panel);
+  background: #f5f6f4;
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
   padding: 16px 28px;
@@ -25,7 +25,8 @@
   display: flex;
   flex-wrap: wrap;
   align-items: stretch;
-  gap: 12px;
+  justify-content: center;
+  gap: 14px;
 }
 
 .search-wrap {
@@ -37,15 +38,21 @@
 .search-input {
   width: 100%;
   height: 100%;
-  min-height: 44px;
-  padding: 12px 34px 12px 14px;
-  border: 1px solid #ccc;
+  min-height: 54px;
+  padding: 14px 38px 14px 16px;
+  border: 1px solid #c6cac7;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 17px;
   outline: none;
+  background: #fff;
+  box-shadow: 0 3px 12px rgba(46, 48, 50, 0.08);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.search-input:focus { border-color: var(--accent); }
+.search-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(192, 90, 43, 0.16), 0 4px 14px rgba(46, 48, 50, 0.1);
+}
 
 .search-clear {
   position: absolute;
@@ -65,33 +72,22 @@
   justify-content: center;
 }
 
-.search-clear:hover { background: #f1f1f1; color: var(--ink); }
+.search-clear:hover { background: var(--accent-bg); color: var(--accent); }
 .search-clear.visible { display: flex; }
 
 .sort-select {
-  padding: 12px 12px;
-  border: 1px solid #ccc;
+  min-height: 50px;
+  padding: 13px 16px;
+  border: 1px solid #c6cac7;
   border-radius: 8px;
   font-size: 16px;
-  background: #fff;
+  background: #f1f3f1;
   cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
 }
 
-.shuffle-btn {
-  min-height: 40px;
-  padding: 10px 14px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background: #fff;
-  color: var(--ink);
-  font-size: 13px;
-  cursor: pointer;
-}
-
-.shuffle-btn:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
+.sort-select:hover,
+.sort-select:focus { border-color: var(--accent); }
 
 .clear-filters-btn {
   background: none;
@@ -106,6 +102,21 @@
 }
 
 .clear-filters-btn.visible { display: inline-block; }
+
+.search-row .clear-filters-btn {
+  min-height: 50px;
+  padding: 13px 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: #f1f3f1;
+  text-decoration: none;
+}
+
+.search-row .clear-filters-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-bg);
+}
 
 
 /* =========================================================
@@ -125,21 +136,26 @@
   align-items: center;
   gap: 8px;
   height: 100%;
-  min-height: 40px;
-  padding: 10px 14px;
-  border: 1px solid #ccc;
+  min-height: 52px;
+  padding: 13px 16px;
+  border: 1px solid #c6cac7;
   border-radius: 8px;
-  background: #fff;
-  font-size: 13px;
+  background: #f1f3f1;
+  font-size: 16px;
   cursor: pointer;
   white-space: nowrap;
+  transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
 }
 
-.filter-toggle:hover { border-color: var(--accent); }
+.filter-toggle:hover {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+}
 
 /* Turns the toggle red when any filter is active */
 .filter-toggle.has-active {
   border-color: var(--accent);
+  background: var(--accent-bg);
   color: var(--accent);
   font-weight: 600;
 }
@@ -212,9 +228,9 @@
 
 
 /* =========================================================
- GRID — 3 CARDS PER ROW
+ GRID — 4 CARDS PER ROW
  ---------------------------------------------------------
- "repeat(3, minmax(0, 1fr))" = 3 equal columns. The
+ "repeat(4, minmax(0, 1fr))" = 4 equal columns. The
  minmax(0, ...) stops long words from stretching a column.
  Grid rows automatically make every card in the same row
  as tall as the tallest one, so rows line up neatly.
@@ -224,41 +240,23 @@
 
 .project-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 34px;
-  margin-left: 28px;
-  margin-right: 28px;
+  margin-left: 84px;
+  margin-right: 84px;
 }
-
-.project-grid .card.is-shuffling {
-  animation: shuffle-card 650ms cubic-bezier(0.2, 0.8, 0.3, 1) var(--shuffle-delay, 0ms) both;
-  pointer-events: none;
-}
-
-@keyframes shuffle-card {
-  0% {
-    opacity: 0;
-    transform: translateY(-18px) rotate(var(--shuffle-tilt, 0deg));
-  }
-
-  55% {
-    opacity: 1;
-    transform: translateY(5px) rotate(var(--shuffle-settle-tilt, 0deg));
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateY(0) rotate(0deg);
-  }
-}
-
 
 /* =========================================================
  TABLET — 2 per row
  ========================================================= */
 
 @media (max-width: 1000px) {
-  .project-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 30px; }
+  .project-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 30px;
+    margin-left: 52px;
+    margin-right: 52px;
+  }
 }
 
 
@@ -312,8 +310,8 @@
   .project-grid .loading,
   .project-grid .error-state { flex: 1 0 100%; }
 
-  :root { --card-pad: 20px; }
-  .card-title { font-size: 24px; }
+  :root { --card-pad: 16px; }
+  .card-title { font-size: 20px; }
   .controls { padding: 14px 16px; }
   .results-summary { margin-left: 16px; margin-right: 16px; }
 }
@@ -339,7 +337,7 @@
   min-height: 92px;
   width: 100vw;
   margin: 0 0 0 calc(50% - 50vw);
-  padding: 10px 18px;
+  padding: 10px 84px;
   background: #dfe2df;
   border-bottom: 1px solid #c5c9c6;
 }
@@ -431,6 +429,10 @@
 }
 
 .banner [hidden] { display: none; }
+
+@media (max-width: 1000px) and (min-width: 701px) {
+  .site-header { padding-left: 52px; padding-right: 52px; }
+}
 
 @media (max-width: 700px) {
   body { padding: 0; }

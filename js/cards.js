@@ -376,7 +376,7 @@
      a double-click can't tangle things up.
      ========================================================= */
 
-  const ANIMATION_MS = 650; // let the flip finish before revealing the back
+  const ANIMATION_MS = 850; // let the flip finish before revealing the back
 
   let openState = null; // { card, expanded, overlay } while open
   let busy = false;

@@ -24,7 +24,7 @@
   --panel: #ffffff;
   --page-bg: #eceeec;
   --radius: 12px;
-  --card-pad: 28px; /* inner spacing of each card face */
+  --card-pad: 22px; /* inner spacing of each card face */
 }
 
 * { box-sizing: border-box; }
@@ -140,7 +140,7 @@ select:focus-visible {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.45s ease;
   cursor: pointer;
 }
 
@@ -152,10 +152,10 @@ select:focus-visible {
   perspective: 2200px;
   cursor: pointer;
   transition:
-    top 0.55s cubic-bezier(0.22, 0.61, 0.36, 1),
-    left 0.55s cubic-bezier(0.22, 0.61, 0.36, 1),
-    width 0.55s cubic-bezier(0.22, 0.61, 0.36, 1),
-    height 0.55s cubic-bezier(0.22, 0.61, 0.36, 1);
+    top 0.75s cubic-bezier(0.22, 0.61, 0.36, 1),
+    left 0.75s cubic-bezier(0.22, 0.61, 0.36, 1),
+    width 0.75s cubic-bezier(0.22, 0.61, 0.36, 1),
+    height 0.75s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
 /* The enlarged card gets keyboard focus (for screen readers and
@@ -166,7 +166,8 @@ select:focus-visible {
   width: 100%;
   height: 100%;
   transform-style: preserve-3d;
-  transition: transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+  transition: transform 0.8s cubic-bezier(0.22, 0.61, 0.36, 1);
+  will-change: transform;
 }
 
 .expanded-card.flipped .card-inner { transform: rotateY(180deg); }
@@ -175,6 +176,8 @@ select:focus-visible {
   position: absolute;
   inset: 0;
   height: auto;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
 }
 
@@ -182,10 +185,6 @@ select:focus-visible {
    front of the front face so no edge of the front peeks
    around its corners when flipped. */
 .expanded-card .card-front { box-shadow: none; }
-
-/* Once the flip has finished, hide the front completely so it
-   can't show through anywhere (added/removed by JavaScript). */
-.expanded-card.settled .card-front { visibility: hidden; }
 
 .card-back {
   transform: rotateY(180deg) translateZ(1px);
@@ -198,7 +197,7 @@ select:focus-visible {
 
 .expanded-card .card-back > * {
   opacity: 0;
-  transition: opacity 0.18s ease;
+  transition: opacity 0.25s ease;
 }
 
 .expanded-card.settled .card-back > * { opacity: 1; }
@@ -213,7 +212,7 @@ select:focus-visible {
  ========================================================= */
 
 .card-title {
-  font-size: 28px;
+  font-size: 22px;
   font-weight: 700;
   color: var(--ink);
   margin: 0 0 12px 0;
@@ -243,7 +242,7 @@ select:focus-visible {
   display: block;
   margin-top: 5px;
   color: var(--ink-faint);
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 500;
 }
 
@@ -269,7 +268,7 @@ select:focus-visible {
   text-overflow: ellipsis;
   background: #f6dfd2;
   color: #9b431f;
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 600;
   padding: 4px 9px;
   border-radius: 4px;
@@ -279,19 +278,19 @@ select:focus-visible {
 
 .maker-tag {
   color: #666;
-  font-size: 16px;
+  font-size: 13px;
   font-weight: 600;
 }
 
 .card-desc {
   color: #444;
-  font-size: 18px;
+  font-size: 15px;
   line-height: 1.6;
   margin: 0 0 14px;
 }
 
 .section-label {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 700;
   color: var(--accent);
   text-transform: uppercase;
@@ -301,13 +300,13 @@ select:focus-visible {
 
 .section-text {
   color: #555;
-  font-size: 17px;
+  font-size: 14px;
   line-height: 1.6;
   white-space: pre-line; /* keeps the line breaks from the sheet */
 }
 
 .scope-text {
-  font-size: 19px;
+  font-size: 16px;
   line-height: 1.55;
 }
 
