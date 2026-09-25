@@ -17,15 +17,15 @@
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 10px;
-  padding: 14px;
-  margin-bottom: 20px;
+  padding: 16px;
+  margin-bottom: 24px;
 }
 
 .search-row {
   display: flex;
   flex-wrap: wrap;
   align-items: stretch;
-  gap: 10px;
+  gap: 12px;
 }
 
 .search-wrap {
@@ -37,8 +37,8 @@
 .search-input {
   width: 100%;
   height: 100%;
-  min-height: 40px;
-  padding: 10px 34px 10px 14px;
+  min-height: 44px;
+  padding: 12px 34px 12px 14px;
   border: 1px solid #ccc;
   border-radius: 8px;
   font-size: 14px;
@@ -69,7 +69,7 @@
 .search-clear.visible { display: flex; }
 
 .sort-select {
-  padding: 10px 12px;
+  padding: 12px 12px;
   border: 1px solid #ccc;
   border-radius: 8px;
   font-size: 13px;
@@ -183,7 +183,7 @@
 .results-summary {
   font-size: 13px;
   color: var(--ink-faint);
-  margin: 0 0 14px 2px;
+  margin: 0 0 18px 2px;
 }
 
 /* Only shown on phones (see PHONE section below) */
@@ -209,7 +209,9 @@
 .project-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 24px;
+  gap: 34px;
+  margin-left: 12px;
+  margin-right: 12px;
 }
 
 
@@ -218,7 +220,7 @@
  ========================================================= */
 
 @media (max-width: 1000px) {
-  .project-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .project-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 30px; }
 }
 
 
@@ -241,7 +243,7 @@
  ========================================================= */
 
 @media (max-width: 700px) {
-  body { padding: 12px; }
+  body { padding: 16px; }
 
   .search-row { flex-direction: column; }
   .sort-select,
@@ -257,15 +259,15 @@
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
-    padding: 4px 4px 14px;
+    padding: 10px 10px 10px;
     margin: 0 -12px;           /* let the row run to the screen edges */
-    padding-left: 12px;
-    padding-right: 12px;
+    padding-left: 20px;
+    padding-right: 20px;
     scroll-padding-left: 12px;
   }
 
   .project-grid .card {
-    flex: 0 0 86%;
+    flex: 0 0 80%;
     scroll-snap-align: start;
   }
 
@@ -290,13 +292,29 @@
  .banner-title centered in the middle of the banner
  ========================================================= */
 
+.site-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 6px 0 10px;
+}
+
+.site-logo {
+  display: block;
+  height: 110px;
+  width: auto;
+  max-width: 42%;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4));
+}
+
 .banner {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 500px;
-  margin-bottom: 20px;
+  margin-bottom: 28px;
   padding: 40px 24px;
   border-radius: 16px;
   overflow: hidden;
@@ -310,6 +328,15 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  opacity: 1;
+  transition: opacity 1.6s ease-in-out;
+  z-index: 0;
+  will-change: opacity;
+}
+
+.banner-img--next {
+  opacity: 0;
+  z-index: 0;
 }
 
 .banner::after {
@@ -317,23 +344,13 @@
   position: absolute;
   inset: 0;
   background: rgba(0, 0, 0, 0.45);
-}
-
-.banner-logo {
-  position: absolute;
-  top: 18px;
-  left: 20px;
-  z-index: 2;
-  height: 64px;       /* logo height; width follows automatically */
-  width: auto;
-  max-width: 40%;
-  object-fit: contain;
-  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4));
+  z-index: 1;
+  pointer-events: none;
 }
 
 .banner-title {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   margin: 0;
   color: #fff;
   font-size: clamp(30px, 5vw, 56px);
@@ -345,15 +362,18 @@
 .banner [hidden] { display: none; }
 
 @media (max-width: 700px) {
-  .banner {
-    min-height: 200px;
-    padding: 64px 16px 32px; /* extra top room so the logo doesn't touch the title */
-    border-radius: 12px;
+  .site-header {
+    margin: 4px 0 8px;
   }
 
-  .banner-logo {
-    top: 12px;
-    left: 14px;
-    height: 42px;
+  .site-logo {
+    height: 64px;
+    max-width: 55%;
+  }
+
+  .banner {
+    min-height: 200px;
+    padding: 28px 16px;
+    border-radius: 12px;
   }
 }

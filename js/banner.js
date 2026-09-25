@@ -15,18 +15,29 @@
   const { BANNER } = MB.config;
 
   const heading = document.getElementById('bannerTitle');
+  const banner = document.querySelector('.banner');
   const photo = document.getElementById('bannerImg');
-  const logo = document.getElementById('bannerLogo');
+  let photoNext = document.getElementById('bannerImgNext');
 
-  /*
-    toImageUrl: GitHub has two kinds of links to a file.
-      github.com/<user>/<repo>/blob/main/images/x.jpg
-        -> opens a web PAGE about the file (won't work as an image)
-      github.com/<user>/<repo>/blob/main/images/x.jpg?raw=true
-        -> sends the actual image file
-    If a "blob" link is missing "?raw=true", this adds it. Any other
-    link or repo path (e.g. images/x.jpg) is left as it is.
-  */
+  if (!photoNext) {
+    photoNext = document.createElement('img');
+    photoNext.id = 'bannerImgNext';
+    photoNext.className = 'banner-img banner-img--next';
+    photoNext.alt = '';
+    banner.appendChild(photoNext);
+  }
+
+  const imageUrls = Array.isArray(BANNER.imageUrls) && BANNER.imageUrls.length
+    ? BANNER.imageUrls
+    : [BANNER.imageUrl || 'images/Banner.jfif'];
+  const intervalMs = Number(BANNER.intervalMs) || 5000;
+  const fadeMs = Number(BANNER.fadeMs) || 2200;
+
+  let currentIndex = 0;
+  let timerId = null;
+  let activePhoto = photo;
+  let nextPhoto = photoNext;
+
   function toImageUrl(url) {
     const u = String(url || '').trim();
     if (/^https?:\/\/github\.com\/[^/]+\/[^/]+\/blob\//i.test(u) && !/[?&]raw=true/i.test(u)) {
@@ -35,12 +46,6 @@
     return u;
   }
 
-  /*
-    setImage: gives an <img> its link. If there's no link, or the
-    image fails to load (wrong name, typo, not uploaded yet), the
-    <img> is hidden so no broken-image icon shows. The banner still
-    appears with its dark background and title.
-  */
   function setImage(img, url) {
     const src = toImageUrl(url);
     if (!src) {
@@ -52,14 +57,58 @@
       console.warn('Banner image could not be loaded:', src);
     };
     img.src = src;
+    img.hidden = false;
+  }
+
+  function showSlide(index) {
+    const nextUrl = imageUrls[index % imageUrls.length];
+    const nextSrc = toImageUrl(nextUrl);
+
+    if (!nextSrc) return;
+
+    const nextImage = new Image();
+    nextImage.onload = () => {
+      nextPhoto.src = nextSrc;
+      nextPhoto.hidden = false;
+      nextPhoto.style.transition = `opacity ${fadeMs}ms ease-in-out`;
+      activePhoto.style.transition = `opacity ${fadeMs}ms ease-in-out`;
+
+      nextPhoto.style.opacity = '1';
+      activePhoto.style.opacity = '0';
+
+      setTimeout(() => {
+        activePhoto.src = nextSrc;
+        activePhoto.style.opacity = '1';
+        nextPhoto.style.opacity = '0';
+
+        const temp = activePhoto;
+        activePhoto = nextPhoto;
+        nextPhoto = temp;
+      }, fadeMs);
+    };
+    nextImage.src = nextSrc;
+  }
+
+  function scheduleNext() {
+    clearInterval(timerId);
+    timerId = setInterval(() => {
+      currentIndex = (currentIndex + 1) % imageUrls.length;
+      showSlide(currentIndex);
+    }, intervalMs);
   }
 
   if (BANNER.title) {
     heading.textContent = BANNER.title;
-    document.title = BANNER.title; // browser tab text too
+    document.title = BANNER.title;
   }
 
-  setImage(photo, BANNER.imageUrl);
-  setImage(logo, BANNER.logoUrl);
-  logo.alt = BANNER.logoAlt || '';
+  if (imageUrls.length > 0) {
+    setImage(activePhoto, imageUrls[currentIndex]);
+    activePhoto.style.opacity = '1';
+    nextPhoto.style.opacity = '0';
+    scheduleNext();
+  }
+
+  banner.addEventListener('mouseenter', () => clearInterval(timerId));
+  banner.addEventListener('mouseleave', scheduleNext);
 })();

@@ -25,20 +25,20 @@
 .featured-section[hidden] { display: none; }
 
 .featured-section {
-  margin-bottom: 24px;
+  margin-bottom: 30px;
   background: var(--accent-bg);
   border: 1px solid var(--accent-light);
   border-radius: 16px;
-  padding: 22px 0 8px;
+  padding: 24px 0 10px;
 }
 
 .featured-head {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 16px;
-  padding: 0 22px;
-  margin-bottom: 14px;
+  gap: 18px;
+  padding: 0 24px;
+  margin-bottom: 18px;
 }
 
 .featured-title {
@@ -89,13 +89,13 @@
 
 .featured-track {
   display: flex;
-  gap: 22px;
+  gap: 24px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
-  scroll-padding-left: 22px;
+  scroll-padding-left: 24px;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
-  padding: 6px 22px 20px;
+  padding: 8px 24px 22px;
   scrollbar-width: thin;
   scrollbar-color: var(--accent-light) transparent;
 }
@@ -104,7 +104,7 @@
 .featured-track::-webkit-scrollbar-thumb { background: var(--accent-light); border-radius: 3px; }
 
 .featured-track .card {
-  flex: 0 0 clamp(280px, 30vw, 380px); /* same size as the main grid cards */
+  flex: 0 0 clamp(280px, 30vw, 360px); /* same size as the main grid cards */
   min-width: 0; /* stop long tags from stretching a card wider than its size */
   scroll-snap-align: start;
 }

@@ -105,14 +105,31 @@ window.MB = window.MB || {};
 
   const BANNER = {
     title: 'WPI MakerBucks Showroom',
-    imageUrl: 'images/Banner.jfif',   // big background photo
-    logoUrl: 'images/Gears-05.png',      // small logo in the top-left corner
-    logoAlt: 'WPI MakerBucks logo'   // read aloud by screen readers
+    // Put your banner photos in a folder such as images/banner/
+    // and add the relative paths here.
+    // Example:
+    // images/banner/1.jpg,
+    // images/banner/2.jpg,
+    // images/banner/3.jpg
+    imageUrls: [
+      'images/Banner.jfif', 
+      'images/baner2.JPG', 
+      'images/baner3.JPG', 
+      'images/baner4.JPG',
+    ],
+    intervalMs: 2000,
+    fadeMs: 1000
+  };
+
+  const HEADER_LOGO = {
+    logoUrl: 'images/Gears-05.png',
+    logoAlt: 'WPI MakerBucks logo'
   };
 
   // Share these with the other scripts
   MB.config = {
     BANNER,
+    HEADER_LOGO,
     SHEET_URL,
     SHEET_ID,
     FULL_URL,
