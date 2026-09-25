@@ -98,8 +98,7 @@
       allProjects = projects;
       renderFeatured();
     })
-    .catch(err => {
+    .catch(() => {
       track.innerHTML = MB.LOAD_ERROR_HTML;
-      console.error(err);
     });
 })();

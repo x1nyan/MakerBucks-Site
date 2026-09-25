@@ -363,8 +363,7 @@
       renderCategoryOptions(displayCats.values());
       renderAll();
     })
-    .catch(err => {
+    .catch(() => {
       container.innerHTML = MB.LOAD_ERROR_HTML;
-      console.error(err);
     });
 })();

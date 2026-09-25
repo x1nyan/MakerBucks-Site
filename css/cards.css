@@ -194,9 +194,11 @@ select:focus-visible {
   border-color: var(--accent-light);
   padding: 32px;
   overflow: hidden;
+  scrollbar-gutter: stable;
 }
 
 .back-content {
+  --detail-scale: 1;
   transform-origin: top left;
   max-width: 100%;
   display: block;
@@ -329,7 +331,7 @@ select:focus-visible {
 .back-header { margin-bottom: 24px; }
 
 .back-title {
-  font-size: 24px;
+  font-size: calc(24px * var(--detail-scale));
   font-weight: 700;
   color: var(--accent);
   margin: 0 0 4px;
@@ -337,14 +339,14 @@ select:focus-visible {
 
 .back-meta {
   color: var(--ink-soft);
-  font-size: 13px;
+  font-size: calc(13px * var(--detail-scale));
   font-weight: 600;
   margin: 0 0 6px;
 }
 
 .back-hint {
   color: var(--ink-faint);
-  font-size: 12px;
+  font-size: calc(12px * var(--detail-scale));
   margin: 0;
 }
 
@@ -356,7 +358,7 @@ select:focus-visible {
   background: var(--accent-bg);
   color: var(--accent);
   font: inherit;
-  font-size: 13px;
+  font-size: calc(13px * var(--detail-scale));
   font-weight: 600;
   cursor: pointer;
 }
@@ -375,7 +377,10 @@ select:focus-visible {
 .back-section { margin-bottom: 22px; }
 .back-section:last-child { margin-bottom: 0; }
 .back-section .section-label { margin-top: 0; }
-.card-back .section-text { font-size: 14px; line-height: 1.55; }
+.card-back .section-text {
+  font-size: calc(14px * var(--detail-scale));
+  line-height: calc(1.55 * var(--detail-scale));
+}
 
 .back-empty {
   color: var(--ink-faint);

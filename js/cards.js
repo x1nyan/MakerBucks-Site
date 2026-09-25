@@ -105,7 +105,9 @@
       .filter(([field]) => !String(project[field] || '').trim())
       .map(([, label]) => label);
 
-    if (!project.photoUrls.length) missing.push('cover image');
+    if (!project.photoUrls.length && window.location.protocol !== 'file:') {
+      missing.push('cover image');
+    }
     return missing;
   }
 
@@ -483,11 +485,23 @@
     const availableWidth = Math.max(0, back.clientWidth - paddingX);
     const availableHeight = Math.max(0, back.clientHeight - paddingY);
 
-    const targetScaleY = availableHeight > 0 ? availableHeight / content.scrollHeight : 1;
+    const targetScaleY = availableHeight > 0 ? availableHeight / Math.max(content.scrollHeight, 1) : 1;
     const targetScaleX = availableWidth > 0 ? availableWidth / Math.max(content.scrollWidth, 1) : 1;
-    const minScale = 0.8;
-    const scale = Math.min(1, Math.max(minScale, Math.min(targetScaleX, targetScaleY, 1)));
+    const readableMinScale = 0.9;
+    const scale = Math.min(1, Math.min(targetScaleX, targetScaleY, 1));
 
+    const needsScroll = scale < readableMinScale;
+
+    back.style.overflowY = needsScroll ? 'auto' : 'hidden';
+    back.style.overflowX = 'hidden';
+
+    if (needsScroll) {
+      content.style.transform = 'none';
+      content.style.width = '100%';
+      return;
+    }
+
+    content.style.setProperty('--detail-scale', scale.toFixed(3));
     content.style.transform = `scale(${scale})`;
     content.style.width = `${100 / scale}%`;
   }
@@ -781,55 +795,80 @@
     return rows;
   }
 
+  function processCsvText(text) {
+    const rows = parseCsv(text.replace(/^\uFEFF/, ''));
+    if (!rows.length) return Promise.resolve([]);
+
+    const headers = rows.shift().map(header => header.trim().toLowerCase());
+    const column = name => headers.indexOf(name.toLowerCase());
+    const records = rows.map(row => name => row[column(name)] || '');
+    const standaloneCats = findStandaloneCategories(
+      records.map(get => get('project') ? get('category') : '')
+    );
+
+    return Promise.all(
+      records.map(async (get, index) => {
+        const title = get('project').trim();
+        if (!title) return null;
+
+        const featuredValue = get('featured');
+        const imageFolderPath = get('image folder path').trim();
+        const project = {
+          title,
+          maker: get('maker(s)'),
+          categories: splitCategories(get('category'), standaloneCats),
+          featured: String(featuredValue).toUpperCase() === 'TRUE',
+          overview: get('overview'),
+          scope: get('scope'),
+          materials: get('materials'),
+          fabrication: get('fabrication steps'),
+          outcome: get('outcome'),
+          imageFolderPath,
+          photoUrls: await parsePhotoFolder(imageFolderPath)
+        };
+
+        const missingFields = getMissingProjectFields(project);
+        if (missingFields.length) {
+          console.warn(
+            `Skipping incomplete CSV row ${index + 2} (${title}): ` +
+            missingFields.join(', ')
+          );
+          return null;
+        }
+
+        project.score = contentScore(project);
+        return project;
+      })
+    ).then(items => items.filter(Boolean));
+  }
+
   function fetchProjects() {
+    const embeddedCsv = window.MB && typeof window.MB.rawCsv === 'string'
+      ? window.MB.rawCsv.trim()
+      : '';
+
+    if (window.location.protocol === 'file:' && embeddedCsv) {
+      return processCsvText(embeddedCsv);
+    }
+
     return fetch(CSV_URL)
       .then(res => {
-        if (!res.ok) throw new Error(`Could not load ${CSV_URL}`);
+        if (!res.ok) {
+          if (embeddedCsv) return processCsvText(embeddedCsv);
+          throw new Error(`Could not load ${CSV_URL}`);
+        }
         return res.text();
       })
       .then(text => {
-        const rows = parseCsv(text.replace(/^\uFEFF/, ''));
-        const headers = rows.shift().map(header => header.trim().toLowerCase());
-        const column = name => headers.indexOf(name.toLowerCase());
-        const records = rows.map(row => name => row[column(name)] || '');
-        const standaloneCats = findStandaloneCategories(
-          records.map(get => get('project') ? get('category') : '')
-        );
-
-        return Promise.all(
-          records.map(async (get, index) => {
-            const title = get('project').trim();
-            if (!title) return null;
-
-            const featuredValue = get('featured');
-            const imageFolderPath = get('image folder path').trim();
-            const project = {
-              title,
-              maker: get('maker(s)'),
-              categories: splitCategories(get('category'), standaloneCats),
-              featured: String(featuredValue).toUpperCase() === 'TRUE',
-              overview: get('overview'),
-              scope: get('scope'),
-              materials: get('materials'),
-              fabrication: get('fabrication steps'),
-              outcome: get('outcome'),
-              imageFolderPath,
-              photoUrls: await parsePhotoFolder(imageFolderPath)
-            };
-
-            const missingFields = getMissingProjectFields(project);
-            if (missingFields.length) {
-              console.warn(
-                `Skipping incomplete CSV row ${index + 2} (${title}): ` +
-                missingFields.join(', ')
-              );
-              return null;
-            }
-
-            project.score = contentScore(project);
-            return project;
-          })
-        ).then(items => items.filter(Boolean));
+        if (!text || !text.trim()) {
+          if (embeddedCsv) return processCsvText(embeddedCsv);
+          return [];
+        }
+        return processCsvText(text);
+      })
+      .catch(err => {
+        if (embeddedCsv) return processCsvText(embeddedCsv);
+        throw err;
       });
   }
 

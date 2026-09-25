@@ -43,7 +43,6 @@
     }
     img.onerror = () => {
       img.hidden = true;
-      console.warn('Banner image could not be loaded:', src);
     };
     img.src = src;
     img.hidden = false;
