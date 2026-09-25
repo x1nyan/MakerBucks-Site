@@ -371,7 +371,7 @@
      a double-click can't tangle things up.
      ========================================================= */
 
-  const ANIMATION_MS = 400; // a bit longer than the CSS transitions
+  const ANIMATION_MS = 650; // let the flip finish before revealing the back
 
   let openState = null; // { card, expanded, overlay } while open
   let busy = false;
@@ -554,10 +554,9 @@
       return;
     }
 
-    // Only cards inside a card area open: the main grid
-    // (.project-grid) or the featured row (.featured-track)
+    // Every rendered card uses the same shared flip interaction.
     const card = e.target.closest('.card');
-    if (!card || !card.closest('.project-grid, .featured-track')) return;
+    if (!card) return;
     if (selecting && card.contains(selection.anchorNode)) return;
 
     openCard(card);
