@@ -12,15 +12,10 @@ For complete architecture, data, styling, and maintenance details, see
 [`MASTER_DOCUMENTATION.md`](MASTER_DOCUMENTATION.md).
 
 ## Changing the content
-New projects should be submitted through the Google Form. Once the URL is set
-in `js/config.js`, a **Submit a project** link appears in the site header.
-
-Current placeholder:
-`PASTE_GOOGLE_FORM_LINK_HERE`
+New projects should be submitted through the designated Google Form.
 
 The site maintainer reviews the submission, uploads the submitted photo to the
-repository, and adds the resulting CSV row. In `js/config.js`, replace the
-empty `PROJECT_SUBMISSION_FORM_URL` value with the form link when it is ready.
+repository, and adds the resulting CSV row.
 The page reads `MakerBucks_Database.csv` every time it loads.
 
 ## Project photos
