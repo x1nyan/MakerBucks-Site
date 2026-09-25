@@ -26,8 +26,6 @@ window.MB = window.MB || {};
 
   const CSV_URL = 'MakerBucks_Database.csv';
 
-  // Paste the Google Form link here when the submission form is ready.
-  const PROJECT_SUBMISSION_FORM_URL = '';
   /*
     OPTIONAL manual override for category names that contain a
     comma. You normally DON'T need to touch this: the page works
@@ -81,7 +79,6 @@ window.MB = window.MB || {};
     BANNER,
     HEADER_LOGO,
     CSV_URL,
-    PROJECT_SUBMISSION_FORM_URL,
     MULTI_WORD_CATEGORIES
   };
 })();
