@@ -67,11 +67,21 @@ content:
         label: Outcome
         type: text
         required: true
-      - name: imageFolderPath
-        label: Image Folder Path
-        type: string
+      - name: photos
+        label: Project photos
+        type: image
         required: true
-        description: Relative path to this project's images folder, for example images/Project 2026/ABV Meter.
+        options:
+          media: photos
+          multiple:
+            max: 30
+          unique: true
+        description: >-
+          Upload every photo for this project. Create a new folder for the
+          project when the upload dialog asks where to save, then select all
+          of that folder's photos here. Name one photo "Cover" (with any
+          supported extension) so it appears first on the site; the build
+          fails if no photo is named Cover.
       - name: url
         label: Project URL
         type: string

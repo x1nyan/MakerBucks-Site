@@ -43,9 +43,9 @@
   const IMAGE_EXTENSIONS = /\.(png|jpe?g|gif|webp|avif|jfif|bmp|svg)(\?.*)?$/i;
 
   /*
-    Photo folders are relative to index.html. Hosts that expose folder
-    listings provide every carousel image; otherwise, probe the expected
-    Cover filename so the main photo still works on static hosting.
+    Photo paths come straight from the CMS-managed Photos column (one path
+    per line), so the page just needs to clean up whitespace and put the
+    photo named Cover first.
   */
   function normalizePath(value) {
     return String(value || '').trim().replace(/\\/g, '/');
@@ -60,57 +60,12 @@
     });
   }
 
-  async function listFolderImagePaths(folderPath) {
-    const value = normalizePath(folderPath).replace(/^\.\//, '').replace(/\/+$/, '');
-    if (!value) return [];
-
-    if (IMAGE_EXTENSIONS.test(value)) {
-      return [value];
-    }
-
-    try {
-      const response = await fetch(`${value}/`);
-      if (response.ok) {
-        const html = await response.text();
-        const doc = new DOMParser().parseFromString(html, 'text/html');
-        const paths = [...doc.querySelectorAll('a[href]')]
-          .map(link => link.getAttribute('href'))
-          .filter(Boolean)
-          .filter(href => IMAGE_EXTENSIONS.test(href))
-          .map(href => `${value}/${decodeURIComponent(href).split('/').pop()}`);
-
-        if (paths.length) return sortPhotoPaths(paths);
-      }
-    } catch (error) {
-      // A static server may not expose directory listings; we keep the rest of the code working.
-    }
-
-    const coverExtensions = [
-      'jpg', 'JPG', 'png', 'PNG', 'jpeg', 'JPEG',
-      'jfif', 'JFIF', 'webp', 'WEBP', 'avif', 'AVIF',
-      'gif', 'GIF', 'bmp', 'BMP', 'svg', 'SVG'
-    ];
-    for (const extension of coverExtensions) {
-      const coverPath = `${value}/Cover.${extension}`;
-      try {
-        const response = await fetch(coverPath, { method: 'HEAD' });
-        if (response.ok) return [coverPath];
-      } catch (error) {
-        // Continue trying supported cover image extensions.
-      }
-    }
-    return [];
-  }
-
-  async function parsePhotoFolder(folderPath) {
-    const value = normalizePath(folderPath);
-    if (!value) return [];
-
-    if (IMAGE_EXTENSIONS.test(value)) {
-      return [value];
-    }
-
-    return listFolderImagePaths(value);
+  function parsePhotoList(cellValue) {
+    const paths = String(cellValue || '')
+      .split('\n')
+      .map(normalizePath)
+      .filter(value => value && IMAGE_EXTENSIONS.test(value));
+    return sortPhotoPaths(paths);
   }
 
   const REQUIRED_PROJECT_FIELDS = [
@@ -120,8 +75,7 @@
     ['scope', 'Scope'],
     ['materials', 'Materials'],
     ['fabrication', 'Fabrication Steps'],
-    ['outcome', 'Outcome'],
-    ['imageFolderPath', 'Image Folder Path']
+    ['outcome', 'Outcome']
   ];
 
   function getMissingProjectFields(project) {
@@ -830,40 +784,38 @@
       records.map(get => get('project') ? get('category') : '')
     );
 
-    return Promise.all(
-      records.map(async (get, index) => {
-        const title = get('project').trim();
-        if (!title) return null;
+    const projects = records.map((get, index) => {
+      const title = get('project').trim();
+      if (!title) return null;
 
-        const featuredValue = get('featured');
-        const imageFolderPath = get('image folder path').trim();
-        const project = {
-          title,
-          maker: get('maker(s)'),
-          categories: splitCategories(get('category'), standaloneCats),
-          featured: String(featuredValue).toUpperCase() === 'TRUE',
-          overview: get('overview'),
-          scope: get('scope'),
-          materials: get('materials'),
-          fabrication: get('fabrication steps'),
-          outcome: get('outcome'),
-          imageFolderPath,
-          photoUrls: await parsePhotoFolder(imageFolderPath)
-        };
+      const featuredValue = get('featured');
+      const project = {
+        title,
+        maker: get('maker(s)'),
+        categories: splitCategories(get('category'), standaloneCats),
+        featured: String(featuredValue).toUpperCase() === 'TRUE',
+        overview: get('overview'),
+        scope: get('scope'),
+        materials: get('materials'),
+        fabrication: get('fabrication steps'),
+        outcome: get('outcome'),
+        photoUrls: parsePhotoList(get('photos'))
+      };
 
-        const missingFields = getMissingProjectFields(project);
-        if (missingFields.length) {
-          console.warn(
-            `Skipping incomplete CSV row ${index + 2} (${title}): ` +
-            missingFields.join(', ')
-          );
-          return null;
-        }
+      const missingFields = getMissingProjectFields(project);
+      if (missingFields.length) {
+        console.warn(
+          `Skipping incomplete CSV row ${index + 2} (${title}): ` +
+          missingFields.join(', ')
+        );
+        return null;
+      }
 
-        project.score = contentScore(project);
-        return project;
-      })
-    ).then(items => items.filter(Boolean));
+      project.score = contentScore(project);
+      return project;
+    }).filter(Boolean);
+
+    return Promise.resolve(projects);
   }
 
   function fetchProjects() {

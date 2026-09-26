@@ -17,6 +17,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 CSV_PATH = ROOT / "MakerBucks_Database.csv"
+PROJECT_DATA_PATH = ROOT / "js" / "project-data.js"
 PROJECTS_DIR = ROOT / "data" / "projects"
 
 CSV_FIELDS = [
@@ -29,7 +30,7 @@ CSV_FIELDS = [
     "Materials",
     "Fabrication Steps",
     "Outcome",
-    "Image Folder Path",
+    "Photos",
     "Url",
     "Notes",
 ]
@@ -51,7 +52,6 @@ CSV_TO_PROJECT = {
     "Materials": "materials",
     "Fabrication Steps": "fabricationSteps",
     "Outcome": "outcome",
-    "Image Folder Path": "imageFolderPath",
     "Url": "url",
     "Notes": "notes",
 }
@@ -65,8 +65,16 @@ REQUIRED_CSV_FIELDS = [
     "Materials",
     "Fabrication Steps",
     "Outcome",
-    "Image Folder Path",
+    "Photos",
 ]
+
+COVER_PATTERN = re.compile(r"(?:^|/)cover\.[^/]+$", re.IGNORECASE)
+
+
+def sort_photo_paths(paths: list[str]) -> list[str]:
+    """Order photo paths with the cover image first, then alphabetically."""
+    unique = list(dict.fromkeys(paths))
+    return sorted(unique, key=lambda path: (not COVER_PATTERN.search(path), path.lower()))
 
 
 def read_csv_rows() -> list[dict[str, str]]:
@@ -149,10 +157,12 @@ def migrate() -> None:
             raise ValueError(f"Duplicate project filename for {title!r}.")
         used_slugs.add(slug)
 
+        photos = [line.strip() for line in row["Photos"].splitlines() if line.strip()]
         project: dict[str, Any] = {
             "order": order,
             "categories": parse_categories(row["Category"]),
             "featured": row["Featured"].strip().casefold() == "true",
+            "photos": photos,
         }
         project.update(
             {project_field: row[csv_field] for csv_field, project_field in CSV_TO_PROJECT.items()}
@@ -165,14 +175,14 @@ def migrate() -> None:
             newline="",
         )
 
-        image_folder = ROOT / row["Image Folder Path"]
-        if row["Image Folder Path"] and not image_folder.is_dir():
-            image_warnings.append(f"{title}: {row['Image Folder Path']}")
+        missing_photos = [photo for photo in photos if not (ROOT / photo).is_file()]
+        if missing_photos:
+            image_warnings.append(f"{title}: {', '.join(missing_photos)}")
 
     print(f"Migrated {len(rows)} projects into {PROJECTS_DIR.relative_to(ROOT)}.")
     print("The source CSV was not changed. Run the build command to regenerate it.")
     if image_warnings:
-        print("Image folders that do not exist:")
+        print("Photos that do not exist:")
         for warning in image_warnings:
             print(f"  - {warning}")
 
@@ -222,6 +232,15 @@ def project_to_csv(project: dict[str, Any]) -> dict[str, str]:
     else:
         raise ValueError(f"{source}: Featured must be a boolean.")
 
+    photos = project.get("photos") or []
+    if not isinstance(photos, list) or any(not isinstance(item, str) for item in photos):
+        raise ValueError(f"{source}: photos must be a list of uploaded image paths.")
+    photos = sort_photo_paths([photo.strip() for photo in photos if photo.strip()])
+    if photos and not any(COVER_PATTERN.search(photo) for photo in photos):
+        raise ValueError(
+            f"{source}: no uploaded photo is named Cover; rename one photo to Cover."
+        )
+
     row = {
         csv_field: str(project.get(project_field) or "")
         for csv_field, project_field in CSV_TO_PROJECT.items()
@@ -229,6 +248,7 @@ def project_to_csv(project: dict[str, Any]) -> dict[str, str]:
     row["Project"] = title
     row["Category"] = ", ".join(categories)
     row["Featured"] = "TRUE" if featured else "FALSE"
+    row["Photos"] = "\n".join(photos)
 
     missing = [field for field in REQUIRED_CSV_FIELDS if not row[field].strip()]
     if missing:
@@ -262,7 +282,13 @@ def build() -> None:
         if temporary_path.exists():
             temporary_path.unlink()
 
-    print(f"Wrote {len(rows)} projects to {CSV_PATH.name}.")
+    fallback_js = (
+        "window.MB = window.MB || {};\n"
+        f"window.MB.rawCsv = {json.dumps(csv_text)};\n"
+    )
+    PROJECT_DATA_PATH.write_text(fallback_js, encoding="utf-8", newline="")
+
+    print(f"Wrote {len(rows)} projects to {CSV_PATH.name} and {PROJECT_DATA_PATH.name}.")
 
 
 def check_round_trip() -> None:

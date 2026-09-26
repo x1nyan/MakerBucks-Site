@@ -11,7 +11,13 @@
   "materials": "• 3D-printed helmet shell segments\n • Surface-finishing supplies (filler, primer, sandpaper)\n • Paint and clear coat\n • Assembly hardware/adhesive to join printed segments",
   "fabricationSteps": "1. Source or prepare a 3D-printable Clone Trooper helmet model, split into segments sized for the available printer bed.\n 2. Print all helmet segments.\n 3. Sand, fill, and smooth print lines and layer seams on each segment.\n 4. Join the segments into a complete helmet shell.\n 5. Prime, paint, and clear-coat the assembled helmet in the correct color scheme.\n 6. Fit-check the helmet and document the finished prop with photos and video.",
   "outcome": "Successfully created a completed Clone Trooper helmet prop with media documentation and a video demonstration.",
-  "imageFolderPath": "images/Project 2026/Clone Helemt",
+  "photos": [
+    "images/Project 2026/Clone Helemt/Cover.jpg",
+    "images/Project 2026/Clone Helemt/FillingLayerLines1.jpeg",
+    "images/Project 2026/Clone Helemt/Final1.jpg",
+    "images/Project 2026/Clone Helemt/Final2.jpg",
+    "images/Project 2026/Clone Helemt/Final3.jpg"
+  ],
   "url": "",
   "notes": ""
 }

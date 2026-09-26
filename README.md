@@ -34,14 +34,12 @@ existing non-empty forms directory. `check` compares every project value with
 the CSV. To regenerate the CSV locally, run `py scripts/showcase_data.py build`.
 
 ## Project photos
-Set the form's `Image Folder Path` to a repository-relative folder such as
-`images/Project 2026/ABV Meter`. Name the cover image `Cover` with a supported
-extension. Hosts that expose directory listings can populate the full photo
-carousel; on hosts without listings, the site probes for the cover image and
-shows that photo alone.
-
-Upload photos into the exact repository folder in the form. Rows missing
-required content or a readable cover image are skipped automatically.
+Use the form's `Project photos` field to upload the project's images directly
+through the CMS; there is no folder path to type. Name one uploaded photo
+`Cover` (with a supported extension) so it appears first in the carousel. The
+CMS commits the photos to the repository and writes their paths into the form;
+**Build projects CSV** then lists them in the CSV's `Photos` column and fails
+if no photo is named `Cover`.
 
 The **Resize uploaded images** GitHub Action processes new or changed JPEG, PNG,
 and WebP files under `images/`. It caps the longest dimension at 2400 pixels and

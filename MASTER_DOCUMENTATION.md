@@ -126,7 +126,7 @@ rebuilds it from those JSON forms.
 The generated CSV header is:
 
 ```text
-Project,Maker(s),Category,Featured,Overview,Scope,Materials,Fabrication Steps,Outcome,Image Folder Path,Url,Notes
+Project,Maker(s),Category,Featured,Overview,Scope,Materials,Fabrication Steps,Outcome,Photos,Url,Notes
 ```
 
 Important fields:
@@ -140,31 +140,33 @@ Important fields:
 - `Materials`: expanded-card materials section; retains embedded line breaks.
 - `Fabrication Steps`: expanded-card fabrication section; retains embedded line breaks.
 - `Outcome`: expanded-card outcome section.
-- `Image Folder Path`: relative folder containing the project's images.
+- `Photos`: one repository-relative image path per line, in carousel order,
+  written by `scripts/showcase_data.py` from each form's uploaded `photos` list.
 - `Url`: retained as source data but not currently displayed by the UI.
 - `Notes`: available in the CSV but not currently displayed by the UI.
 
 The parser supports quoted fields containing commas and line breaks. Do not
 manually edit this generated CSV; use the Pages CMS project forms instead.
 
-## 7. Project Photo Folders
+## 7. Project Photos
 
-Set the form's `Image Folder Path` to the project's repository-relative image
-folder. Use a cover named `Cover` with a supported extension. When the host
-provides a directory listing, all supported images are sorted by filename with
-the cover first. When it does not, the site probes for the cover and displays
-that single image. For example:
+The Pages CMS form's `Project photos` field uploads images directly to the
+repository through the CMS's media picker — there is no folder path to type.
+Upload every photo for the project (create a new folder in the media picker
+when it asks where to save), and name one photo `Cover` with a supported
+extension. `scripts/showcase_data.py build` writes the uploaded paths into the
+`Photos` CSV column, cover image first, and refuses to build if no photo is
+named `Cover`.
 
 ```text
-Image Folder Path: images/Project 2026/ABV Meter
-  Cover.jpg
-  72A36A92-B1B8-41D6-A9C8-8332A74370C1.jpeg
+Photos:
+  images/Project 2026/ABV Meter/Cover.jpg
+  images/Project 2026/ABV Meter/72A36A92-B1B8-41D6-A9C8-8332A74370C1.jpeg
 ```
 
-The site must be served through HTTP. Directory-listing support varies by host;
-GitHub Pages does not provide one, so there the carousel falls back to the
-`Cover.<extension>` image. The generated CSV can also specify a direct image
-file path instead of a folder, though Pages CMS forms currently store folders.
+The site reads every listed path directly, so it no longer depends on
+directory-listing support from the host; the full carousel works the same on
+GitHub Pages as anywhere else.
 
 ## 8. Pages CMS Editing Workflow
 
@@ -192,9 +194,10 @@ py scripts/showcase_data.py build
 refuses to overwrite a non-empty forms directory. `check` compares the forms
 against all CSV cells. `build` regenerates the site CSV from the forms.
 
-New projects must include the required fields and a valid image folder. The CMS
-does not provide a dynamic folder picker for this string field, so check the
-path's spelling and capitalization against `images/` before saving.
+New projects must include the required fields and at least one uploaded photo.
+Upload photos through the `Project photos` field's media picker; the CMS
+commits the files and writes their repository paths into the form, so nothing
+is typed by hand. Name one uploaded photo `Cover`; `build` fails if none match.
 
 ### Photo optimization
 
@@ -208,15 +211,16 @@ commit optimized photos.
 
 ```text
 Pages CMS
-  -> data/projects/*.json
+  -> upload photos through the Project photos media field
+  -> data/projects/*.json (photos array, cover image first)
   -> Build projects CSV GitHub Action
-  -> MakerBucks_Database.csv
+  -> MakerBucks_Database.csv (Photos column) and js/project-data.js
 
 cards.js
   -> fetch generated CSV (or embedded project-data.js fallback)
   -> parse quoted CSV rows
   -> normalize project fields
-  -> resolve photo URLs from folder listings or the Cover fallback
+  -> split the Photos cell into carousel URLs (cover first)
   -> calculate content score
   -> cache the Promise
 
@@ -367,7 +371,7 @@ Featured section layout, horizontal track, arrows, whole-card snapping, and resp
 
 1. Edit the project form in Pages CMS, or add a project in the `Projects` collection.
 2. Select its categories and set the Featured toggle as needed.
-3. Set `Image Folder Path` to the exact repository-relative photo folder.
+3. Upload the project's photos in `Project photos`, with one photo named `Cover`.
 4. Save and wait for **Build projects CSV** to complete.
 5. Pull the branch before making local edits; do not edit the generated CSV.
 
@@ -407,11 +411,11 @@ Edit the CMS form schema in `.pages.yml`, the JSON/CSV mapping in
 
 ### A local photo does not load
 
-- Confirm the project form's `Image Folder Path` points to the correct folder.
-- Confirm the folder contains a supported image named `Cover` with a supported
-  extension and matching capitalization.
-- If only the cover appears, the site host likely does not expose directory listings.
-- Check capitalization and file extensions.
+- Confirm the project form's `Project photos` field has at least one photo
+  uploaded and one is named `Cover` (with a supported extension).
+- Confirm the **Build projects CSV** action succeeded; it fails the build if
+  no photo is named `Cover`.
+- Check the `Photos` cell in the generated CSV lists the expected paths.
 
 ### A project is missing from Featured Projects
 
