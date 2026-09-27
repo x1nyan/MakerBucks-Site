@@ -214,7 +214,7 @@ is typed by hand. Name one uploaded photo `Cover`; `build` fails if none match.
 
 The **Resize uploaded images** workflow runs when files under `images/` change.
 It installs Pillow and optimizes changed JPEG, PNG, and WebP images, resizing
-their longest dimension to at most 2400px and removing EXIF metadata. Animated
+their longest dimension to at most 800px and removing EXIF metadata. Animated
 GIF and SVG files are skipped. The action needs contents write permission to
 commit optimized photos.
 

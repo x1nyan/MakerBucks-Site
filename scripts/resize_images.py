@@ -12,7 +12,7 @@ from PIL import Image, ImageOps
 
 ROOT = Path(__file__).resolve().parents[1]
 IMAGES_ROOT = (ROOT / "images").resolve()
-MAX_SIDE = 2400
+MAX_SIDE = 800
 SUPPORTED_FORMATS = {"JPEG", "PNG", "WEBP"}
 
 
@@ -46,9 +46,9 @@ def optimize_image(argument: str) -> bool:
         output = io.BytesIO()
         save_options = {"optimize": True}
         if image_format == "JPEG":
-            save_options.update(quality=85, progressive=True)
+            save_options.update(quality=82, progressive=True)
         elif image_format == "WEBP":
-            save_options.update(quality=85, method=6)
+            save_options.update(quality=82, method=6)
         clean.save(output, format=image_format, **save_options)
 
     optimized_bytes = output.getvalue()

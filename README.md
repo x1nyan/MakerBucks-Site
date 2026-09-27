@@ -42,7 +42,7 @@ CMS commits the photos to the repository and writes their paths into the form;
 if no photo is named `Cover`.
 
 The **Resize uploaded images** GitHub Action processes new or changed JPEG, PNG,
-and WebP files under `images/`. It caps the longest dimension at 2400 pixels and
+and WebP files under `images/`. It caps the longest dimension at 800 pixels and
 removes EXIF metadata. SVG and animated GIF files are left unchanged.
 
 ## Run locally
