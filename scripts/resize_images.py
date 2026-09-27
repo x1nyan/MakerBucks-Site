@@ -12,7 +12,7 @@ from PIL import Image, ImageOps
 
 ROOT = Path(__file__).resolve().parents[1]
 IMAGES_ROOT = (ROOT / "images").resolve()
-MAX_SIDE = 800
+MAX_SIDE = 400
 SUPPORTED_FORMATS = {"JPEG", "PNG", "WEBP"}
 
 
