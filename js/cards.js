@@ -861,4 +861,5 @@
   MB.loadProjects = loadProjects;
   MB.makeCardEl = makeCardEl;
   MB.LOAD_ERROR_HTML = LOAD_ERROR_HTML;
+  MB.parseCsv = parseCsv; // reused by footer.js to read DonorStatement.csv
 })();

@@ -232,6 +232,33 @@
 
 
 /* =========================================================
+ FOOTER
+ ---------------------------------------------------------
+ A short sponsor acknowledgment under the project grid, so
+ the bottom of the page isn't left empty.
+ ========================================================= */
+
+.site-footer {
+  width: 100vw;
+  margin: 40px 0 0 calc(50% - 50vw);
+  padding: 28px;
+  background: var(--header-bg);
+  border-top: 1px solid var(--header-border);
+  text-align: center;
+}
+
+.footer-sponsor {
+  max-width: 760px;
+  margin: 0 auto;
+  color: var(--ink-soft);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.footer-sponsor strong { color: var(--accent); }
+
+
+/* =========================================================
  GRID — 3 CARDS PER ROW
  ---------------------------------------------------------
  "repeat(3, minmax(0, 1fr))" = 3 equal columns. The
@@ -315,10 +342,10 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
-  min-height: 92px;
+  min-height: 60px;
   width: 100vw;
   margin: 0 0 0 calc(50% - 50vw);
-  padding: 6px 84px;
+  padding: 4px 84px;
   background: var(--header-bg);
   border-bottom: 1px solid var(--header-border);
 }
@@ -334,12 +361,12 @@
 
 .header-link {
   display: inline-block;
-  padding: 10px 12px;
+  padding: 7px 12px;
   border: 1px solid transparent;
   border-radius: 6px;
   background: transparent;
   color: var(--ink);
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 600;
   text-decoration: none;
   white-space: nowrap;
@@ -360,8 +387,8 @@
   grid-column: 3;
   grid-row: 1;
   justify-self: end;
-  width: 72px;
-  height: 40px;
+  width: 60px;
+  height: 32px;
   padding: 3px;
   border: 1px solid var(--control-border);
   border-radius: 999px;
@@ -375,25 +402,25 @@
 .theme-toggle-icon {
   z-index: 1;
   display: grid;
-  width: 28px;
-  height: 28px;
+  width: 22px;
+  height: 22px;
   place-items: center;
-  font-size: 16px;
+  font-size: 14px;
 }
 
 .theme-toggle-thumb {
   position: absolute;
-  top: 5px;
-  left: 5px;
-  width: 28px;
-  height: 28px;
+  top: 4px;
+  left: 4px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   background: var(--panel);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.22);
   transition: transform 0.18s ease;
 }
 
-:root[data-theme="dark"] .theme-toggle-thumb { transform: translateX(30px); }
+:root[data-theme="dark"] .theme-toggle-thumb { transform: translateX(28px); }
 
 @media (min-width: 1001px) {
   .theme-toggle { transform: translateX(52px); }
@@ -404,7 +431,7 @@
   grid-column: 2;
   grid-row: 1;
   justify-self: center;
-  height: 140px;
+  height: 88px;
   width: auto;
   max-width: 48%;
   object-fit: contain;
@@ -419,7 +446,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: clamp(220px, 38vw, 440px);
+  min-height: clamp(340px, 52vw, 620px);
   width: 100vw;
   margin: 0 0 28px calc(50% - 50vw);
   padding: 40px 24px;
@@ -494,24 +521,26 @@
   body { padding: 0; }
 
   .site-header {
-    min-height: 76px;
+    min-height: 52px;
     width: 100%;
     margin-left: 0;
-    padding: 6px 10px;
+    padding: 4px 10px;
   }
 
   .site-logo {
-    height: 64px;
+    height: 46px;
     max-width: 45%;
   }
 
   .theme-toggle { transform: none; }
 
   .header-links { gap: 0; }
-  .header-link { padding: 7px 3px; font-size: 12px; }
+  .header-link { padding: 6px 3px; font-size: 12px; }
+
+  .footer-sponsor { font-size: 13px; }
 
   .banner {
-    min-height: 220px;
+    min-height: 300px;
     width: 100%;
     margin-left: 0;
     padding: 28px 16px;

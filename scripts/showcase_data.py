@@ -19,6 +19,9 @@ ROOT = Path(__file__).resolve().parents[1]
 CSV_PATH = ROOT / "MakerBucks_Database.csv"
 PROJECT_DATA_PATH = ROOT / "js" / "project-data.js"
 PROJECTS_DIR = ROOT / "data" / "projects"
+FOOTER_PATH = ROOT / "data" / "footer.json"
+FOOTER_CSV_PATH = ROOT / "DonorStatement.csv"
+FOOTER_CSV_FIELDS = ["Statement"]
 
 CSV_FIELDS = [
     "Project",
@@ -269,8 +272,39 @@ def build_rows() -> list[dict[str, str]]:
     return [{field: row[field] for field in CSV_FIELDS} for row in rows]
 
 
+def footer_csv_text() -> str:
+    """Build the DonorStatement.csv contents from data/footer.json."""
+    if not FOOTER_PATH.exists():
+        raise ValueError(f"{FOOTER_PATH.relative_to(ROOT)} is missing.")
+
+    data = json.loads(FOOTER_PATH.read_text(encoding="utf-8"))
+    if not isinstance(data, dict):
+        raise ValueError(f"{FOOTER_PATH.name} must contain a JSON object.")
+
+    statement = str(data.get("donorStatement") or "").strip()
+    if not statement:
+        raise ValueError(f"{FOOTER_PATH.name}: donorStatement is required.")
+
+    buffer = io.StringIO(newline="")
+    writer = csv.DictWriter(buffer, fieldnames=FOOTER_CSV_FIELDS, lineterminator=os.linesep)
+    writer.writeheader()
+    writer.writerow({"Statement": statement})
+    return buffer.getvalue().removesuffix(os.linesep)
+
+
+def write_text_atomically(path: Path, text: str) -> None:
+    temporary_path = path.with_suffix(path.suffix + ".tmp")
+    try:
+        with temporary_path.open("w", encoding="utf-8", newline="") as output:
+            output.write(text)
+        temporary_path.replace(path)
+    finally:
+        if temporary_path.exists():
+            temporary_path.unlink()
+
+
 def build() -> None:
-    """Write MakerBucks_Database.csv from the ordered JSON project forms."""
+    """Write MakerBucks_Database.csv and DonorStatement.csv from the JSON forms."""
     rows = build_rows()
     temporary_path = CSV_PATH.with_suffix(".csv.tmp")
     try:
@@ -287,13 +321,20 @@ def build() -> None:
         if temporary_path.exists():
             temporary_path.unlink()
 
+    footer_text = footer_csv_text()
+    write_text_atomically(FOOTER_CSV_PATH, footer_text)
+
     fallback_js = (
         "window.MB = window.MB || {};\n"
         f"window.MB.rawCsv = {json.dumps(csv_text)};\n"
+        f"window.MB.rawFooterCsv = {json.dumps(footer_text)};\n"
     )
     PROJECT_DATA_PATH.write_text(fallback_js, encoding="utf-8", newline="")
 
-    print(f"Wrote {len(rows)} projects to {CSV_PATH.name} and {PROJECT_DATA_PATH.name}.")
+    print(
+        f"Wrote {len(rows)} projects to {CSV_PATH.name}, {FOOTER_CSV_PATH.name}, "
+        f"and {PROJECT_DATA_PATH.name}."
+    )
 
 
 def check_round_trip() -> None:
@@ -305,6 +346,16 @@ def check_round_trip() -> None:
             "The project forms do not match the current CSV. "
             "Run the build command, then check again."
         )
+
+    if not FOOTER_CSV_PATH.exists():
+        raise ValueError(f"{FOOTER_CSV_PATH.name} is missing. Run the build command.")
+    current_footer = FOOTER_CSV_PATH.read_text(encoding="utf-8-sig", newline="")
+    if current_footer != footer_csv_text():
+        raise ValueError(
+            "The footer form does not match the current DonorStatement.csv. "
+            "Run the build command, then check again."
+        )
+
     print(f"Round-trip verified: {len(source_rows)} projects, {len(CSV_FIELDS)} columns.")
 
 

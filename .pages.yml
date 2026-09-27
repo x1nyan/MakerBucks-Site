@@ -91,6 +91,21 @@ content:
     operations:
       delete: false
 
+  - name: footer
+    label: Footer
+    type: file
+    path: data/footer.json
+    format: json
+    fields:
+      - name: donorStatement
+        label: Donor statement
+        type: text
+        required: true
+        description: >-
+          Shown at the bottom of every page. Wrap a name or phrase in
+          **double asterisks** to make it bold, e.g. **Nancy and Mike
+          Abrams '77**.
+
 settings:
   commit:
     identity: user

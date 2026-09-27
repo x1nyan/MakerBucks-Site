@@ -10,6 +10,7 @@
     3. Featured Projects  (side-scrolling row marked TRUE in the CSV)
     4. Search / filter / sort controls
     5. Main project grid  (three desktop columns, vertical on phones)
+    6. Footer             (donor statement from DonorStatement.csv)
 
   The code is split into a few files so each one stays readable:
 
@@ -24,18 +25,21 @@
     js/project-data.js  embedded CSV fallback for file:// or fetch failure
     js/banner.js        fills in the title banner
     js/cards.js         building cards, flip view, loading the CSV
+    js/footer.js        fills in the donor statement from DonorStatement.csv
     js/featured.js      the Featured Projects row + its arrows
     js/showcase.js      search, filters, sort, and the grid
 
   Data workflow:
-    Pages CMS edits one JSON file per project in data/projects/.
-    A GitHub Action regenerates MakerBucks_Database.csv for the site.
-    Do not edit the generated CSV directly.
+    Pages CMS edits one JSON file per project in data/projects/, plus the
+    single data/footer.json donor statement form.
+    A GitHub Action regenerates MakerBucks_Database.csv and
+    DonorStatement.csv for the site. Do not edit either generated CSV
+    directly.
 
   Scripts in the head load theme.js before the stylesheets. The scripts
   at the bottom load config.js, project-data.js, logo.js, banner.js,
-  cards.js, featured.js, then showcase.js. Both project sections share
-  the cached CSV load from cards.js.
+  cards.js, footer.js, featured.js, then showcase.js. Both project sections
+  share the cached CSV load from cards.js.
 
   Project photos are uploaded through each form's Project photos field; the
   CMS writes their paths into the generated CSV's Photos column.
@@ -173,12 +177,29 @@
     <button class="clear-filters-btn visible" id="noResultsClearBtn" type="button">clear your filters</button>.
   </div>
 
+  <!-- =========================================================
+     FOOTER
+     ========================================================= -->
+
+  <footer class="site-footer">
+    <p class="footer-sponsor">
+      This year&rsquo;s MakerBucks Innovation Program is proudly supported by
+      <strong>Nancy and Mike Abrams &rsquo;77</strong>, whose generosity fuels
+      student creativity and innovation. Their commitment ensures that every
+      WPI student has the chance to make an impact. The Abrams&rsquo;
+      philanthropic vision inspires future alumni to pay it forward&mdash;continuing
+      WPI&rsquo;s mission of experiential learning and innovation for
+      generations to come.
+    </p>
+  </footer>
+
   <!-- Scripts: order matters (see the note at the top of this file) -->
   <script src="js/config.js"></script>
   <script src="js/project-data.js"></script>
   <script src="js/logo.js"></script>
   <script src="js/banner.js"></script>
   <script src="js/cards.js"></script>
+  <script src="js/footer.js"></script>
   <script src="js/featured.js"></script>
   <script src="js/showcase.js"></script>
 

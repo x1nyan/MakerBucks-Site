@@ -185,6 +185,13 @@ the action to complete before checking the site, and pull the latest branch
 before making local edits. The workflow needs repository contents write
 permission; branch protection must allow the GitHub Actions bot to push.
 
+`.pages.yml` also defines a single `Footer` form at `data/footer.json` with
+one `donorStatement` text field, shown at the bottom of the site. Wrap a name
+or phrase in `**double asterisks**` to bold it. Saving the form runs the same
+action, which regenerates `DonorStatement.csv`; `js/footer.js` fetches that
+CSV and fills in the footer paragraph, falling back to the copy embedded in
+`js/project-data.js` if the fetch fails.
+
 The one-time migration and maintenance commands are:
 
 ```powershell
@@ -195,7 +202,8 @@ py scripts/showcase_data.py build
 
 `migrate` converts the legacy CSV into JSON forms without changing the CSV and
 refuses to overwrite a non-empty forms directory. `check` compares the forms
-against all CSV cells. `build` regenerates the site CSV from the forms.
+against all CSV cells, and also verifies `DonorStatement.csv` matches
+`data/footer.json`. `build` regenerates both generated CSVs from the forms.
 
 New projects must include the required fields and at least one uploaded photo.
 Upload photos through the `Project photos` field's media picker; the CMS

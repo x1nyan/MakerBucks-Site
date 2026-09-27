@@ -66,7 +66,9 @@ CSV and local photos over HTTP.
 ## Key files
 - `index.html`: page markup and script loading order.
 - `MakerBucks_Database.csv`: generated site data; do not edit directly.
+- `DonorStatement.csv`: generated footer donor statement; do not edit directly.
 - `data/projects/*.json`: editable Pages CMS project forms.
+- `data/footer.json`: editable Pages CMS footer donor statement form.
 - `scripts/showcase_data.py`: migrate, build, and verify project data.
 - `scripts/resize_images.py`: optimize supported uploaded photos.
 - `.github/workflows/`: CSV rebuild and image optimization automation.
