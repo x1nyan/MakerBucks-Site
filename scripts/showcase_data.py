@@ -42,6 +42,10 @@ CATEGORIES = [
     "Robotics",
     "Science & Sensors",
 ]
+# Historical category names, used only to split the legacy single-string
+# Category cell during `migrate`. Categories are otherwise a free-form list
+# per project form; new categories don't need to be added here.
+
 
 CSV_TO_PROJECT = {
     "Project": "title",
@@ -217,8 +221,11 @@ def project_to_csv(project: dict[str, Any]) -> dict[str, str]:
     categories = project.get("categories") or []
     if isinstance(categories, str):
         categories = parse_categories(categories)
-    if not isinstance(categories, list) or any(item not in CATEGORIES for item in categories):
-        raise ValueError(f"{source}: categories must be selected from the configured list.")
+    if not isinstance(categories, list) or any(not isinstance(item, str) for item in categories):
+        raise ValueError(f"{source}: categories must be a list of category names.")
+    categories = [category.strip() for category in categories if category.strip()]
+    if not categories:
+        raise ValueError(f"{source}: at least one category is required.")
 
     featured_value = project.get("featured", False)
     if isinstance(featured_value, str):

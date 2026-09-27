@@ -16,16 +16,11 @@
 
   const heading = document.getElementById('bannerTitle');
   const photo = document.getElementById('bannerImg');
+  const photoNext = document.getElementById('bannerImgNext');
 
   const imageUrls = Array.isArray(BANNER.imageUrls) && BANNER.imageUrls.length
     ? BANNER.imageUrls
     : [BANNER.imageUrl || 'images/Banner.jfif'];
-
-  function randomBannerImage() {
-    if (!imageUrls.length) return '';
-    const index = Math.floor(Math.random() * imageUrls.length);
-    return imageUrls[index];
-  }
 
   function toImageUrl(url) {
     const u = String(url || '').trim();
@@ -53,7 +48,51 @@
     document.title = BANNER.title;
   }
 
-  if (imageUrls.length > 0) {
-    setImage(photo, randomBannerImage());
+  if (!imageUrls.length) return;
+
+  /*
+    Picks the next image at random, avoiding an immediate repeat of the
+    one currently showing (unless there's only one photo to choose from).
+  */
+  let lastIndex = -1;
+  function pickNextUrl() {
+    if (imageUrls.length === 1) return imageUrls[0];
+    let index = Math.floor(Math.random() * imageUrls.length);
+    if (index === lastIndex) index = (index + 1) % imageUrls.length;
+    lastIndex = index;
+    return imageUrls[index];
   }
+
+  setImage(photo, pickNextUrl());
+
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (imageUrls.length < 2 || prefersReducedMotion) return;
+
+  /*
+    Rotates the banner photo every BANNER.intervalMs. Two stacked <img>
+    elements crossfade: the hidden one loads the next photo, then swaps
+    to visible (opacity 0 -> 1) while the current one fades out, per the
+    .banner-img / .banner-img--next transition in showcase.css.
+  */
+  let active = photo;
+  let hidden = photoNext;
+
+  function rotate() {
+    const src = toImageUrl(pickNextUrl());
+    if (!src) return;
+
+    const loader = new Image();
+    loader.onload = () => {
+      hidden.src = src;
+      hidden.hidden = false;
+      requestAnimationFrame(() => {
+        hidden.classList.remove('banner-img--next');
+        active.classList.add('banner-img--next');
+        [active, hidden] = [hidden, active];
+      });
+    };
+    loader.src = src;
+  }
+
+  setInterval(rotate, Number(BANNER.intervalMs) || 7000);
 })();

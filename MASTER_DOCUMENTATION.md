@@ -170,10 +170,14 @@ GitHub Pages as anywhere else.
 ## 8. Pages CMS Editing Workflow
 
 `.pages.yml` defines the `Projects` collection at `data/projects/`. Each JSON
-file is one structured form with title, maker, multi-select categories,
-Featured boolean, multiline project text, uploaded photos, notes, and hidden
-order. The current category values are listed in `.pages.yml` and
-`scripts/showcase_data.py`; update both when adding a category.
+file is one structured form with title, maker, a free-form list of category
+tags, Featured boolean, multiline project text, uploaded photos, notes, and
+hidden order. Categories aren't a fixed dropdown: type a new name in the
+`Categories` field to create it, and it appears on the site's filter dropdown
+the next time **Build projects CSV** runs — no `.pages.yml` or
+`scripts/showcase_data.py` edit needed. Avoid putting a comma inside a single
+category name (see `MULTI_WORD_CATEGORIES` above) since commas separate
+categories in the generated CSV's `Category` column.
 
 After a project form is saved, **Build projects CSV** runs and commits the
 regenerated `MakerBucks_Database.csv`. Do not edit the CSV directly. Wait for
@@ -423,10 +427,10 @@ Edit the CMS form schema in `.pages.yml`, the JSON/CSV mapping in
 
 ### Categories look incorrect
 
-- Confirm selected categories are in the CMS multi-select and the converter's
-  `CATEGORIES` list.
-- If a comma-containing category is ambiguous in legacy CSV data, configure
-  `MULTI_WORD_CATEGORIES` in `js/config.js`.
+- Confirm the project form's `Categories` field lists the expected tags; any
+  typed value becomes a real category once the CSV rebuilds.
+- If a category name itself contains a comma and gets split incorrectly,
+  configure `MULTI_WORD_CATEGORIES` in `js/config.js`.
 
 ### Flip animation looks wrong
 

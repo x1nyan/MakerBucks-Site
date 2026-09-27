@@ -32,17 +32,15 @@ content:
         required: true
       - name: categories
         label: Categories
-        type: select
+        type: string
         required: true
-        options:
-          multiple: true
-          values:
-            - Design & Fabrication
-            - Electronics & Hardware
-            - Engineering & Testing
-            - Props, Costumes & Art
-            - Robotics
-            - Science & Sensors
+        list:
+          min: 1
+        description: >-
+          Add one or more categories for this project (e.g. Robotics,
+          Electronics & Hardware, Science & Sensors). Type a new name to
+          create a category; it shows up on the site automatically. Avoid
+          putting a comma inside a single category name.
       - name: featured
         label: Featured
         type: boolean

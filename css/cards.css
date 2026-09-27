@@ -118,6 +118,21 @@ select:focus-visible {
 .card {
   display: flex; /* lets the front stretch to the row's height */
   cursor: pointer;
+  animation: cardIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.card:nth-child(2) { animation-delay: 0.04s; }
+.card:nth-child(3) { animation-delay: 0.08s; }
+.card:nth-child(4) { animation-delay: 0.12s; }
+.card:nth-child(5) { animation-delay: 0.16s; }
+.card:nth-child(6) { animation-delay: 0.2s; }
+.card:nth-child(7) { animation-delay: 0.24s; }
+.card:nth-child(8) { animation-delay: 0.28s; }
+.card:nth-child(9) { animation-delay: 0.32s; }
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(16px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .card.is-hidden { display: none !important; }
@@ -142,9 +157,34 @@ select:focus-visible {
   overflow: hidden; /* clips the photo to the card's rounded corners */
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
+  position: relative;
+  transition: box-shadow 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
 }
 
-.card:hover .card-face { box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12); }
+.card-face::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-light));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s ease;
+  z-index: 1;
+}
+
+.card:hover .card-face {
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.16);
+  transform: translateY(-4px);
+  border-color: var(--accent-light);
+}
+
+.card:hover .card-face::before { transform: scaleX(1); }
+
+@media (prefers-reduced-motion: reduce) {
+  .card { animation: none; }
+  .card:hover .card-face { transform: none; }
+}
 
 
 /* =========================================================
@@ -516,9 +556,16 @@ select:focus-visible {
   height: 100%;
   object-fit: contain;
   display: none;
+  transition: transform 0.5s ease;
 }
 
 .carousel-slide.active { display: block; }
+
+.card:hover .carousel-slide.active { transform: scale(1.045); }
+
+@media (prefers-reduced-motion: reduce) {
+  .card:hover .carousel-slide.active { transform: none; }
+}
 
 .carousel-btn {
   position: absolute;
