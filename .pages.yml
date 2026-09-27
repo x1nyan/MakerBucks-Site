@@ -82,9 +82,6 @@ content:
           of that folder's photos here. Name one photo "Cover" (with any
           supported extension) so it appears first on the site; the build
           fails if no photo is named Cover.
-      - name: url
-        label: Project URL
-        type: string
       - name: notes
         label: Notes
         type: text

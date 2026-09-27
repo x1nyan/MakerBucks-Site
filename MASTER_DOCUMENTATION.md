@@ -126,7 +126,7 @@ rebuilds it from those JSON forms.
 The generated CSV header is:
 
 ```text
-Project,Maker(s),Category,Featured,Overview,Scope,Materials,Fabrication Steps,Outcome,Photos,Url,Notes
+Project,Maker(s),Category,Featured,Overview,Scope,Materials,Fabrication Steps,Outcome,Photos,Notes
 ```
 
 Important fields:
@@ -142,7 +142,6 @@ Important fields:
 - `Outcome`: expanded-card outcome section.
 - `Photos`: one repository-relative image path per line, in carousel order,
   written by `scripts/showcase_data.py` from each form's uploaded `photos` list.
-- `Url`: retained as source data but not currently displayed by the UI.
 - `Notes`: available in the CSV but not currently displayed by the UI.
 
 The parser supports quoted fields containing commas and line breaks. Do not
@@ -172,7 +171,7 @@ GitHub Pages as anywhere else.
 
 `.pages.yml` defines the `Projects` collection at `data/projects/`. Each JSON
 file is one structured form with title, maker, multi-select categories,
-Featured boolean, multiline project text, image folder, URL, notes, and hidden
+Featured boolean, multiline project text, uploaded photos, notes, and hidden
 order. The current category values are listed in `.pages.yml` and
 `scripts/showcase_data.py`; update both when adding a category.
 

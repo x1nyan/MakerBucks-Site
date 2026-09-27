@@ -31,7 +31,6 @@ CSV_FIELDS = [
     "Fabrication Steps",
     "Outcome",
     "Photos",
-    "Url",
     "Notes",
 ]
 
@@ -52,7 +51,6 @@ CSV_TO_PROJECT = {
     "Materials": "materials",
     "Fabrication Steps": "fabricationSteps",
     "Outcome": "outcome",
-    "Url": "url",
     "Notes": "notes",
 }
 

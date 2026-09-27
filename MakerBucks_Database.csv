@@ -1,4 +1,4 @@
-Project,Maker(s),Category,Featured,Overview,Scope,Materials,Fabrication Steps,Outcome,Photos,Url,Notes
+Project,Maker(s),Category,Featured,Overview,Scope,Materials,Fabrication Steps,Outcome,Photos,Notes
 18th Century Coat Replica,Philip Miu,"Props, Costumes & Art",FALSE,"Historically detailed 18th-century coat replica focused on historical garment reconstruction, textile sourcing, precision pattern design, and specialized tailoring.","Historical pattern drafting, material sourcing, structural tailoring, and allocation of funding for specialized textile supplies.","• Historically appropriate textiles (wool or similar period fabric)
  • Lining fabric
  • Thread, buttons, and period-appropriate trim/hardware
@@ -11,7 +11,7 @@ Project,Maker(s),Category,Featured,Overview,Scope,Materials,Fabrication Steps,Ou
  7. Photograph the completed coat and document with video.",Successfully constructed a complete 18th-century coat replica with detailed photography and a video presentation.,"images/Project 2026/Coat Pictures/Cover.jpg
 images/Project 2026/Coat Pictures/Coat3.jpg
 images/Project 2026/Coat Pictures/Coat4.jpg
-images/Project 2026/Coat Pictures/Coat6.jpg",,
+images/Project 2026/Coat Pictures/Coat6.jpg",
 3lb Combat Robot for NHRL,Lucas Dion,Robotics,FALSE,"Lightweight competition combat robot developed with WPI MakerBucks support, engineered through CAD modeling and finite element analysis for NHRL competition.","Concept development, CAD modeling, material selection and simulation, manufacturing and assembly, and pre-competition testing.","• Structural and mechanical components selected and validated through FEA
  • Drive motors and a weapon motor
  • Electronic speed controllers (ESCs)
@@ -22,7 +22,7 @@ images/Project 2026/Coat Pictures/Coat6.jpg",,
  4. Manufacture components and assemble the robot.
  5. Test the assembled robot's drive and weapon systems, and prepare for competition.","Delivered a fully operational 3lb combat robot with functioning drivetrain and weapon system, ready for NHRL competition.","images/Project 2026/Development of a 3lb Combat Robot for NHRL Competition/Cover.png
 images/Project 2026/Development of a 3lb Combat Robot for NHRL Competition/Photo 5_Lucas Dion.png
-images/Project 2026/Development of a 3lb Combat Robot for NHRL Competition/PXL_20260413_225823614_Lucas Dion.jpg",,
+images/Project 2026/Development of a 3lb Combat Robot for NHRL Competition/PXL_20260413_225823614_Lucas Dion.jpg",
 ABV Meter,Leo Shraybman,"Electronics & Hardware, Science & Sensors",FALSE,"Portable alcohol-by-volume (ABV) meter developed with WPI MakerBucks support, combining a custom capacitive sensor with a 3D-printed enclosure.","Capacitance-based sensing circuit design, custom coaxial capacitor fabrication, microcontroller integration, and enclosure design for portability.","• Arduino Uno R3
  • A custom coaxial capacitor (3D-printed frame plus cut sheet metal), used as the sensing element
  • Heat-shrink tubing (to waterproof the capacitor's inner rod) and a heat gun
@@ -42,7 +42,7 @@ ABV Meter,Leo Shraybman,"Electronics & Hardware, Science & Sensors",FALSE,"Porta
  11. Build a calibration graph relating measured capacitance to known ABV values, and implement that calibration curve in the Arduino's C++ code.","Delivered a working portable ABV measurement device, with future plans to consolidate electronics onto a custom PCB for a more compact design.","images/Project 2026/ABV Meter/Cover.jpg
 images/Project 2026/ABV Meter/72A36A92-B1B8-41D6-A9C8-8332A74370C1.jpeg
 images/Project 2026/ABV Meter/9C1A96E3-6681-4D15-9EA9-679EF63F6ED7.jpeg
-images/Project 2026/ABV Meter/EB8C1854-88D4-4960-9926-D6E4E1D48753.jpeg",,
+images/Project 2026/ABV Meter/EB8C1854-88D4-4960-9926-D6E4E1D48753.jpeg",
 Battlebots for Competition,"Kekoto Maane, Azura Simsek & Klejvi Gjoni",Robotics,FALSE,"Competition combat robot developed with WPI MakerBucks support for entry into the National Havoc Robot League (NHRL), built as part of an MQP.","Iterative design brainstorming, parts sourcing, in-house part fabrication, robot assembly, and pre-competition testing.","• UHMW (ultra-high-molecular-weight polyethylene) structural material
  • AR500 steel (armor/structural plate)
  • Bolts and lock-nuts
@@ -60,7 +60,7 @@ images/Project 2026/Battlebots for Competition/Screenshot 2026-03-03 191932_Keko
 images/Project 2026/Battlebots for Competition/Screenshot 2026-03-03 192050_Kekoto Maane.png
 images/Project 2026/Battlebots for Competition/Screenshot 2026-03-03 192141_Kekoto Maane.png
 images/Project 2026/Battlebots for Competition/Screenshot 2026-03-03 192230_Kekoto Maane.png
-images/Project 2026/Battlebots for Competition/Screenshot 2026-03-03 192323_Kekoto Maane.png",,
+images/Project 2026/Battlebots for Competition/Screenshot 2026-03-03 192323_Kekoto Maane.png",
 Custom Door Handle Flashlight,Kaden L.,"Design & Fabrication, Electronics & Hardware",TRUE,"Door handle with an integrated flashlight developed with WPI MakerBucks support, combining custom electronics with compact mechanical packaging.","Electronics housing design, rotary-encoder-based lighting controls, component stacking and integration, and functional testing.","• A 3D-printed PLA sleeve (electronics housing)
  • A rotary encoder (for on/off click and brightness dimming)
  • A single 18650 lithium-ion cell
@@ -76,7 +76,7 @@ Custom Door Handle Flashlight,Kaden L.,"Design & Fabrication, Electronics & Hard
  7. Test all functions: the main light and dimming worked as intended; the ring light and capacitive touch sensor did not work reliably in this version.","Delivered a working proof-of-concept flashlight handle, with an aluminum-machined version planned to improve durability and thermal performance.","images/Project 2026/Custom Door handle/Cover.png
 images/Project 2026/Custom Door handle/IMG_5882_Kaden Ly.jpg
 images/Project 2026/Custom Door handle/IMG_8519_Kaden Ly.jpg
-images/Project 2026/Custom Door handle/Screenshot 2026-05-25 194730_Kaden Ly.png",,
+images/Project 2026/Custom Door handle/Screenshot 2026-05-25 194730_Kaden Ly.png",
 Custom Leatherworking Project,Philip Miu,"Props, Costumes & Art",FALSE,"Custom leather goods project focused on hand craftsmanship, material sourcing, and developing practical leatherworking techniques.","Material selection, leather craft, design execution, and allocation of funding for supplies and tooling.","• Leather (hide, cut to pattern)
  • Leatherworking tools (cutting, stitching, edge-finishing tools)
  • Hardware/fasteners as needed for the specific piece (rivets, buckles, thread)","1. Choose the leather good to make and sketch or pattern its design.
@@ -94,7 +94,7 @@ images/Project 2026/Custom Leatherworking Project/Book3-min.jpg
 images/Project 2026/Custom Leatherworking Project/Duffel1-min.jpg
 images/Project 2026/Custom Leatherworking Project/Duffel2-min.jpg
 images/Project 2026/Custom Leatherworking Project/Duffel3-min.jpg
-images/Project 2026/Custom Leatherworking Project/Duffel4-min.jpg",,
+images/Project 2026/Custom Leatherworking Project/Duffel4-min.jpg",
 DEA Makers Lightsaber Prototype,Peter Story & Alex Knox,"Props, Costumes & Art, Electronics & Hardware",FALSE,"Custom functional lightsaber replica developed with WPI MakerBucks support, focusing on prop design, hardware integration, and rapid prototyping.","Custom hilt design, component integration, assembly, and allocation of funds for materials and 3D printing.","• Custom 3D-printed hilt components
  • Integrated electronic components (likely LED and/or sound elements, based on typical lightsaber-prop builds)
  • Fasteners and internal mounting hardware","1. Design the hilt in CAD, planning internal space for electronics.
@@ -105,7 +105,7 @@ DEA Makers Lightsaber Prototype,Peter Story & Alex Knox,"Props, Costumes & Art, 
  6. Test the completed prop and document with photos and video.",Successfully constructed a functional prototype with visual documentation and a video demonstration.,"images/Project 2026/Lightsaber/Cover.JPG
 images/Project 2026/Lightsaber/Final Product 1.JPG
 images/Project 2026/Lightsaber/Final Product 2.JPG
-images/Project 2026/Lightsaber/Final Product 4.JPG",,
+images/Project 2026/Lightsaber/Final Product 4.JPG",
 Drone Localization in 3D Space (UWB),Tair Kareneyev,"Robotics, Electronics & Hardware",TRUE,"Ultra-wideband (UWB) indoor localization system developed with WPI MakerBucks support, proving out real-time 3D tracking as a foundation for future drone swarm applications.","UWB anchor network setup and calibration, wireless telemetry development, real-time trilateration software, and signal-filtering optimization.","• 4x ESP32 microcontrollers (one per anchor)
  • 4x DW1000 UWB anchor modules
  • 1x ESP32 + DW1000 UWB tag module (the object being localized)
@@ -120,7 +120,7 @@ Drone Localization in 3D Space (UWB),Tair Kareneyev,"Robotics, Electronics & Har
  8. Build a real-time 3D dashboard to visualize the tracked position.","Achieved real-time 3D tracking accurate to roughly 12 cm in the horizontal plane and 30 cm vertically, validating the concept ahead of planned outdoor and drone-mounted testing.","images/Project 2026/Drone localization in 3d space/Cover.jpg
 images/Project 2026/Drone localization in 3d space/20260224_181812_Tair Kareneyev.jpg
 images/Project 2026/Drone localization in 3d space/20260225_221344_Tair Kareneyev.jpg
-images/Project 2026/Drone localization in 3d space/20260225_221351_Tair Kareneyev.jpg",,
+images/Project 2026/Drone localization in 3d space/20260225_221351_Tair Kareneyev.jpg",
 Electric Motor Spinner Heat Vent,John Cassell,Engineering & Testing,FALSE,"Experimental electric aircraft motor developed with WPI MakerBucks support, exploring heat dissipation through a specially designed vented spinner.","Motor and spinner design for improved thermal venting, fabrication and assembly, and thermal performance testing.","• Motor components (stator, rotor, and standard motor hardware)
  • A custom-fabricated, vented spinner geometry
  • Supporting mounting hardware","1. Design a spinner geometry with venting intended to actively move heat away from the motor.
@@ -130,7 +130,7 @@ Electric Motor Spinner Heat Vent,John Cassell,Engineering & Testing,FALSE,"Exper
  5. Document the venting performance on video.","Successfully demonstrated effective heat venting through the spinner design, with future work planned around vapor chambers and alternate spinner geometries.","images/Project 2026/Electric motor that vents heat through its spinner to reduce heat drag in electric aircraft/Cover.png
 images/Project 2026/Electric motor that vents heat through its spinner to reduce heat drag in electric aircraft/PXL_20250925_231624191_John Cassell.jpg
 images/Project 2026/Electric motor that vents heat through its spinner to reduce heat drag in electric aircraft/PXL_20250925_231924554_John Cassell.jpg
-images/Project 2026/Electric motor that vents heat through its spinner to reduce heat drag in electric aircraft/PXL_20250925_232617110_John Cassell.jpg",,
+images/Project 2026/Electric motor that vents heat through its spinner to reduce heat drag in electric aircraft/PXL_20250925_232617110_John Cassell.jpg",
 Engine Dynamometer Test Rig,Harrison Brown,Engineering & Testing,FALSE,"Engine dynamometer prototype designed to collect engine performance data for future experimental projects, including development of a hybrid-electric go-kart.","Hardware design, material sourcing, structural fabrication, and data collection setup for small engine testing.","• Structural materials for the rig frame
  • Hardware (fasteners, mounts) to secure the test engine
  • Data-collection components/sensors for measuring engine output","1. Design the dynamometer frame and mounting layout for the target test engine.
@@ -141,7 +141,7 @@ Engine Dynamometer Test Rig,Harrison Brown,Engineering & Testing,FALSE,"Engine d
  6. Mount the test engine to the rig and run initial calibration tests.
  7. Collect and document engine performance data.",Delivered a functional dynamometer testing rig with media assets and invoice documentation.,"images/Project 2026/Engine Dynamometer Test Rig/Cover.jpg
 images/Project 2026/Engine Dynamometer Test Rig/20240218_164933.jpg
-images/Project 2026/Engine Dynamometer Test Rig/Screenshot 2023-09-11 174039.png",,
+images/Project 2026/Engine Dynamometer Test Rig/Screenshot 2023-09-11 174039.png",
 FLICKER 3D Printer Prototype,Jakub Jandus,Design & Fabrication,FALSE,"Custom 3D printer prototype exploring printer architecture, open-frame electronics testing, and structural trade-offs in rapid prototyping.","Custom 3D printer build, open-frame systems verification, electronics integration, and planned acrylic enclosure expansion.","• 3D-printed and structural frame components
  • Printer electronics (mainboard, stepper motors, drivers — implied by a custom 3D printer build)
  • Planned (not yet installed) acrylic panels for a future enclosure","1. Design the printer's frame and motion system architecture.
@@ -153,7 +153,7 @@ FLICKER 3D Printer Prototype,Jakub Jandus,Design & Fabrication,FALSE,"Custom 3D 
 images/Project 2026/Flickers/20230325_153456.jpg
 images/Project 2026/Flickers/20230325_153504.jpg
 images/Project 2026/Flickers/20230325_153531.jpg
-images/Project 2026/Flickers/20230325_153539.jpg",,
+images/Project 2026/Flickers/20230325_153539.jpg",
 Mastersword,Peter Story & Team,"Props, Costumes & Art, Electronics & Hardware",TRUE,"Custom LED-illuminated sword prop developed with WPI MakerBucks support, combining CAD-designed 3D-printed components with gyroscope-reactive lighting effects.","Three-layer blade design and fabrication, custom PCB development for LED control, gyroscope/accelerometer integration, and hilt finishing and detailing.","• PLA filament (outer blade shell)
  • TPU filament (inner blade core, holds and cushions the LED strip)
  • Polycarbonate tubing, 3/4"" outer diameter (middle alignment layer)
@@ -171,7 +171,7 @@ Mastersword,Peter Story & Team,"Props, Costumes & Art, Electronics & Hardware",T
  5. Prime and paint the hilt: a purple gloss base coat, hand-painted gold acrylic accents on the gem and handle end (painted separately from the blade connector to avoid sticking), then a clear matte topcoat to seal the finish.
  6. Add the handle's wrap detail: cut shoelaces to length, seal the cut ends with a lighter to prevent fraying, then lattice-wrap and superglue them around the hilt.
  7. Final-assemble the blade layers, electronics, and finished hilt into the complete sword.","Completed a fully assembled, motion-reactive illuminated sword prop with custom electronics and refined cosmetic finishing.","images/Project 2026/Masterswords/Cover.jpg
-images/Project 2026/Masterswords/Caption 2E_Peter Story.jpg",,
+images/Project 2026/Masterswords/Caption 2E_Peter Story.jpg",
 Permanent Magnet Levitation,Irakli Bakuradze,"Science & Sensors, Engineering & Testing",FALSE,"Experimental permanent-magnet levitation platform developed with WPI MakerBucks support, investigating the physical limits of static magnetic levitation.","Magnetic layout design, force modeling and optimization in Python, and physical prototyping of magnet arrays and support frames.","• Neodymium magnets
  • Cardboard (for the initial test array)
  • A 3D-printed triangular holder frame (PLA)
@@ -182,7 +182,7 @@ Permanent Magnet Levitation,Irakli Bakuradze,"Science & Sensors, Engineering & T
  5. Interpret the simulation results: they didn't predict free levitation, since for this type of layout the net force integrated over all positions works out to zero — meaning a floating platform would need to be constrained to specific regions rather than fully free-floating.
  6. Design and 3D print a triangular holder frame based on the simulated layout.
  7. Test the physical setup: as predicted, free-float levitation was not achieved, but the platform did levitate once a few degrees of freedom were mechanically constrained.","Confirmed that free-floating levitation is not achievable with this configuration, consistent with Earnshaw's theorem, while constrained-motion levitation was demonstrated successfully.","images/Project 2026/Permanent Magnet Levitation/Cover.jpg
-images/Project 2026/Permanent Magnet Levitation/IMG_0399_Irakli Bakuradze.jpg",,
+images/Project 2026/Permanent Magnet Levitation/IMG_0399_Irakli Bakuradze.jpg",
 RF Light Art (Campus Spectrum Display),Mary S.,"Electronics & Hardware, Props, Costumes & Art",TRUE,"Real-time electromagnetic spectrum visualization installation developed with WPI MakerBucks support, translating invisible campus radio activity into a glowing LED light display.","Software-defined radio signal capture, custom driver development, FFT-based signal processing, and LED matrix hardware integration.","• RTL-SDR Blog V4 software-defined radio receiver
  • Raspberry Pi 4
  • Adafruit RGB Matrix Bonnet
@@ -197,7 +197,7 @@ RF Light Art (Campus Spectrum Display),Mary S.,"Electronics & Hardware, Props, C
  7. Wire an Adafruit RGB Matrix Bonnet to a Raspberry Pi 4 and connect a HUB75 LED matrix panel.
  8. Work around broken Python bindings for the rpi-rgb-led-matrix library by writing a custom C program that acts as a ""pixel server,"" accepting pixel data over stdin.
  9. Build a circular glow-rendering system where each frequency band renders as a colored circle whose radius and brightness scale with that band's live signal strength, mounted behind a frosted acrylic diffuser panel.","Delivered a functioning, continuously updating light art installation reflecting real-time campus radio activity, with plans to find it a permanent home in the ECE building.","images/Project 2026/RF Light Art/Cover.jpg
-images/Project 2026/RF Light Art/visualizer_mockup_Mary Schwedatschenko.png",,
+images/Project 2026/RF Light Art/visualizer_mockup_Mary Schwedatschenko.png",
 Robotic Arm,Kaden Ly,"Robotics, Electronics & Hardware",TRUE,"Custom 3D-printed robotic arm developed with WPI MakerBucks support, focusing on iterative CAD design, precision tolerancing, and stepper-driven joint actuation.","Iterative prototyping of arm joints, clearance and tolerance testing, stepper motor integration, and development of forward-kinematics control software.","• 3D-printed structural/joint components (from CAD)
  • Stepper motors (one or more per joint)
  • Stepper motor drivers (1/8 microstepping)
@@ -217,7 +217,7 @@ images/Project 2026/Robotic Arm/1.jpg
 images/Project 2026/Robotic Arm/10.jpg
 images/Project 2026/Robotic Arm/2.jpg
 images/Project 2026/Robotic Arm/4.jpg
-images/Project 2026/Robotic Arm/6.jpg",,
+images/Project 2026/Robotic Arm/6.jpg",
 ROV Submarine Chassis,Zirun Yang,"Robotics, Engineering & Testing",FALSE,Competition-grade ROV submarine chassis developed with WPI MakerBucks support for the team's first entry into the international MATE ROV underwater robotics competition.,"Design and fabrication of a pressure-resistant hull and mechanical chassis, power distribution board development, and control system programming.","• 3D-printed pressure-bearing hull and chassis components
  • A custom power distribution board (PDB) and associated electronics
  • Control system hardware (microcontroller/computer, per the ROV's RBE/CS control stack)
@@ -232,7 +232,7 @@ ROV Submarine Chassis,Zirun Yang,"Robotics, Engineering & Testing",FALSE,Competi
 images/Project 2026/ROV Submarine -- Chassis/rov_01_Zirun Yang.png
 images/Project 2026/ROV Submarine -- Chassis/rov_02_Zirun Yang.jpg
 images/Project 2026/ROV Submarine -- Chassis/rov_4_Zirun Yang.jpg
-images/Project 2026/ROV Submarine -- Chassis/rov_5_Zirun Yang.jpg",,
+images/Project 2026/ROV Submarine -- Chassis/rov_5_Zirun Yang.jpg",
 Singing Wineglass Robot,Kyle Mitchell,Robotics,FALSE,Automated robot exploring acoustic robotics and mechanical tuning by driving controlled friction across wineglass rims to produce musical tones.,"Acoustic iteration, mechanical design, and tuning of sponge pressure, moisture levels, air density, and structural rigidity.","• Wineglasses (tuned by fill level or size, one per note)
  • Mechanical drive components for rim-friction actuation
  • Sponge or contact material for the rim interface
@@ -248,7 +248,7 @@ images/Project 2026/Singing Wineglass Robot/20231207_160410.jpg
 images/Project 2026/Singing Wineglass Robot/20231207_160436.jpg
 images/Project 2026/Singing Wineglass Robot/20231207_160533.jpg
 images/Project 2026/Singing Wineglass Robot/20231207_161143.jpg
-images/Project 2026/Singing Wineglass Robot/20231207_161219.jpg",,
+images/Project 2026/Singing Wineglass Robot/20231207_161219.jpg",
 Splitflap PCB,Kaden Ly,Electronics & Hardware,FALSE,"Custom-designed PCB for a split-flap display module, developed with WPI MakerBucks support, covering schematic design, board layout, and assembly.","Circuit prototyping, PCB schematic and layout design in KiCad, component sourcing, board assembly, and multi-unit soldering and integration.","• Custom PCB, matte black finish (ordered from JLCPCB)
  • Electronic components sourced from Digikey (microcontroller, motor driver components, screw terminals)
  • Small motors to drive the flap mechanism (one per board)
@@ -268,7 +268,7 @@ images/Project 2026/Splitflap PCB/16.jpg
 images/Project 2026/Splitflap PCB/17.jpg
 images/Project 2026/Splitflap PCB/19.jpg
 images/Project 2026/Splitflap PCB/2.jpg
-images/Project 2026/Splitflap PCB/6.jpg",,
+images/Project 2026/Splitflap PCB/6.jpg",
 Star Wars Clone Trooper Helmet,Phil Miu,"Props, Costumes & Art",FALSE,"Custom full-scale Clone Trooper helmet replica created with WPI MakerBucks support, focusing on 3D printing, surface finishing, and assembly.","3D printing, post-processing, assembly, and budget management for project fabrication supplies.","• 3D-printed helmet shell segments
  • Surface-finishing supplies (filler, primer, sandpaper)
  • Paint and clear coat
@@ -281,7 +281,7 @@ Star Wars Clone Trooper Helmet,Phil Miu,"Props, Costumes & Art",FALSE,"Custom fu
 images/Project 2026/Clone Helemt/FillingLayerLines1.jpeg
 images/Project 2026/Clone Helemt/Final1.jpg
 images/Project 2026/Clone Helemt/Final2.jpg
-images/Project 2026/Clone Helemt/Final3.jpg",,
+images/Project 2026/Clone Helemt/Final3.jpg",
 Suitcase Maze Game,Benjamin Levy,"Props, Costumes & Art, Design & Fabrication",TRUE,"Interactive cooperative art game developed with WPI MakerBucks support, transforming a vintage suitcase into a maze-navigation experience.","Prototyping and gameplay design, laser-cutting and hand-assembly of a maze enclosure, and integration of the suitcase's wheels as a communication interface.","• Plywood and acrylic sheet (laser-cut)
  • Wood glue and epoxy
  • A vintage suitcase (repurposed for its built-in wheels)
@@ -305,7 +305,7 @@ images/Project 2026/Suitcase Maze Game/SuitcaseMazeGame_06_Benjamin Levy.jpg
 images/Project 2026/Suitcase Maze Game/SuitcaseMazeGame_08_Benjamin Levy.jpg
 images/Project 2026/Suitcase Maze Game/SuitcaseMazeGame_09_Benjamin Levy.jpg
 images/Project 2026/Suitcase Maze Game/SuitcaseMazeGame_10_Benjamin Levy.jpg
-images/Project 2026/Suitcase Maze Game/SuitcaseMazeGame_CoverPhoto_Benjamin Levy.jpg",,
+images/Project 2026/Suitcase Maze Game/SuitcaseMazeGame_CoverPhoto_Benjamin Levy.jpg",
 Thunderhawk Transporter,Anthony P.,Design & Fabrication,FALSE,"Large-scale 3D-printed Warhammer 40k model developed with WPI MakerBucks support, focusing on multi-part print scaling and structural assembly.","Digital model scaling and slicing, multi-part print segmentation, support removal and finishing, and structural assembly.","• 3D-printed plastic parts (model split into 4 separate prints)
  • Gorilla Glue (structural adhesive for assembly)
  • Duct tape (temporary bracing during glue cure)
@@ -322,7 +322,7 @@ images/Project 2026/Thunderhawk Transporter/0(2).jpg
 images/Project 2026/Thunderhawk Transporter/0(3).jpg
 images/Project 2026/Thunderhawk Transporter/0(4).jpg
 images/Project 2026/Thunderhawk Transporter/0(6).jpg
-images/Project 2026/Thunderhawk Transporter/0.jpg",,
+images/Project 2026/Thunderhawk Transporter/0.jpg",
 Truck Tent Prototype,Jakob Sperry,Design & Fabrication,FALSE,"Custom truck tent prototype focused on outdoor gear design, practical spatial fitting, material selection, and structural support for vehicle-integrated shelter.","Custom enclosure design, vehicle fitting, material sourcing, and budget allocation for structural supplies and fabrication.","• Tent fabric/material (weather-resistant)
  • Structural supports (poles or frame members)
  • Fasteners and attachment hardware for mounting to the truck bed
@@ -337,7 +337,7 @@ images/Project 2026/Truck Tent/IMG_5427.jpeg
 images/Project 2026/Truck Tent/IMG_5428.jpeg
 images/Project 2026/Truck Tent/IMG_5657.jpeg
 images/Project 2026/Truck Tent/IMG_5685.jpeg
-images/Project 2026/Truck Tent/IMG_5689.jpeg",,
+images/Project 2026/Truck Tent/IMG_5689.jpeg",
 Universal Remote Prototype,Joseph Nixon,"Electronics & Hardware, Robotics",FALSE,"Custom universal remote control prototype developed with WPI MakerBucks support, focusing on functional enclosure design, rapid prototyping, and cost-conscious material selection.","Hardware enclosure design, component integration, and prototype testing for universal remote functionality.","• 3D-printed PETG enclosure (switched from nylon for cost reasons)
  • Remote-control electronics/components (IR emitter, microcontroller, buttons — per the enclosure's internal layout)
  • Fasteners for enclosure assembly","1. Define the functional requirements for the universal remote (buttons, IR range, form factor).
@@ -353,4 +353,4 @@ images/Project 2026/Universal Remote/IMG_20240923_133821137.jpg
 images/Project 2026/Universal Remote/IMG_20240929_224107138.jpg
 images/Project 2026/Universal Remote/IMG_20240930_124032280.jpg
 images/Project 2026/Universal Remote/IMG_20240930_124213044_HDR.jpg
-images/Project 2026/Universal Remote/IMG_20240930_124220580.jpg",,
+images/Project 2026/Universal Remote/IMG_20240930_124220580.jpg",
