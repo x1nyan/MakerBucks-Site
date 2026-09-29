@@ -1,0 +1,54 @@
+name: Delete project photo folder
+
+on:
+  workflow_dispatch:
+    inputs:
+      payload:
+        description: Pages CMS action payload
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: content-maintenance-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  delete:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out current branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref_name }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Delete unreferenced photo folder
+        env:
+          PAGES_CMS_PAYLOAD: ${{ inputs.payload }}
+        run: python scripts/delete_photo_folder.py
+
+      - name: Commit folder removal
+        env:
+          BRANCH_NAME: ${{ github.ref_name }}
+        shell: bash
+        run: |
+          if git diff --quiet -- "images/Project 2026"; then
+            echo "No photo folder changes to commit."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A -- "images/Project 2026"
+          git commit -m "chore: delete project photo folder"
+          git fetch origin "$BRANCH_NAME"
+          git rebase "origin/$BRANCH_NAME"
+          git push origin "HEAD:$BRANCH_NAME"

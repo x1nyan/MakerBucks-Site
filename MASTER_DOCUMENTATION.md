@@ -167,6 +167,11 @@ The site reads every listed path directly, so it no longer depends on
 directory-listing support from the host; the full carousel works the same on
 GitHub Pages as anywhere else.
 
+To delete a project photo folder, use **Delete project photo folder** on the
+Pages CMS media page and enter its folder name under `images/Project 2026/`.
+The action permanently removes that folder and refuses to run while any project
+form still references photos inside it.
+
 ## 8. Pages CMS Editing Workflow
 
 `.pages.yml` defines the `Projects` collection at `data/projects/`. Each JSON

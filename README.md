@@ -46,6 +46,11 @@ CMS commits the photos to the repository and writes their paths into the form;
 **Build projects CSV** then lists them in the CSV's `Photos` column and fails
 if no photo is named `Cover`.
 
+To remove a photo folder, use **Delete project photo folder** on the Project
+photos media page and enter its folder name under `images/Project 2026/`. The
+action refuses to delete folders whose photos are still referenced by a project
+form.
+
 The **Resize uploaded images** GitHub Action processes new or changed JPEG, PNG,
 and WebP files under `images/`. It caps the longest dimension at 800 pixels and
 removes EXIF metadata. SVG and animated GIF files are left unchanged.

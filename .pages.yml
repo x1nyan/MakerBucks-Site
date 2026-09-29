@@ -4,6 +4,20 @@ media:
     input: images
     output: images
     categories: [image]
+    actions:
+      - name: delete-project-photo-folder
+        label: Delete project photo folder
+        workflow: delete-photo-folder.yml
+        ref: current
+        confirm:
+          title: Delete project photo folder?
+          message: This permanently deletes the folder and all its files. It can only be deleted when no project uses its photos.
+          button: Delete folder
+        fields:
+          - name: folder
+            label: Folder name under Project 2026
+            type: text
+            required: true
 
 content:
   - name: projects
