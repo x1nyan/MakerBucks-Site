@@ -217,11 +217,14 @@ is typed by hand. Name one uploaded photo `Cover`; `build` fails if none match.
 
 ### Photo optimization
 
-The **Resize uploaded images** workflow runs when files under `images/` change.
-It installs Pillow and optimizes changed JPEG, PNG, and WebP images, resizing
-their longest dimension to at most 800px and removing EXIF metadata. Animated
-GIF and SVG files are skipped. The action needs contents write permission to
-commit optimized photos.
+The CMS accepts JPG/JPEG, PNG, WebP, GIF, APNG, SVG, and AVIF images. The
+**Resize uploaded images** workflow runs when files under `images/` change and
+rejects image files larger than 20 MiB with a `File is too big` error. This
+check runs after Pages CMS commits the upload. The workflow installs Pillow and
+optimizes changed JPEG, PNG, and WebP images, resizing their longest dimension
+to at most 1600px and removing EXIF metadata. GIF, APNG, SVG, and AVIF files
+are left unchanged. The action needs contents write permission to commit
+optimized photos.
 
 ## 9. Data Flow
 

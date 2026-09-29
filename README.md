@@ -51,9 +51,13 @@ photos media page and enter its folder name under `images/Project 2026/`. The
 action refuses to delete folders whose photos are still referenced by a project
 form.
 
-The **Resize uploaded images** GitHub Action processes new or changed JPEG, PNG,
-and WebP files under `images/`. It caps the longest dimension at 800 pixels and
-removes EXIF metadata. SVG and animated GIF files are left unchanged.
+The CMS accepts JPG/JPEG, PNG, WebP, GIF, APNG, SVG, and AVIF images. The
+**Resize uploaded images** GitHub Action checks changed images under
+`images/`; files over 20 MiB fail with a clear `File is too big` error. JPEG,
+PNG, and WebP images are resized to at most 1600 pixels on the longest side and
+have EXIF metadata removed. GIF, APNG, SVG, and AVIF files are kept unchanged.
+The size check runs after Pages CMS commits the upload, so replace or delete an
+oversized file after the failed Action.
 
 ## Run locally
 From the repository root, serve the site over HTTP:

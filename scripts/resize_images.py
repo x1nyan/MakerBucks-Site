@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Optimize changed JPEG, PNG, and WebP images and remove embedded metadata."""
+"""Optimize supported raster images and reject oversized photo uploads."""
 
 from __future__ import annotations
 
@@ -13,7 +13,10 @@ from PIL import Image, ImageOps
 ROOT = Path(__file__).resolve().parents[1]
 IMAGES_ROOT = (ROOT / "images").resolve()
 MAX_SIDE = 1600
+MAX_FILE_SIZE_BYTES = 20 * 1024 * 1024
 SUPPORTED_FORMATS = {"JPEG", "PNG", "WEBP"}
+SUPPORTED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
+PASSTHROUGH_EXTENSIONS = {".gif", ".apng", ".svg", ".avif"}
 
 
 def optimize_image(argument: str) -> bool:
@@ -24,7 +27,22 @@ def optimize_image(argument: str) -> bool:
     if not path.is_file():
         return False
 
+    extension = path.suffix.casefold()
+    if extension not in SUPPORTED_EXTENSIONS | PASSTHROUGH_EXTENSIONS:
+        print(f"Skipped non-image file: {path.relative_to(ROOT)}")
+        return False
+
     original_size = path.stat().st_size
+    if original_size > MAX_FILE_SIZE_BYTES:
+        raise ValueError(
+            f"File is too big: {path.relative_to(ROOT)} is "
+            f"{original_size / (1024 * 1024):.1f} MiB; the limit is 20 MiB."
+        )
+
+    if extension in PASSTHROUGH_EXTENSIONS:
+        print(f"Skipped format without raster optimization: {path.relative_to(ROOT)}")
+        return False
+
     with Image.open(path) as source:
         image_format = source.format
         if image_format not in SUPPORTED_FORMATS:
