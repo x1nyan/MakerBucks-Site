@@ -13,7 +13,8 @@
 
 window.MB = window.MB || {};
 
-(function () {
+/** Publish shared site settings for the browser modules. */
+(function initializeConfig() {
   'use strict';
 
   /* =========================================================

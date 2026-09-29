@@ -83,6 +83,7 @@ def sort_photo_paths(paths: list[str]) -> list[str]:
 
 
 def read_csv_rows() -> list[dict[str, str]]:
+    """Read the generated project CSV and validate its header and row shape."""
     with CSV_PATH.open("r", encoding="utf-8-sig", newline="") as source:
         reader = csv.DictReader(source)
         if reader.fieldnames != CSV_FIELDS:
@@ -100,6 +101,7 @@ def read_csv_rows() -> list[dict[str, str]]:
 
 
 def parse_categories(value: str) -> list[str]:
+    """Split a legacy category cell using the historical category list."""
     text = value.strip()
     if not text:
         return []
@@ -135,6 +137,7 @@ def parse_categories(value: str) -> list[str]:
 
 
 def slugify(value: str) -> str:
+    """Convert a project title to a lowercase, filesystem-friendly slug."""
     normalized = unicodedata.normalize("NFKD", value)
     ascii_value = normalized.encode("ascii", "ignore").decode("ascii")
     slug = re.sub(r"[^a-z0-9]+", "-", ascii_value.lower()).strip("-")
@@ -193,6 +196,7 @@ def migrate() -> None:
 
 
 def load_projects() -> list[dict[str, Any]]:
+    """Load project JSON forms and return them in their configured display order."""
     paths = sorted(PROJECTS_DIR.glob("*.json"))
     projects = []
     for path in paths:
@@ -203,6 +207,7 @@ def load_projects() -> list[dict[str, Any]]:
         projects.append(project)
 
     def order_key(project: dict[str, Any]) -> tuple[bool, int, str]:
+        """Sort valid numeric order values before projects without an order."""
         try:
             order = int(project.get("order"))
             return False, order, str(project.get("title", "")).casefold()
@@ -213,6 +218,7 @@ def load_projects() -> list[dict[str, Any]]:
 
 
 def project_to_csv(project: dict[str, Any]) -> dict[str, str]:
+    """Validate one project form and convert it to generated CSV fields."""
     source = project.get("_source", "project form")
     title = str(project.get("title") or "").strip()
     if not title:
@@ -264,6 +270,7 @@ def project_to_csv(project: dict[str, Any]) -> dict[str, str]:
 
 
 def build_rows() -> list[dict[str, str]]:
+    """Convert all loaded project forms to ordered CSV row dictionaries."""
     projects = load_projects()
     rows = [project_to_csv(project) for project in projects]
     return [{field: row[field] for field in CSV_FIELDS} for row in rows]
@@ -290,6 +297,7 @@ def footer_csv_text() -> str:
 
 
 def write_text_atomically(path: Path, text: str) -> None:
+    """Write text through a temporary file before replacing the destination."""
     temporary_path = path.with_suffix(path.suffix + ".tmp")
     try:
         with temporary_path.open("w", encoding="utf-8", newline="") as output:

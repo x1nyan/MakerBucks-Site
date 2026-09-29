@@ -9,7 +9,8 @@
    cards.js (through window.MB).
    ===================================================================== */
 
-(function () {
+/** Initialize search, filters, sorting, and the main project grid. */
+(function initializeShowcase() {
   'use strict';
 
   const { makeCardEl } = MB;
@@ -85,12 +86,21 @@
        "Filter: ★ Featured, Robotics"
      ========================================================= */
 
+  /** Create one filter checkbox for each category in the loaded projects.
+   * @param {Iterable<string>} categories - Unique display category names.
+   * @returns {void}
+   */
   function renderCategoryOptions(categories) {
     categoryOptions.innerHTML = '';
 
     Array.from(categories)
-      .sort((a, b) => a.localeCompare(b))
-      .forEach(cat => {
+      .sort(
+        /** Compare category labels alphabetically for stable display. */
+        (a, b) => a.localeCompare(b)
+      )
+      .forEach(
+        /** Build and append a checkbox that updates the selected filters. */
+        cat => {
         const label = document.createElement('label');
         label.className = 'filter-option';
 
@@ -99,7 +109,8 @@
         box.value = cat.toLowerCase();
         box.dataset.display = cat;
 
-        box.addEventListener('change', () => {
+        /** Add or remove this category from the active filter set. */
+        box.addEventListener('change', function updateSelectedCategory() {
           if (box.checked) selectedCategories.add(box.value);
           else selectedCategories.delete(box.value);
           applyFilters();
@@ -108,13 +119,20 @@
         label.appendChild(box);
         label.appendChild(document.createTextNode(cat));
         categoryOptions.appendChild(label);
-      });
+        }
+      );
   }
 
+  /** Update the filter button label to reflect active category and featured filters.
+   * @returns {void}
+   */
   function updateFilterLabel() {
     const checkedNames = Array.from(
       categoryOptions.querySelectorAll('input:checked')
-    ).map(b => b.dataset.display);
+    ).map(
+      /** Read the user-facing category label from each checked input. */
+      b => b.dataset.display
+    );
 
     const parts = [];
     if (featuredOnly) parts.push('★ Featured');
@@ -130,31 +148,39 @@
   }
 
   // Open/close the panel. aria-expanded tells screen readers its state.
+  /** Show or hide the category panel and synchronize its accessibility state.
+   * @param {boolean} open - Whether the filter panel should be visible.
+   * @returns {void}
+   */
   function setPanelOpen(open) {
     filterPanel.hidden = !open;
     filterToggle.setAttribute('aria-expanded', String(open));
   }
 
-  filterToggle.addEventListener('click', () => {
+  /** Toggle the category panel from its control button. */
+  filterToggle.addEventListener('click', function toggleFilterPanel() {
     setPanelOpen(filterPanel.hidden);
   });
 
   // Clicking anywhere outside the dropdown closes it.
-  document.addEventListener('click', e => {
+  /** Close the category panel when a click lands outside its container. */
+  document.addEventListener('click', function closeFilterOnOutsideClick(e) {
     if (!filterPanel.hidden && !filterDropdown.contains(e.target)) {
       setPanelOpen(false);
     }
   });
 
   // Pressing Escape closes it and puts focus back on the button.
-  document.addEventListener('keydown', e => {
+  /** Close the category panel and restore focus when Escape is pressed. */
+  document.addEventListener('keydown', function closeFilterOnEscape(e) {
     if (e.key === 'Escape' && !filterPanel.hidden) {
       setPanelOpen(false);
       filterToggle.focus();
     }
   });
 
-  featuredCheckbox.addEventListener('change', () => {
+  /** Apply the featured-only state when its checkbox changes. */
+  featuredCheckbox.addEventListener('change', function updateFeaturedFilter() {
     featuredOnly = featuredCheckbox.checked;
     applyFilters();
   });
@@ -172,35 +198,54 @@
        3rd: if still tied, alphabetical by title
      ========================================================= */
 
+  /** Return a copy of the projects ordered by the selected sort mode.
+   * @param {Array<object>} list - Project records to sort.
+   * @returns {Array<object>} A sorted copy; the input array is unchanged.
+   */
   function sortProjects(list) {
     const sorted = list.slice();
 
     switch (currentSort) {
       case 'az':
-        sorted.sort((a, b) => a.title.localeCompare(b.title));
+        sorted.sort(
+          /** Compare project titles in ascending order. */
+          (a, b) => a.title.localeCompare(b.title)
+        );
         break;
 
       case 'za':
-        sorted.sort((a, b) => b.title.localeCompare(a.title));
+        sorted.sort(
+          /** Compare project titles in descending order. */
+          (a, b) => b.title.localeCompare(a.title)
+        );
         break;
 
       case 'maker':
-        sorted.sort((a, b) => (a.maker || '').localeCompare(b.maker || ''));
+        sorted.sort(
+          /** Compare maker names in ascending order. */
+          (a, b) => (a.maker || '').localeCompare(b.maker || '')
+        );
         break;
 
       case 'featured':
-        sorted.sort((a, b) =>
-          (b.featured - a.featured) ||
-          (b.score - a.score) ||
-          a.title.localeCompare(b.title));
+        sorted.sort(
+          /** Rank featured projects first, then score, then title. */
+          (a, b) =>
+            (b.featured - a.featured) ||
+            (b.score - a.score) ||
+            a.title.localeCompare(b.title)
+        );
         break;
 
       case 'detail':
       default:
         // Most content first; thinner cards sink to the bottom
-        sorted.sort((a, b) =>
-          (b.score - a.score) ||
-          a.title.localeCompare(b.title));
+        sorted.sort(
+          /** Rank by detail score, using title as a stable tie-breaker. */
+          (a, b) =>
+            (b.score - a.score) ||
+            a.title.localeCompare(b.title)
+        );
         break;
     }
 
@@ -217,11 +262,17 @@
      hidden.
      ========================================================= */
 
+  /** Rebuild the grid in sorted order and reapply the current filters.
+   * @returns {void}
+   */
   function renderAll() {
     container.innerHTML = '';
-    sortProjects(allProjects).forEach(project => {
+    sortProjects(allProjects).forEach(
+      /** Create and append one card for each sorted project. */
+      project => {
       container.appendChild(makeCardEl(project));
-    });
+      }
+    );
     applyFilters();
   }
 
@@ -244,16 +295,24 @@
      dropdown's label, and whether "Clear filters" is visible.
      ========================================================= */
 
+  /** Show matching cards and update counts, labels, and empty states.
+   * @returns {void}
+   */
   function applyFilters() {
     const query = searchInput.value.trim().toLowerCase();
     const anyCategoryFilter = selectedCategories.size > 0;
     let visibleCount = 0;
 
-    container.querySelectorAll('.card').forEach(card => {
+    container.querySelectorAll('.card').forEach(
+      /** Evaluate the active filters and update one card's visibility. */
+      card => {
       const cardCats = card.dataset.categories.split('|');
 
       const matchesCategory =
-        !anyCategoryFilter || cardCats.some(c => selectedCategories.has(c));
+        !anyCategoryFilter || cardCats.some(
+          /** Match when the card has any selected category. */
+          c => selectedCategories.has(c)
+        );
       const matchesFeatured =
         !featuredOnly || card.dataset.featured === '1';
       const matchesSearch =
@@ -262,7 +321,8 @@
       const show = matchesCategory && matchesFeatured && matchesSearch;
       card.classList.toggle('is-hidden', !show);
       if (show) visibleCount++;
-    });
+      }
+    );
 
     const activeFilterCount = selectedCategories.size + (featuredOnly ? 1 : 0);
 
@@ -284,12 +344,18 @@
      all cards again.
      ========================================================= */
 
+  /** Clear search and filter state, then restore every project card.
+   * @returns {void}
+   */
   function clearAllFilters() {
     selectedCategories.clear();
     featuredOnly = false;
     featuredCheckbox.checked = false;
     searchInput.value = '';
-    categoryOptions.querySelectorAll('input').forEach(b => { b.checked = false; });
+    categoryOptions.querySelectorAll('input').forEach(
+      /** Uncheck one category control while clearing filter state. */
+      b => { b.checked = false; }
+    );
     applyFilters();
   }
 
@@ -310,18 +376,21 @@
     Each new keystroke cancels the previous timer and starts
     a fresh one, so filtering only runs once typing settles.
   */
-  searchInput.addEventListener('input', () => {
+  /** Debounce text search until the user pauses typing. */
+  searchInput.addEventListener('input', function debounceSearchInput() {
     clearTimeout(searchDebounceTimer);
     searchDebounceTimer = setTimeout(applyFilters, 150);
   });
 
-  searchClearBtn.addEventListener('click', () => {
+  /** Clear the search query and return focus to its input. */
+  searchClearBtn.addEventListener('click', function clearSearchInput() {
     searchInput.value = '';
     searchInput.focus();
     applyFilters();
   });
 
-  sortSelect.addEventListener('change', () => {
+  /** Update the sort mode and rebuild cards in the selected order. */
+  sortSelect.addEventListener('change', function changeSortOrder() {
     currentSort = sortSelect.value;
     renderAll();
   });
@@ -334,7 +403,8 @@
      ========================================================= */
 
   MB.loadProjects()
-    .then(projects => {
+    /** Build category controls and render the loaded project list. */
+    .then(function renderLoadedProjects(projects) {
       allProjects = projects;
 
       if (allProjects.length === 0) {
@@ -350,16 +420,23 @@
         the checkbox label.
       */
       const displayCats = new Map();
-      allProjects.forEach(p => {
-        p.categories.forEach(c => {
+      allProjects.forEach(
+        /** Collect all category labels used by the loaded projects. */
+        p => {
+        p.categories.forEach(
+          /** Preserve the first spelling of each case-insensitive category. */
+          c => {
           if (!displayCats.has(c.toLowerCase())) displayCats.set(c.toLowerCase(), c);
-        });
-      });
+          }
+        );
+        }
+      );
 
       renderCategoryOptions(displayCats.values());
       renderAll();
     })
-    .catch(() => {
+    /** Show the shared data-load error when the project request fails. */
+    .catch(function showProjectLoadError() {
       container.innerHTML = MB.LOAD_ERROR_HTML;
     });
 })();

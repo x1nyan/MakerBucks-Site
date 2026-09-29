@@ -272,8 +272,8 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 34px;
-  margin-left: 84px;
-  margin-right: 84px;
+  margin-left: 100px;
+  margin-right: 100px;
 }
 
 /* =========================================================

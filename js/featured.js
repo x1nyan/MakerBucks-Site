@@ -10,7 +10,8 @@
    not this row.
    ===================================================================== */
 
-(function () {
+/** Load and display projects marked Featured in the generated CSV. */
+(function initializeFeaturedProjects() {
   'use strict';
 
   const { makeCardEl } = MB;
@@ -40,9 +41,14 @@
      page), and builds a card for each into the scrolling row.
      ========================================================= */
 
+  /** Filter, sort, and render featured cards or hide the empty section.
+   * @returns {void}
+   */
   function renderFeatured() {
     const featured = allProjects
+      /** Keep only projects enabled for the featured section. */
       .filter(p => p.featured)
+      /** Rank featured projects by detail score, then title. */
       .sort((a, b) => (b.score - a.score) || a.title.localeCompare(b.title));
 
     track.innerHTML = '';
@@ -51,6 +57,7 @@
     featuredSection.hidden = featured.length === 0;
     if (featured.length === 0) return;
 
+    /** Create and append one card for each featured project. */
     featured.forEach(project => track.appendChild(makeCardEl(project)));
     updateScrollButtons();
   }
@@ -66,6 +73,9 @@
      is resized.
      ========================================================= */
 
+  /** Calculate the horizontal distance needed to advance one featured card.
+   * @returns {number} Card width plus its track gap, or a viewport-based fallback.
+   */
   function scrollStep() {
     const card = track.querySelector('.card');
     if (!card) return track.clientWidth * 0.8;
@@ -73,6 +83,9 @@
     return card.getBoundingClientRect().width + gap;
   }
 
+  /** Update arrow visibility and disabled state from the track scroll position.
+   * @returns {void}
+   */
   function updateScrollButtons() {
     const maxScroll = track.scrollWidth - track.clientWidth;
     scrollBtns.hidden = maxScroll <= 2;
@@ -80,8 +93,14 @@
     scrollNext.disabled = track.scrollLeft >= maxScroll - 2;
   }
 
-  scrollPrev.addEventListener('click', () => track.scrollBy({ left: -scrollStep() }));
-  scrollNext.addEventListener('click', () => track.scrollBy({ left: scrollStep() }));
+  /** Scroll the featured track back by one card. */
+  scrollPrev.addEventListener('click', function scrollToPreviousCard() {
+    track.scrollBy({ left: -scrollStep() });
+  });
+  /** Scroll the featured track forward by one card. */
+  scrollNext.addEventListener('click', function scrollToNextCard() {
+    track.scrollBy({ left: scrollStep() });
+  });
   track.addEventListener('scroll', updateScrollButtons, { passive: true });
   window.addEventListener('resize', updateScrollButtons);
 
@@ -94,11 +113,13 @@
      ========================================================= */
 
   MB.loadProjects()
-    .then(projects => {
+    /** Save the shared project list and render the featured subset. */
+    .then(function renderLoadedFeaturedProjects(projects) {
       allProjects = projects;
       renderFeatured();
     })
-    .catch(() => {
+    /** Show the shared load error when project data cannot be retrieved. */
+    .catch(function showFeaturedLoadError() {
       track.innerHTML = MB.LOAD_ERROR_HTML;
     });
 })();

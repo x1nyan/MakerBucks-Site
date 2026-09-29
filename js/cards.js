@@ -16,7 +16,8 @@
    Everything else stays private inside this file.
    ===================================================================== */
 
-(function () {
+/** Define shared project parsing, card rendering, and interaction helpers. */
+(function initializeCards() {
   'use strict';
 
   const { CSV_URL, MULTI_WORD_CATEGORIES } = MB.config;
@@ -32,6 +33,10 @@
     the HTML (or inject code). It swaps those characters for
     their harmless "&...;" versions, which display the same.
   */
+  /** Escape HTML-sensitive characters before inserting project text into markup.
+   * @param {string} str - Untrusted text from project content.
+   * @returns {string} Safe HTML text that displays the original characters.
+   */
   function escapeHtml(str) {
     return String(str)
       .replace(/&/g, '&amp;')
@@ -47,23 +52,40 @@
     per line), so the page just needs to clean up whitespace and put the
     photo named Cover first.
   */
+  /** Trim a photo path and normalize Windows separators for browser URLs.
+   * @param {string} value - Repository-relative photo path.
+   * @returns {string} Normalized path.
+   */
   function normalizePath(value) {
     return String(value || '').trim().replace(/\\/g, '/');
   }
 
+  /** Put Cover first, then sort unique photo paths alphabetically.
+   * @param {string[]} paths - Photo paths from one CSV cell.
+   * @returns {string[]} Unique paths in display order.
+   */
   function sortPhotoPaths(paths) {
-    return [...new Set(paths)].sort((a, b) => {
+    return [...new Set(paths)].sort(
+      /** Compare paths with the cover image ahead of all other images. */
+      (a, b) => {
       const aCover = /(?:^|\/|\\)cover\.[^/\\]+$/i.test(a);
       const bCover = /(?:^|\/|\\)cover\.[^/\\]+$/i.test(b);
       if (aCover !== bCover) return aCover ? -1 : 1;
       return a.localeCompare(b);
-    });
+      }
+    );
   }
 
+  /** Parse newline-separated CSV photo paths and discard unsupported suffixes.
+   * @param {string} cellValue - Contents of one Photos CSV cell.
+   * @returns {string[]} Valid photo URLs with Cover first.
+   */
   function parsePhotoList(cellValue) {
     const paths = String(cellValue || '')
       .split('\n')
+      /** Normalize each individual path before checking its extension. */
       .map(normalizePath)
+      /** Keep non-empty paths that end in a recognized image extension. */
       .filter(value => value && IMAGE_EXTENSIONS.test(value));
     return sortPhotoPaths(paths);
   }
@@ -78,9 +100,15 @@
     ['outcome', 'Outcome']
   ];
 
+  /** List required fields absent from a normalized project record.
+   * @param {object} project - Parsed project with normalized field names.
+   * @returns {string[]} User-facing names of missing fields.
+   */
   function getMissingProjectFields(project) {
     const missing = REQUIRED_PROJECT_FIELDS
+      /** Find required properties whose values are blank. */
       .filter(([field]) => !String(project[field] || '').trim())
+      /** Convert internal property names into readable labels. */
       .map(([, label]) => label);
 
     if (!project.photoUrls.length && window.location.protocol !== 'file:') {
@@ -123,8 +151,13 @@
 
     A blank Category cell becomes "General".
   */
+  /** Find category labels that appear as complete, comma-free CSV cells.
+   * @param {string[]} cellValues - Category values from project rows.
+   * @returns {Set<string>} Lowercase category labels known to be standalone.
+   */
   function findStandaloneCategories(cellValues) {
     const standalone = new Set();
+    /** Record each complete category without a comma separator. */
     cellValues.forEach(v => {
       const text = String(v || '').trim();
       if (text && !text.includes(',')) standalone.add(text.toLowerCase());
@@ -132,6 +165,11 @@
     return standalone;
   }
 
+  /** Split a category cell while preserving known comma-containing labels.
+   * @param {string} cellValue - Category cell from the generated CSV.
+   * @param {Set<string>} standalone - Known comma-free labels, lowercased.
+   * @returns {string[]} Parsed category names, or General when empty.
+   */
   function splitCategories(cellValue, standalone) {
     if (!cellValue) return ['General'];
 
@@ -139,6 +177,7 @@
     const found = [];
 
     // Manual overrides first (normally an empty list)
+    /** Apply explicit overrides before parsing comma-separated pieces. */
     MULTI_WORD_CATEGORIES.forEach(name => {
       if (text.includes(name)) {
         found.push(name);
@@ -146,14 +185,20 @@
       }
     });
 
-    const pieces = text.split(',').map(s => s.trim()).filter(Boolean);
+    const pieces = text.split(',')
+      /** Remove surrounding whitespace from each possible category. */
+      .map(s => s.trim())
+      /** Ignore empty pieces created by adjacent or trailing commas. */
+      .filter(Boolean);
     let unknownRun = []; // consecutive pieces that aren't standalone categories
 
+    /** Join consecutive unknown pieces back into one comma-containing name. */
     const flushUnknown = () => {
       if (unknownRun.length) found.push(unknownRun.join(', '));
       unknownRun = [];
     };
 
+    /** Separate known labels and accumulate adjacent unknown label pieces. */
     pieces.forEach(piece => {
       if (standalone.has(piece.toLowerCase())) {
         flushUnknown();
@@ -165,7 +210,10 @@
     flushUnknown();
 
     // Remove accidental duplicates within one cell
-    const unique = [...new Map(found.map(c => [c.toLowerCase(), c])).values()];
+    const unique = [...new Map(
+      /** Deduplicate labels case-insensitively while preserving their spelling. */
+      found.map(c => [c.toLowerCase(), c])
+    ).values()];
     return unique.length ? unique : ['General'];
   }
 
@@ -183,6 +231,10 @@
     Want photos to matter more (or less)? Change the 300.
     Want step count to matter more? Raise the 60.
   */
+  /** Score project detail and media completeness for default sorting.
+   * @param {object} p - Normalized project record.
+   * @returns {number} Score based on text length, steps, materials, and photos.
+   */
   function contentScore(p) {
     const textLength =
       p.overview.length +
@@ -211,10 +263,16 @@
      until the user scrolls near them (faster first load).
      ========================================================= */
 
+  /** Build the photo carousel or no-photo placeholder for a card.
+   * @param {object} project - Normalized project record.
+   * @returns {string} Markup for the card's media area.
+   */
   function buildMediaHTML(project) {
     if (project.photoUrls.length > 0) {
       const slides = project.photoUrls
-        .map((url, i) =>
+        .map(
+          /** Render one image slide with an accessible project-specific label. */
+          (url, i) =>
           `<img src="${escapeHtml(url)}"
                 class="carousel-slide ${i === 0 ? 'active' : ''}"
                 alt="${escapeHtml(project.title)} photo ${i + 1}"
@@ -223,7 +281,9 @@
 
       const dots = project.photoUrls.length > 1
         ? `<ul class="carousel-dots">
-            ${project.photoUrls.map((_, i) =>
+            ${project.photoUrls.map(
+              /** Render one accessible dot button for a carousel slide. */
+              (_, i) =>
               `<li><button class="dot ${i === 0 ? 'active' : ''}"
                     aria-label="Show photo ${i + 1}" type="button"></button></li>`).join('')}
            </ul>`
@@ -259,6 +319,12 @@
     If a project value is empty, it shows emptyText in italics
     instead — or nothing at all if emptyText is ''.
   */
+  /** Build one labeled detail section, optionally showing empty-state text.
+   * @param {string} label - Section heading.
+   * @param {string} value - Project content for the section.
+   * @param {string} emptyText - Placeholder for empty content, or empty string.
+   * @returns {string} Escaped section markup or an empty string.
+   */
   function backSection(label, value, emptyText) {
     if (value) {
       return `<div class="back-section">
@@ -280,9 +346,16 @@
     title, overview, and scope. Desktop CSS compacts this preview.
     Sections with no content are left out.
   */
+  /** Build the compact front face for one project card.
+   * @param {object} project - Normalized project record.
+   * @returns {string} Escaped front-face markup.
+   */
   function buildFrontHTML(project) {
     const catTags = project.categories
-      .map(c => `<span class="cat-tag">${escapeHtml(c)}</span>`)
+      .map(
+        /** Render one escaped category label as a card tag. */
+        c => `<span class="cat-tag">${escapeHtml(c)}</span>`
+      )
       .join('');
 
     const frontOverview = project.overview
@@ -322,6 +395,10 @@
       left column:  Overview, Scope, Materials, Outcome
       right column: Fabrication Steps
   */
+  /** Build the expanded detail face for one project card.
+   * @param {object} project - Normalized project record.
+   * @returns {string} Escaped detail-face markup.
+   */
   function buildBackHTML(project) {
     return `
       <div class="card-face card-back">
@@ -364,6 +441,10 @@
                         whether this contains what you typed
      ========================================================= */
 
+  /** Create a DOM card with search/filter metadata and its project record.
+   * @param {object} project - Normalized project record.
+   * @returns {HTMLDivElement} Card element ready to append to a grid or track.
+   */
   function makeCardEl(project) {
     const card = document.createElement('div');
     card.className = 'card';
@@ -409,6 +490,11 @@
             (Only if a project is taller than the screen does
             the back fall back to scrolling.)
   */
+  /** Measure and center the expanded card within the current viewport.
+   * @param {object} project - Project whose detail content is measured.
+   * @param {number} startHeight - Current card height, used as a minimum.
+   * @returns {{width: number, height: number, left: number, top: number}} Target box.
+   */
   function getTargetBox(project, startHeight) {
     const vw = window.innerWidth;
     const vh = window.innerHeight;
@@ -445,6 +531,11 @@
     };
   }
 
+  /** Apply a measured card box to an element using pixel dimensions.
+   * @param {HTMLElement} el - Element to position and size.
+   * @param {{width: number, height: number, left: number, top: number}} box - Target box.
+   * @returns {void}
+   */
   function setBox(el, box) {
     el.style.top = box.top + 'px';
     el.style.left = box.left + 'px';
@@ -452,6 +543,10 @@
     el.style.height = box.height + 'px';
   }
 
+  /** Scale expanded details to fit, or allow vertical scrolling if too small.
+   * @param {HTMLElement} expanded - Expanded card containing the back face.
+   * @returns {void}
+   */
   function fitBackContent(expanded) {
     const back = expanded.querySelector('.card-back');
     const content = back && back.querySelector('.back-content');
@@ -489,6 +584,9 @@
     Hiding the scrollbar would make the page jump sideways, so
     the scrollbar's width is added as padding to compensate.
   */
+  /** Prevent background scrolling and compensate for the hidden scrollbar.
+   * @returns {void}
+   */
   function lockScroll() {
     const scrollbar = window.innerWidth - document.documentElement.clientWidth;
     const pad = parseFloat(getComputedStyle(document.body).paddingRight) || 0;
@@ -496,11 +594,18 @@
     document.body.style.overflow = 'hidden';
   }
 
+  /** Restore the page's original scrolling styles after the card closes.
+   * @returns {void}
+   */
   function unlockScroll() {
     document.body.style.paddingRight = '';
     document.body.style.overflow = '';
   }
 
+  /** Create and animate the accessible expanded view for a project card.
+   * @param {HTMLDivElement} card - Original card to expand.
+   * @returns {void}
+   */
   function openCard(card) {
     if (openState || busy) return;
     busy = true;
@@ -534,7 +639,9 @@
     card.classList.add('is-open');
     lockScroll();
     const pageElements = [...document.body.children]
+      /** Exclude the overlay and expanded card from background inertness. */
       .filter(element => element !== overlay && element !== expanded);
+    /** Make each other page-level element unavailable while the dialog is open. */
     pageElements.forEach(element => { element.inert = true; });
 
     overlay.classList.add('show');
@@ -545,7 +652,8 @@
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const revealDelay = prefersReducedMotion ? 0 : 320;
 
-    window.setTimeout(() => {
+    /** Fit the detail text and focus its close button after the flip transition. */
+    window.setTimeout(function settleExpandedCard() {
       fitBackContent(expanded);
       expanded.classList.add('settled');
       expanded.querySelector('.back-close')?.focus({ preventScroll: true });
@@ -559,6 +667,9 @@
     expanded.focus({ preventScroll: true });
   }
 
+  /** Animate the expanded card closed and restore page interaction and focus.
+   * @returns {void}
+   */
   function closeCard() {
     if (!openState || busy) return;
     busy = true;
@@ -577,10 +688,12 @@
     setBox(expanded, end);
     overlay.classList.remove('show');
 
-    window.setTimeout(() => {
+    /** Remove temporary elements and restore the original card after the flip. */
+    window.setTimeout(function restoreOriginalCard() {
       expanded.remove();
       overlay.remove();
       card.classList.remove('is-open');
+      /** Re-enable each page-level element after the modal closes. */
       pageElements.forEach(element => { element.inert = false; });
       unlockScroll();
 
@@ -605,7 +718,8 @@
       - Highlighting text on a card?     -> don't open, so text
                                            can still be copied
   */
-  document.addEventListener('click', function (e) {
+  /** Delegate card clicks to open/close behavior while preserving text selection. */
+  document.addEventListener('click', function handleCardClick(e) {
     if (e.target.closest('.carousel-btn') || e.target.closest('.dot')) return;
 
     const selection = window.getSelection();
@@ -626,7 +740,8 @@
   });
 
   // Escape key closes an open card
-  document.addEventListener('keydown', e => {
+  /** Close the open card with Escape and keep Tab focus on its close control. */
+  document.addEventListener('keydown', function handleCardKeyboard(e) {
     if (e.key === 'Escape' && openState) closeCard();
     if (e.key === 'Tab' && openState) {
       const closeButton = openState.expanded.querySelector('.back-close');
@@ -638,7 +753,8 @@
   });
 
   // If the window is resized while open, re-center the card
-  window.addEventListener('resize', () => {
+  /** Re-measure an open card when viewport dimensions change. */
+  window.addEventListener('resize', function repositionOpenCard() {
     if (!openState || busy) return;
     const target = getTargetBox(openState.card.project, 0);
     setBox(openState.expanded, target);
@@ -660,6 +776,11 @@
      Like the flip, this uses one document-wide click listener.
      ========================================================= */
 
+  /** Activate a carousel slide and update its dot and blurred backdrop.
+   * @param {HTMLElement} carousel - Carousel container to update.
+   * @param {number} index - Requested slide index; wraps at either end.
+   * @returns {void}
+   */
   function goToSlide(carousel, index) {
     const slides = carousel.querySelectorAll('.carousel-slide');
     const dots = carousel.querySelectorAll('.dot');
@@ -685,7 +806,8 @@
     carousel.setAttribute('data-index', next);
   }
 
-  document.addEventListener('click', function (e) {
+  /** Delegate carousel button and dot clicks to the matching slide update. */
+  document.addEventListener('click', function handleCarouselClick(e) {
     const prevBtn = e.target.closest('.carousel-btn.prev');
     const nextBtn = e.target.closest('.carousel-btn.next');
     const dotBtn = e.target.closest('.dot');
@@ -727,11 +849,18 @@
   */
   let loadPromise = null;
 
+  /** Return the shared project-load promise, starting the request only once.
+   * @returns {Promise<object[]>} Parsed and validated project records.
+   */
   function loadProjects() {
     if (!loadPromise) loadPromise = fetchProjects();
     return loadPromise;
   }
 
+  /** Parse CSV rows while preserving quoted commas and embedded newlines.
+   * @param {string} text - CSV source text.
+   * @returns {string[][]} Parsed rows and cells.
+   */
   function parseCsv(text) {
     const rows = [];
     let row = [];
@@ -773,18 +902,41 @@
     return rows;
   }
 
+  /** Convert generated CSV text into validated normalized project records.
+   * @param {string} text - Project CSV text.
+   * @returns {Promise<object[]>} Parsed projects, including their sort scores.
+   */
   function processCsvText(text) {
     const rows = parseCsv(text.replace(/^\uFEFF/, ''));
     if (!rows.length) return Promise.resolve([]);
 
-    const headers = rows.shift().map(header => header.trim().toLowerCase());
-    const column = name => headers.indexOf(name.toLowerCase());
-    const records = rows.map(row => name => row[column(name)] || '');
+    const headers = rows.shift().map(
+      /** Normalize header names for case-insensitive column lookup. */
+      header => header.trim().toLowerCase()
+    );
+    /** Find a CSV column index without depending on header capitalization. */
+    const column = function findColumnIndex(name) {
+      return headers.indexOf(name.toLowerCase());
+    };
+    const records = rows.map(
+      /** Create a getter for the named cells in one CSV row. */
+      function createRowGetter(row) {
+        /** Read one trimmed-schema column from this row, defaulting to empty. */
+        return function readRowValue(name) {
+          return row[column(name)] || '';
+        };
+      }
+    );
     const standaloneCats = findStandaloneCategories(
-      records.map(get => get('project') ? get('category') : '')
+      records.map(
+        /** Collect categories only from rows that represent a project. */
+        get => get('project') ? get('category') : ''
+      )
     );
 
-    const projects = records.map((get, index) => {
+    const projects = records.map(
+      /** Normalize one CSV row and skip blank or incomplete projects. */
+      (get, index) => {
       const title = get('project').trim();
       if (!title) return null;
 
@@ -813,11 +965,15 @@
 
       project.score = contentScore(project);
       return project;
-    }).filter(Boolean);
+      }
+    ).filter(Boolean);
 
     return Promise.resolve(projects);
   }
 
+  /** Fetch the project CSV, falling back to the generated embedded snapshot.
+   * @returns {Promise<object[]>} Parsed project records.
+   */
   function fetchProjects() {
     const embeddedCsv = window.MB && typeof window.MB.rawCsv === 'string'
       ? window.MB.rawCsv.trim()
@@ -828,21 +984,24 @@
     }
 
     return fetch(CSV_URL)
-      .then(res => {
+      /** Use the response body or reject unsuccessful HTTP statuses. */
+      .then(function readProjectResponse(res) {
         if (!res.ok) {
           if (embeddedCsv) return processCsvText(embeddedCsv);
           throw new Error(`Could not load ${CSV_URL}`);
         }
         return res.text();
       })
-      .then(text => {
+      /** Parse non-empty CSV text or use the embedded snapshot if empty. */
+      .then(function parseProjectResponse(text) {
         if (!text || !text.trim()) {
           if (embeddedCsv) return processCsvText(embeddedCsv);
           return [];
         }
         return processCsvText(text);
       })
-      .catch(err => {
+      /** Use the embedded snapshot after network or parsing failures. */
+      .catch(function useEmbeddedProjectData(err) {
         if (embeddedCsv) return processCsvText(embeddedCsv);
         throw err;
       });

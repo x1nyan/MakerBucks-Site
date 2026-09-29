@@ -18,6 +18,7 @@ PROJECT_PHOTO_DIRECTORY = "Project 2026"
 
 
 def validate_folder_name(folder_name: str) -> str:
+    """Validate that the requested name identifies one safe child folder."""
     if (
         not folder_name
         or folder_name != folder_name.strip()
@@ -29,6 +30,7 @@ def validate_folder_name(folder_name: str) -> str:
 
 
 def folder_is_referenced(folder_name: str, projects_dir: Path) -> bool:
+    """Return whether a project form references an image in this folder."""
     expected_prefix = ("images", PROJECT_PHOTO_DIRECTORY, folder_name)
 
     for form_path in sorted(projects_dir.glob("*.json")):
@@ -53,6 +55,7 @@ def delete_photo_folder(
     photos_root: Path = PHOTOS_ROOT,
     projects_dir: Path = PROJECTS_DIR,
 ) -> Path:
+    """Delete one unreferenced project-photo folder and return its path."""
     folder_name = validate_folder_name(folder_name)
     project_photo_root = photos_root.resolve() / PROJECT_PHOTO_DIRECTORY
 
@@ -74,6 +77,7 @@ def delete_photo_folder(
 
 
 def main() -> int:
+    """Read the Pages CMS workflow payload and delete its requested folder."""
     try:
         payload = json.loads(os.environ["PAGES_CMS_PAYLOAD"])
         if not isinstance(payload, dict) or payload.get("source") != "pages-cms":

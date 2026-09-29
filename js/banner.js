@@ -9,7 +9,8 @@
   config.js to change banner settings; nothing in this file needs to change.
    ===================================================================== */
 
-(function () {
+/** Initialize the banner from configuration and start rotation when appropriate. */
+(function initializeBanner() {
   'use strict';
 
   const { BANNER } = MB.config;
@@ -22,6 +23,10 @@
     ? BANNER.imageUrls
     : [BANNER.imageUrl || 'images/Banner.jfif'];
 
+  /** Convert GitHub blob URLs to raw image URLs; leave other URLs unchanged.
+   * @param {string} url - Configured local or remote image URL.
+   * @returns {string} URL suitable for an image element.
+   */
   function toImageUrl(url) {
     const u = String(url || '').trim();
     if (/^https?:\/\/github\.com\/[^/]+\/[^/]+\/blob\//i.test(u) && !/[?&]raw=true/i.test(u)) {
@@ -30,13 +35,19 @@
     return u;
   }
 
+  /** Set an image element's source, hiding it when the URL is empty or fails.
+   * @param {HTMLImageElement} img - Banner image element to update.
+   * @param {string} url - Configured image URL.
+   * @returns {void}
+   */
   function setImage(img, url) {
     const src = toImageUrl(url);
     if (!src) {
       img.hidden = true;
       return;
     }
-    img.onerror = () => {
+    /** Hide this banner layer if its image cannot be loaded. */
+    img.onerror = function handleImageError() {
       img.hidden = true;
     };
     img.src = src;
@@ -55,6 +66,9 @@
     one currently showing (unless there's only one photo to choose from).
   */
   let lastIndex = -1;
+  /** Choose a banner image without repeating the immediately previous image.
+   * @returns {string} The next configured image URL.
+   */
   function pickNextUrl() {
     if (imageUrls.length === 1) return imageUrls[0];
     let index = Math.floor(Math.random() * imageUrls.length);
@@ -77,15 +91,20 @@
   let active = photo;
   let hidden = photoNext;
 
+  /** Load the next banner image and crossfade it into the visible layer.
+   * @returns {void}
+   */
   function rotate() {
     const src = toImageUrl(pickNextUrl());
     if (!src) return;
 
     const loader = new Image();
-    loader.onload = () => {
+    /** Reveal the preloaded image and move the outgoing layer behind it. */
+    loader.onload = function showLoadedBannerImage() {
       hidden.src = src;
       hidden.hidden = false;
-      requestAnimationFrame(() => {
+      /** Apply the CSS classes after layout so the opacity transition runs. */
+      requestAnimationFrame(function startBannerCrossfade() {
         hidden.classList.remove('banner-img--next');
         active.classList.add('banner-img--next');
         [active, hidden] = [hidden, active];
