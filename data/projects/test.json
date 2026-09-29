@@ -1,0 +1,16 @@
+{
+  "title": "test",
+  "maker": "test",
+  "categories": [
+    "test"
+  ],
+  "featured": false,
+  "overview": "test",
+  "scope": "test",
+  "materials": "test\ntest\ntest",
+  "fabricationSteps": "test \ntest \ntest ",
+  "outcome": "test \ntest \ntets",
+  "photos": [
+    "images/Screenshot 2022-08-09 112317.png"
+  ]
+}
