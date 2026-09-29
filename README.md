@@ -12,6 +12,8 @@ For complete architecture, data, styling, and maintenance details, see
 Connect this repository in [Pages CMS](https://app.pagescms.org/). Its `Projects`
 collection edits one JSON form per project under `data/projects/`, with separate
 multiline fields, a Featured toggle, and a category multi-select.
+New project forms are saved automatically as a slugged project title plus
+`.json`; entries can also be deleted from the collection.
 
 The JSON forms are the source of truth. Saving a form triggers the **Build
 projects CSV** GitHub Action, which regenerates `MakerBucks_Database.csv` for
@@ -35,7 +37,10 @@ the CSV. To regenerate the CSV locally, run `py scripts/showcase_data.py build`.
 
 ## Project photos
 Use the form's `Project photos` field to upload the project's images directly
-through the CMS; there is no folder path to type. Name one uploaded photo
+through the CMS; the selected image paths are written into the form automatically.
+Create a per-project folder under `images/` when uploading to keep filenames such
+as `Cover.jpg` distinct; Pages CMS does not generate project-specific image
+folders from the project title. Name one uploaded photo
 `Cover` (with a supported extension) so it appears first in the carousel. The
 CMS commits the photos to the repository and writes their paths into the form;
 **Build projects CSV** then lists them in the CSV's `Photos` column and fails

@@ -194,9 +194,6 @@ def migrate() -> None:
 
 def load_projects() -> list[dict[str, Any]]:
     paths = sorted(PROJECTS_DIR.glob("*.json"))
-    if not paths:
-        raise ValueError(f"No project forms found in {PROJECTS_DIR}.")
-
     projects = []
     for path in paths:
         project = json.loads(path.read_text(encoding="utf-8"))

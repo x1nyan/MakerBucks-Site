@@ -11,9 +11,7 @@ content:
     type: collection
     path: data/projects
     format: json
-    filename:
-      template: "{title}.json"
-      field: create
+    filename: "{title}.json"
     view:
       fields: [title, maker, featured]
       primary: title
@@ -89,7 +87,7 @@ content:
         hidden: true
         readonly: true
     operations:
-      delete: false
+      delete: true
 
   - name: footer
     label: Footer
