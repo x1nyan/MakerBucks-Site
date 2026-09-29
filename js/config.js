@@ -27,18 +27,8 @@ window.MB = window.MB || {};
 
   const CSV_URL = 'MakerBucks_Database.csv';
 
-  // Optional external submission link; project editing is handled in Pages CMS.
   const PROJECT_SUBMISSION_FORM_URL = '';
-  /*
-    OPTIONAL manual override for category names that contain a
-    comma. You normally DON'T need to touch this: the page works
-    these out from the generated CSV's Category field (see
-    splitCategories below). Only add a name here if the automatic
-    detection ever splits a category the wrong way.
-  */
   const MULTI_WORD_CATEGORIES = [];
-
-
 
   /* =========================================================
      TITLE BANNER
@@ -57,10 +47,7 @@ window.MB = window.MB || {};
     title: 'WPI MakerBucks Showroom',
     // Put your banner photos in a folder such as images/banner/
     // and add the relative paths here.
-    // Example:
-    // images/banner/1.jpg,
-    // images/banner/2.jpg,
-    // images/banner/3.jpg
+    
     
     imageUrls: [
       'images/Banner Photos/Banner.jfif',
