@@ -1,89 +1,89 @@
 # MakerBucks Showcase
 
-Static project gallery for WPI MakerBucks. The page includes a centered logo,
-a persistent light/dark theme switch, a featured-project carousel, search and
-filters, and project cards. The main grid has three columns on desktop, two on
-tablet, and one vertically scrolling column on phones.
+A static project gallery for the WPI MakerBucks program. It runs in a web
+browser and does not use a JavaScript framework or a package-build step. The
+site has a rotating banner, light/dark theme, featured-project carousel,
+search and filters, responsive project cards, and expanded project details.
 
-For complete architecture, data, styling, and maintenance details, see
-[`MASTER_DOCUMENTATION.md`](MASTER_DOCUMENTATION.md).
+## Start Here
 
-## Editing projects in Pages CMS
-Connect this repository in [Pages CMS](https://app.pagescms.org/). Its `Projects`
-collection edits one JSON form per project under `data/projects/`, with separate
-multiline fields, a Featured toggle, and a category multi-select.
-New project forms are saved automatically as a slugged project title plus
-`.json`; entries can also be deleted from the collection.
+- New to this repository or web development? Read [CONTRIBUTING.md](CONTRIBUTING.md).
+- Need the complete architecture and maintenance reference? Read
+  [MASTER_DOCUMENTATION.md](MASTER_DOCUMENTATION.md).
+- Want to edit project descriptions without writing code? Use the
+  [Pages CMS](https://app.pagescms.org/) workflow below.
 
-The JSON forms are the source of truth. Saving a form triggers the **Build
-projects CSV** GitHub Action, which regenerates `MakerBucks_Database.csv` for
-the website. Do not edit the CSV directly; the next build will replace it. Wait
-for the Action to finish before checking the live site, and run `git pull` before
-starting local edits.
+## Run Locally
 
-Both repository workflows need GitHub Actions to have contents write
-permission, and branch rules must allow the Actions bot to push generated files.
-
-The migration and verification commands are:
-
-```powershell
-py scripts/showcase_data.py migrate
-py scripts/showcase_data.py check
-```
-
-`migrate` creates forms from the current CSV and refuses to overwrite an
-existing non-empty forms directory. `check` compares every project value with
-the CSV. To regenerate the CSV locally, run `py scripts/showcase_data.py build`.
-
-## Project photos
-Use the form's `Project photos` field to upload the project's images directly
-through the CMS; the selected image paths are written into the form automatically.
-Create a per-project folder under `images/` when uploading to keep filenames such
-as `Cover.jpg` distinct; Pages CMS does not generate project-specific image
-folders from the project title. Name one uploaded photo
-`Cover` (with a supported extension) so it appears first in the carousel. The
-CMS commits the photos to the repository and writes their paths into the form;
-**Build projects CSV** then lists them in the CSV's `Photos` column and fails
-if no photo is named `Cover`.
-
-To remove a photo folder, use **Delete project photo folder** on the Project
-photos media page and enter its folder name under `images/Project 2026/`. The
-action refuses to delete folders whose photos are still referenced by a project
-form.
-
-The CMS accepts JPG/JPEG, PNG, WebP, GIF, APNG, SVG, and AVIF images. The
-**Resize uploaded images** GitHub Action checks changed images under
-`images/`; files over 20 MiB fail with a clear `File is too big` error. JPEG,
-PNG, and WebP images are resized to at most 1600 pixels on the longest side and
-have EXIF metadata removed. GIF, APNG, SVG, and AVIF files are kept unchanged.
-The size check runs after Pages CMS commits the upload, so replace or delete an
-oversized file after the failed Action.
-
-## Run locally
-From the repository root, serve the site over HTTP:
+Install Python 3.10 or newer. From the repository root, the folder containing
+`index.html`, start a local static web server:
 
 ```powershell
 py -m http.server 8000
 ```
 
-Open `http://localhost:8000/`. Do not use a `file://` URL; the site fetches the
-CSV and local photos over HTTP.
+Open <http://localhost:8000/>. Keep the terminal running while using the site.
+Press `Ctrl+C` in that terminal to stop the server. Do not open `index.html` as
+a `file://` URL: the browser needs HTTP to load the CSV and photos consistently.
 
-## Site settings
-- Banner title and rotating images: `BANNER` in `js/config.js`.
-- Header logo and alternative text: `HEADER_LOGO` in `js/config.js`.
-- Light/dark theme: use the header switch; the preference is saved in browser storage.
-- Main card layout and colors: `css/showcase.css` and `css/cards.css`.
-- Featured carousel layout: `css/featured.css` and `js/featured.js`.
-- CMS fields and category options: `.pages.yml` and `scripts/showcase_data.py`.
+## Edit Projects
 
-## Key files
-- `index.html`: page markup and script loading order.
-- `MakerBucks_Database.csv`: generated site data; do not edit directly.
-- `DonorStatement.csv`: generated footer donor statement; do not edit directly.
-- `data/projects/*.json`: editable Pages CMS project forms.
-- `data/footer.json`: editable Pages CMS footer donor statement form.
-- `scripts/showcase_data.py`: migrate, build, and verify project data.
-- `scripts/resize_images.py`: optimize supported uploaded photos.
-- `.github/workflows/`: CSV rebuild and image optimization automation.
-- `MASTER_DOCUMENTATION.md`: full architecture and maintenance guide.
+Each project is a JSON form in `data/projects/`. In Pages CMS, open the
+`Projects` collection to create, edit, or delete an entry. New filenames come
+from the project title. Save the form and wait for the **Build projects CSV**
+GitHub Action to finish; it regenerates the website data. Do not edit
+`MakerBucks_Database.csv` or `js/project-data.js` by hand because the next
+build replaces them.
+
+Project photos are uploaded through the form's **Project photos** field. Put
+them in a project-specific folder under `images/` and name one image `Cover`
+(for example, `Cover.jpg`). The image paths are stored in the form. Folder
+names are not generated from project titles automatically. To remove an
+unreferenced folder under `images/Project 2026/`, use **Delete project photo
+folder** on the CMS media page; the workflow refuses to delete photos still
+used by a project.
+
+Supported upload extensions are JPG/JPEG, PNG, WebP, GIF, APNG, SVG, and AVIF.
+Files larger than 20 MiB fail the image-processing Action with a `File is too
+big` message. That check happens after CMS upload, so replace or delete the
+oversized file after the Action fails. JPEG, PNG, and WebP are resized to a
+maximum 1600 pixels on the longest side and have EXIF metadata removed; other
+supported formats are kept unchanged.
+
+## Project Data Commands
+
+Run these in PowerShell from the repository root:
+
+```powershell
+py scripts/showcase_data.py check
+py scripts/showcase_data.py build
+```
+
+`check` verifies that project forms match the generated project CSV and that
+the footer form matches its generated CSV. `build` regenerates both CSV files
+and the embedded fallback at `js/project-data.js`. Run `check` after editing
+forms or changing the data-generation script.
+
+`migrate` is a one-time conversion from the legacy project CSV into JSON forms:
+
+```powershell
+py scripts/showcase_data.py migrate
+```
+
+It refuses to run if `data/projects/` already contains files. Do not run it on
+an established forms directory.
+
+## Before Editing Code
+
+1. Run `git status` and `git pull` so you start from the latest branch.
+2. Edit the source file, not its generated output. The contributor guide maps
+	common tasks to their owning files.
+3. Run the checks for the files you changed. For data-pipeline changes, use
+	`py scripts/showcase_data.py build` and then `py scripts/showcase_data.py check`.
+4. Test the site through the local HTTP server at desktop and phone widths.
+5. Review `git diff` before committing. GitHub Actions also regenerate data
+	and optimize newly uploaded photos.
+
+The GitHub workflows need repository **contents: write** permission so the
+Actions bot can commit generated files. Branch protection must permit those
+bot commits.
