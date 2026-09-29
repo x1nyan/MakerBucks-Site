@@ -70,6 +70,7 @@ js/
   logo.js         Header logo loading.
   project-data.js Generated embedded CSV and footer fallback snapshot.
   cards.js        CSV parser, project model, cards, photo carousel, and flip view.
+  footer.js       Donor statement loading and safe formatting.
   featured.js     Featured project filtering and carousel arrows.
   showcase.js     Search, filters, sorting, and main grid rendering.
 
@@ -80,9 +81,10 @@ images/
 ```
 
 The key data rule is: edit the project JSON forms and uploaded image files,
-not the generated CSV or embedded snapshot. `py scripts/showcase_data.py
-build` regenerates the outputs. The **Build projects CSV** workflow runs this
-command automatically after project/footer form changes.
+not the generated CSV or embedded snapshot. Run
+`py scripts/showcase_data.py build` to regenerate the outputs. The **Build
+projects CSV** workflow runs this command automatically after project/footer
+form changes.
 
 ## 4. Script Load Order
 
@@ -174,10 +176,10 @@ the configured `photos` media source (`input: images`, `output: images`).
 During upload, choose or create a project-specific folder under `images/` to
 avoid filename collisions. Pages CMS records the chosen repository paths in
 the JSON form; it does not derive the photo folder from the project title.
-Name one image `Cover` with a supported extension. `scripts/showcase_data.py
-build` writes the paths into the `Photos` CSV cell and orders Cover first. A
-project needs at least one photo path, and if it has photos, one must be named
-Cover.
+Name one image `Cover` with a supported extension. The command
+`py scripts/showcase_data.py build` writes the paths into the `Photos` CSV cell
+and orders Cover first. A project needs at least one photo path, and one must
+be named Cover.
 
 ```text
 Photos:
@@ -249,14 +251,16 @@ typed manually.
 
 ### Photo optimization
 
-The CMS accepts JPG/JPEG, PNG, WebP, GIF, APNG, SVG, and AVIF images. The
+The CMS accepts JPG/JPEG, PNG, WebP, GIF, APNG, SVG, and AVIF extensions. The
 **Resize uploaded images** workflow runs when files under `images/` change and
-rejects image files larger than 20 MiB with a `File is too big` error. This
-check runs after Pages CMS commits the upload. The workflow installs Pillow and
-optimizes changed JPEG, PNG, and WebP images, resizing their longest dimension
-to at most 1600px and removing EXIF metadata. GIF, APNG, SVG, and AVIF files
-are left unchanged. The action needs contents write permission to commit
-optimized photos.
+rejects changed image files larger than 20 MiB with a `File is too big` error.
+This check runs after Pages CMS commits the upload, so a failed upload must be
+replaced or deleted in a follow-up commit. The workflow installs Pillow and
+optimizes non-animated JPEG, PNG, and WebP images, resizing their longest
+dimension to at most 1600 pixels and removing EXIF metadata. The optimized
+file replaces the original only if dimensions changed or the result is
+smaller. GIF, APNG, SVG, and AVIF files are accepted and left unchanged. The
+action needs contents write permission to commit optimized photos.
 
 ## 9. Data Flow
 
@@ -302,6 +306,10 @@ Filtering does not rebuild cards. It toggles `.is-hidden` on existing cards and 
 Sorting rebuilds the main grid through `renderAll()`, then reapplies active filters.
 
 The filter dropdown is created dynamically from the categories found in the CSV.
+Selecting multiple categories uses OR behavior: a card can match any selected
+category. Search, category matching, and the Featured-only option are combined
+with AND behavior: all active filter types must match for a card to show.
+Sorting changes card order and reapplies the existing filters.
 
 ## 11. Card Rendering
 
@@ -368,8 +376,9 @@ Cards with more than one photo receive:
 
 `goToSlide()` in `cards.js` updates the active image, dot, and backdrop. Carousel controls are handled through document-level event delegation so dynamically rebuilt cards continue to work.
 
-Photo sorting puts a cover first and sorts remaining filenames. On hosts without
-directory listings, only the probed cover is available to the carousel.
+Photo sorting puts a cover first and sorts remaining paths alphabetically.
+All carousel paths come from the generated CSV's `Photos` cell; no directory
+listing or filename probing is performed by the browser.
 
 ## 14. Featured Projects
 
@@ -426,9 +435,10 @@ Featured section layout, horizontal track, arrows, whole-card snapping, and resp
 4. Save and wait for **Build projects CSV** to complete.
 5. Pull the branch before making local edits; do not edit the generated CSV.
 
-To change the category options, update both `.pages.yml` and `CATEGORIES` in
-`scripts/showcase_data.py`. Add a new JSON form property only with a matching
-field definition, CSV conversion, and site parser support.
+Categories are free-form in Pages CMS, so adding an ordinary category does not
+require a code change. `CATEGORIES` in `scripts/showcase_data.py` is used only
+to parse the historical CSV during `migrate`. Add a new project-form property
+only with a matching field definition, CSV conversion, and site parser support.
 
 ### Change the banner
 
@@ -446,8 +456,21 @@ Edit `HEADER_LOGO.logoUrl` in `js/config.js`.
 
 ### Change card data behavior
 
-Edit the CMS form schema in `.pages.yml`, the JSON/CSV mapping in
-`scripts/showcase_data.py`, and the browser parser in `js/cards.js` together.
+Edit the CMS form schema in `.pages.yml`, the JSON/CSV mapping and validation
+in `scripts/showcase_data.py`, and the browser parser/rendering in `js/cards.js`
+together. Then regenerate the CSV and embedded fallback, verify round-trip
+data, and test the browser UI. Do not add a form field in only one layer: the
+CMS schema, stored JSON, generated CSV, browser parser, and rendered card form
+a shared data contract.
+
+### Change image formats or image limits
+
+Update the extension allowlist in `.pages.yml` and the corresponding format
+sets and byte limit in `scripts/resize_images.py`. Formats in
+`PASSTHROUGH_EXTENSIONS` are accepted but not decoded or resized. If a format
+needs optimization, verify the Pillow decoder and encoder behavior before
+adding it to `SUPPORTED_FORMATS`. Update the upload help text and both user
+guides whenever the size limit or behavior changes.
 
 ## 19. Troubleshooting
 
@@ -467,6 +490,26 @@ Edit the CMS form schema in `.pages.yml`, the JSON/CSV mapping in
 - Confirm the **Build projects CSV** action succeeded; it fails the build if
   no photo is named `Cover`.
 - Check the `Photos` cell in the generated CSV lists the expected paths.
+- Confirm exact filename case and spaces match the path stored in the form.
+
+### An image upload fails
+
+- Check the **Resize uploaded images** Action log for the specific path and
+  the `File is too big` message. Each changed image must be 20 MiB or smaller.
+- The size check happens after the CMS commit. Replace the oversized image or
+  delete it in a follow-up commit, then wait for the next run to complete.
+- Verify the extension is allowed in `.pages.yml`. JPEG, PNG, and WebP are
+  opened by Pillow; GIF, APNG, SVG, and AVIF are kept unchanged.
+
+### A photo folder cannot be deleted
+
+- The action only operates on a direct folder under `images/Project 2026/`;
+  enter the folder name, not a path.
+- Remove image paths referencing the folder from every project JSON form and
+  wait for the data build. The delete workflow scans all project forms and
+  blocks removal while references remain.
+- Verify the folder exists and is not a symlink. The action intentionally
+  refuses paths outside the configured project-photo directory.
 
 ### A project is missing from Featured Projects
 
@@ -488,15 +531,18 @@ Edit the CMS form schema in `.pages.yml`, the JSON/CSV mapping in
 
 ## 20. Validation
 
-After code or config changes, run VS Code diagnostics on the touched files. For
-project data, verify the forms still match the generated CSV:
+After code or config changes, run VS Code diagnostics on the touched files and
+`git diff --check`. For project data, verify the forms still match the
+generated CSV:
 
 ```powershell
 py scripts/showcase_data.py check
 ```
 
-To generate the CSV locally, run `py scripts/showcase_data.py build`. For the
-site, start `py -m http.server 8000`, open `http://localhost:8000/`, and test:
+To generate the CSVs and embedded JS fallback locally, run
+`py scripts/showcase_data.py build`. To verify form/CSV round trips after a
+script change, run `build` and then `check`. For the site, start
+`py -m http.server 8000`, open `http://localhost:8000/`, and test:
 
 1. CSV loading.
 2. Search and clear-search behavior.
@@ -507,3 +553,8 @@ site, start `py -m http.server 8000`, open `http://localhost:8000/`, and test:
 7. Photo carousel buttons and dots.
 8. Light/dark theme switching and persistence across reloads.
 9. Desktop, tablet, and mobile layouts.
+
+There is no package-based JavaScript test runner in this repository. The
+project-data `check` command verifies data consistency, not browser behavior.
+Use the manual browser checklist for front-end changes and inspect the browser
+console and Network panel when requests or scripts fail.

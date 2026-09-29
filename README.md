@@ -77,9 +77,10 @@ an established forms directory.
 
 1. Run `git status` and `git pull` so you start from the latest branch.
 2. Edit the source file, not its generated output. The contributor guide maps
-	common tasks to their owning files.
+   common tasks to their owning files.
 3. Run the checks for the files you changed. For data-pipeline changes, use
-	`py scripts/showcase_data.py build` and then `py scripts/showcase_data.py check`.
+   `py scripts/showcase_data.py build` and then
+   `py scripts/showcase_data.py check`.
 4. Test the site through the local HTTP server at desktop and phone widths.
 5. Review `git diff` before committing. GitHub Actions also regenerate data
 	and optimize newly uploaded photos.
