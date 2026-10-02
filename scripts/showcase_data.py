@@ -247,6 +247,10 @@ def project_to_csv(project: dict[str, Any]) -> dict[str, str]:
     if not isinstance(photos, list) or any(not isinstance(item, str) for item in photos):
         raise ValueError(f"{source}: photos must be a list of uploaded image paths.")
     photos = sort_photo_paths([photo.strip() for photo in photos if photo.strip()])
+    if photos and not any(COVER_PATTERN.search(photo) for photo in photos):
+        raise ValueError(
+            f"{source}: no uploaded photo is named Cover; rename one photo to Cover."
+        )
 
     row = {
         csv_field: str(project.get(project_field) or "")

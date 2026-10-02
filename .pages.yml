@@ -91,8 +91,9 @@ content:
           Upload JPG/JPEG, PNG, WebP, GIF, APNG, SVG, or AVIF images up to
           20 MiB each. Create a new folder for the project when the upload
           dialog asks where to save, then select all of that folder's photos
-          here. Name one photo "Cover" so it appears first on the site; the
-          build fails if no photo is named Cover.
+          here. REQUIRED: one photo must be named "Cover" (for example
+          Cover.jpg); it appears first on the site. Rename the file in the
+          upload dialog before saving, or the site build will fail.
       - name: notes
         label: Notes
         type: text
