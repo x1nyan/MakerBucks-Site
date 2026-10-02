@@ -70,10 +70,14 @@ REQUIRED_CSV_FIELDS = [
     "Materials",
     "Fabrication Steps",
     "Outcome",
-    "Photos",
 ]
 
 COVER_PATTERN = re.compile(r"(?:^|/)cover\.[^/]+$", re.IGNORECASE)
+
+
+def warn(message: str) -> None:
+    """Report a non-fatal content problem (shown as an annotation in GitHub Actions)."""
+    print(f"::warning::{message}", file=sys.stderr)
 
 
 def sort_photo_paths(paths: list[str]) -> list[str]:
@@ -200,9 +204,13 @@ def load_projects() -> list[dict[str, Any]]:
     paths = sorted(PROJECTS_DIR.glob("*.json"))
     projects = []
     for path in paths:
-        project = json.loads(path.read_text(encoding="utf-8"))
-        if not isinstance(project, dict):
-            raise ValueError(f"{path.name} must contain a JSON object.")
+        try:
+            project = json.loads(path.read_text(encoding="utf-8"))
+            if not isinstance(project, dict):
+                raise ValueError("must contain a JSON object.")
+        except (OSError, ValueError) as error:
+            warn(f"{path.name}: skipped, unreadable project file ({error})")
+            continue
         project["_source"] = path.name
         projects.append(project)
 
@@ -246,11 +254,22 @@ def project_to_csv(project: dict[str, Any]) -> dict[str, str]:
     photos = project.get("photos") or []
     if not isinstance(photos, list) or any(not isinstance(item, str) for item in photos):
         raise ValueError(f"{source}: photos must be a list of uploaded image paths.")
-    photos = sort_photo_paths([photo.strip() for photo in photos if photo.strip()])
-    if photos and not any(COVER_PATTERN.search(photo) for photo in photos):
-        raise ValueError(
-            f"{source}: no uploaded photo is named Cover; rename one photo to Cover."
-        )
+    cover = project.get("coverPhoto") or ""
+    if not isinstance(cover, str):
+        cover = ""
+    photos = [cover, *photos]
+    photos = [photo.strip().replace("\\", "/").lstrip("/") for photo in photos if photo.strip()]
+    existing = [photo for photo in photos if (ROOT / photo).is_file()]
+    for photo in photos:
+        if photo not in existing:
+            warn(f"{source}: photo not found, left out: {photo}")
+    cover = cover.strip().replace("\\", "/").lstrip("/")
+    if cover and cover in existing:
+        photos = [cover, *sort_photo_paths([photo for photo in existing if photo != cover])]
+    else:
+        photos = sort_photo_paths(existing)
+        if photos and not COVER_PATTERN.search(photos[0]):
+            warn(f"{source}: no cover photo set; using {photos[0]} as the cover.")
 
     row = {
         csv_field: str(project.get(project_field) or "")
@@ -272,12 +291,28 @@ def project_to_csv(project: dict[str, Any]) -> dict[str, str]:
 def build_rows() -> list[dict[str, str]]:
     """Convert all loaded project forms to ordered CSV row dictionaries."""
     projects = load_projects()
-    rows = [project_to_csv(project) for project in projects]
+    rows = []
+    for project in projects:
+        try:
+            rows.append(project_to_csv(project))
+        except ValueError as error:
+            warn(f"{error} Project skipped; the rest of the site is unaffected.")
     return [{field: row[field] for field in CSV_FIELDS} for row in rows]
 
 
 def footer_csv_text() -> str:
     """Build the DonorStatement.csv contents from data/footer.json."""
+    try:
+        return _footer_csv_text()
+    except (OSError, ValueError) as error:
+        warn(f"Footer not updated, keeping the existing statement ({error})")
+        if FOOTER_CSV_PATH.exists():
+            return FOOTER_CSV_PATH.read_text(encoding="utf-8-sig", newline="")
+        return "Statement"
+
+
+def _footer_csv_text() -> str:
+    """Strictly build the DonorStatement.csv contents from data/footer.json."""
     if not FOOTER_PATH.exists():
         raise ValueError(f"{FOOTER_PATH.relative_to(ROOT)} is missing.")
 
@@ -311,6 +346,8 @@ def write_text_atomically(path: Path, text: str) -> None:
 def build() -> None:
     """Write MakerBucks_Database.csv and DonorStatement.csv from the JSON forms."""
     rows = build_rows()
+    if not rows:
+        raise ValueError("No valid projects found; leaving the existing site data untouched.")
     temporary_path = CSV_PATH.with_suffix(".csv.tmp")
     try:
         buffer = io.StringIO(newline="")

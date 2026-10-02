@@ -426,18 +426,30 @@
   .theme-toggle { transform: translateX(52px); }
 }
 
-.site-logo {
-  display: block;
+.site-title {
   grid-column: 2;
   grid-row: 1;
   justify-self: center;
-  height: 78px;
+  color: var(--ink);
+  font-size: clamp(30px, 4.5vw, 52px);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.site-logo {
+  display: block;
+  margin: 0 auto 20px;
+  height: 160px;
   width: auto;
-  max-width: 48%;
+  max-width: 80%;
   object-fit: contain;
   filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4));
   transition: transform 0.25s ease;
 }
+
+.site-logo[hidden] { display: none; }
 
 .site-logo:hover { transform: scale(1.04); }
 
@@ -528,9 +540,11 @@
   }
 
   .site-logo {
-    height: 46px;
-    max-width: 45%;
+    height: 110px;
+    max-width: 80%;
   }
+
+  .site-title { font-size: 22px; }
 
   .theme-toggle { transform: none; }
 

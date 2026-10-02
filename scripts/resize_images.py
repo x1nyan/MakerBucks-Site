@@ -83,12 +83,13 @@ def optimize_image(argument: str) -> bool:
 
 
 def main() -> int:
-    """Optimize image paths supplied by the command line."""
-    try:
-        changed = sum(optimize_image(argument) for argument in sys.argv[1:])
-    except (OSError, ValueError) as error:
-        print(f"Error: {error}", file=sys.stderr)
-        return 1
+    """Optimize image paths from the command line; a bad file is reported and skipped."""
+    changed = 0
+    for argument in sys.argv[1:]:
+        try:
+            changed += optimize_image(argument)
+        except Exception as error:  # noqa: BLE001 - corrupt uploads must not fail the workflow
+            print(f"::warning::Image left unchanged, {argument}: {error}", file=sys.stderr)
 
     print(f"Optimized {changed} image(s).")
     return 0

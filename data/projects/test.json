@@ -1,17 +1,18 @@
 {
-  "title": "Test",
-  "maker": "Test",
-  "categories": [
-    "Test"
-  ],
-  "featured": false,
-  "overview": "Test",
-  "scope": "Test \n",
-  "materials": "Test",
-  "fabricationSteps": "test",
-  "outcome": "Test",
-  "photos": [
-    "images/Cover.png"
-  ],
-  "notes": "fds"
+    "title":  "Test",
+    "maker":  "Test",
+    "categories":  [
+                       "Test"
+                   ],
+    "featured":  false,
+    "overview":  "Test",
+    "scope":  "Test \n",
+    "materials":  "Test",
+    "fabricationSteps":  "test",
+    "outcome":  "Test",
+    "coverPhoto":  "images/Cover.png",
+    "photos":  [
+
+               ],
+    "notes":  "fds"
 }
