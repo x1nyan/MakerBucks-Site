@@ -110,11 +110,13 @@
     loader.onload = function showLoadedBannerImage() {
       hidden.src = src;
       hidden.hidden = false;
-      /** Apply the CSS classes after layout so the opacity transition runs. */
-      requestAnimationFrame(function startBannerCrossfade() {
-        hidden.classList.remove('banner-img--next');
-        active.classList.add('banner-img--next');
-        [active, hidden] = [hidden, active];
+      /** Give the visible, transparent layer a paint before starting the fade. */
+      requestAnimationFrame(function prepareBannerCrossfade() {
+        requestAnimationFrame(function startBannerCrossfade() {
+          hidden.classList.remove('banner-img--next');
+          active.classList.add('banner-img--next');
+          [active, hidden] = [hidden, active];
+        });
       });
     };
     loader.src = src;
