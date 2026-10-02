@@ -46,9 +46,16 @@
       img.hidden = true;
       return;
     }
-    /** Hide this banner layer if its image cannot be loaded. */
+    /** On failure try the other configured images before hiding this layer. */
+    const untried = imageUrls.filter(candidate => candidate !== url);
     img.onerror = function handleImageError() {
-      img.hidden = true;
+      const fallback = untried.shift();
+      if (fallback === undefined) {
+        img.onerror = null;
+        img.hidden = true;
+        return;
+      }
+      img.src = toImageUrl(fallback);
     };
     img.src = src;
     img.hidden = false;

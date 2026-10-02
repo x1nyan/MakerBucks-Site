@@ -5,6 +5,7 @@ on:
     paths:
       - 'data/projects/*.json'
       - 'data/footer.json'
+      - 'images/**'
       - 'scripts/showcase_data.py'
   workflow_dispatch:
 
@@ -47,5 +48,5 @@ jobs:
           git add MakerBucks_Database.csv DonorStatement.csv js/project-data.js
           git commit -m "chore: rebuild project CSV"
           git fetch origin "$BRANCH_NAME"
-          git rebase "origin/$BRANCH_NAME"
+          git rebase -X theirs "origin/$BRANCH_NAME" || { git rebase --abort; git reset --hard "origin/$BRANCH_NAME"; python scripts/showcase_data.py build; git add MakerBucks_Database.csv DonorStatement.csv js/project-data.js; git commit -m "chore: rebuild project CSV" || exit 0; }
           git push origin "HEAD:$BRANCH_NAME"

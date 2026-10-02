@@ -111,9 +111,6 @@
       /** Convert internal property names into readable labels. */
       .map(([, label]) => label);
 
-    if (!project.photoUrls.length && window.location.protocol !== 'file:') {
-      missing.push('cover image');
-    }
     return missing;
   }
 
@@ -718,6 +715,47 @@
       - Highlighting text on a card?     -> don't open, so text
                                            can still be copied
   */
+  /*
+    A photo that fails to load (deleted, renamed, bad upload) is removed
+    from its carousel; if none are left the card shows the placeholder.
+    Error events don't bubble, so this listens in the capture phase.
+  */
+  /** Drop a broken carousel slide and keep the carousel consistent. */
+  document.addEventListener('error', function handleBrokenSlide(e) {
+    const img = e.target;
+    if (!(img instanceof HTMLImageElement) || !img.classList.contains('carousel-slide')) return;
+
+    const carousel = img.closest('.carousel-container');
+    if (!carousel) return;
+    const slides = [...carousel.querySelectorAll('.carousel-slide')];
+    const index = slides.indexOf(img);
+    const wasActive = img.classList.contains('active');
+    img.remove();
+    carousel.querySelectorAll('.dot')[index]?.closest('li')?.remove();
+
+    const remaining = carousel.querySelectorAll('.carousel-slide');
+    if (!remaining.length) {
+      carousel.outerHTML = '<div class="no-photo">Photos coming soon</div>';
+      return;
+    }
+    if (remaining.length === 1) {
+      carousel.querySelectorAll('.carousel-btn, .carousel-dots').forEach(el => el.remove());
+    }
+    if (wasActive) {
+      remaining[0].classList.add('active');
+      carousel.querySelectorAll('.dot')[0]?.classList.add('active');
+      carousel.setAttribute('data-index', 0);
+      const backdrop = carousel.querySelector('.carousel-backdrop');
+      if (backdrop) {
+        backdrop.style.backgroundImage =
+          `url('${remaining[0].getAttribute('src').replace(/'/g, '%27')}')`;
+      }
+    } else {
+      const activeIndex = [...remaining].findIndex(el => el.classList.contains('active'));
+      carousel.setAttribute('data-index', Math.max(activeIndex, 0));
+    }
+  }, true);
+
   /** Delegate card clicks to open/close behavior while preserving text selection. */
   document.addEventListener('click', function handleCardClick(e) {
     if (e.target.closest('.carousel-btn') || e.target.closest('.dot')) return;
@@ -935,8 +973,9 @@
     );
 
     const projects = records.map(
-      /** Normalize one CSV row and skip blank or incomplete projects. */
+      /** Normalize one CSV row; a malformed row is skipped, never fatal. */
       (get, index) => {
+      try {
       const title = get('project').trim();
       if (!title) return null;
 
@@ -965,6 +1004,10 @@
 
       project.score = contentScore(project);
       return project;
+      } catch (error) {
+        console.warn(`Skipping malformed CSV row ${index + 2}:`, error);
+        return null;
+      }
       }
     ).filter(Boolean);
 
@@ -992,13 +1035,21 @@
         }
         return res.text();
       })
-      /** Parse non-empty CSV text or use the embedded snapshot if empty. */
+      /** Parse the live CSV; use the embedded snapshot if it is empty, unreadable, or has no valid projects. */
       .then(function parseProjectResponse(text) {
         if (!text || !text.trim()) {
           if (embeddedCsv) return processCsvText(embeddedCsv);
           return [];
         }
-        return processCsvText(text);
+        let live;
+        try {
+          live = processCsvText(text);
+        } catch (error) {
+          live = Promise.reject(error);
+        }
+        return live.then(function keepNonEmpty(projects) {
+          return projects.length || !embeddedCsv ? projects : processCsvText(embeddedCsv);
+        });
       })
       /** Use the embedded snapshot after network or parsing failures. */
       .catch(function useEmbeddedProjectData(err) {
