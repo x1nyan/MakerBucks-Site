@@ -23,12 +23,13 @@ media:
 content:
   - name: projects
     label: Projects
+    description: Add, edit, or remove showcase projects. Changes appear on the site after the automatic rebuild (about a minute).
     type: collection
     path: data/projects
     format: json
     filename: "{title}.json"
     view:
-      fields: [title, maker, featured]
+      fields: [title, maker, categories, featured]
       primary: title
       sort: [title]
       default:
@@ -36,13 +37,15 @@ content:
         order: asc
     fields:
       - name: title
-        label: Project
+        label: Project title
         type: string
         required: true
+        description: The name shown on the project card.
       - name: maker
         label: Maker(s)
         type: string
         required: true
+        description: Who built it, e.g. "Jane Doe, John Smith".
       - name: categories
         label: Categories
         type: string
@@ -55,47 +58,62 @@ content:
           create a category; it shows up on the site automatically. Avoid
           putting a comma inside a single category name.
       - name: featured
-        label: Featured
+        label: Show in Featured carousel
         type: boolean
         default: false
+        description: Turn on to also show this project in the Featured carousel at the top of the site.
       - name: overview
         label: Overview
         type: text
         required: true
+        description: One or two sentences summarizing the project. Shown on the front of the card.
       - name: scope
         label: Scope
         type: text
         required: true
+        description: What the project set out to do. Shown on the front of the card.
       - name: materials
         label: Materials
         type: text
         required: true
+        description: Parts and materials used. Put each item on its own line starting with a bullet (•).
       - name: fabricationSteps
         label: Fabrication Steps
         type: text
         required: true
+        description: How it was built. Put each step on its own line, numbered (1. 2. 3.).
       - name: outcome
         label: Outcome
         type: text
         required: true
-      - name: photos
-        label: Project photos
+        description: What was achieved and what was learned.
+      - name: coverPhoto
+        label: Cover photo
         type: image
         required: true
+        options:
+          media: photos
+          unique: true
+        description: >-
+          Required. The main photo, shown first on the card and in the
+          Featured carousel. Upload it to a new folder for this project
+          (the upload dialog asks where to save), or choose an existing one.
+          JPG, PNG, WebP, GIF, APNG, SVG, or AVIF up to 20 MiB.
+      - name: photos
+        label: More photos
+        type: image
         options:
           media: photos
           multiple:
             max: 30
           unique: true
         description: >-
-          Upload JPG/JPEG, PNG, WebP, GIF, APNG, SVG, or AVIF images up to
-          20 MiB each. Create a new folder for the project when the upload
-          dialog asks where to save, then select all of that folder's photos
-          here. Name one photo "Cover" (for example Cover.jpg) so it appears
-          first on the site; otherwise the first photo alphabetically is used.
+          Optional extra photos, shown after the cover. Save them in the same
+          folder as the cover photo.
       - name: notes
-        label: Notes
+        label: Notes (not shown on the site)
         type: text
+        description: Optional internal notes for the team.
       - name: order
         label: false
         type: number

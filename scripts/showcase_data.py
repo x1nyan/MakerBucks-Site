@@ -254,14 +254,22 @@ def project_to_csv(project: dict[str, Any]) -> dict[str, str]:
     photos = project.get("photos") or []
     if not isinstance(photos, list) or any(not isinstance(item, str) for item in photos):
         raise ValueError(f"{source}: photos must be a list of uploaded image paths.")
+    cover = project.get("coverPhoto") or ""
+    if not isinstance(cover, str):
+        cover = ""
+    photos = [cover, *photos]
     photos = [photo.strip().replace("\\", "/").lstrip("/") for photo in photos if photo.strip()]
     existing = [photo for photo in photos if (ROOT / photo).is_file()]
     for photo in photos:
         if photo not in existing:
             warn(f"{source}: photo not found, left out: {photo}")
-    photos = sort_photo_paths(existing)
-    if photos and not any(COVER_PATTERN.search(photo) for photo in photos):
-        warn(f"{source}: no photo is named Cover; using {photos[0]} as the cover.")
+    cover = cover.strip().replace("\\", "/").lstrip("/")
+    if cover and cover in existing:
+        photos = [cover, *sort_photo_paths([photo for photo in existing if photo != cover])]
+    else:
+        photos = sort_photo_paths(existing)
+        if photos and not COVER_PATTERN.search(photos[0]):
+            warn(f"{source}: no cover photo set; using {photos[0]} as the cover.")
 
     row = {
         csv_field: str(project.get(project_field) or "")

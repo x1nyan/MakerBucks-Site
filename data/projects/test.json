@@ -10,7 +10,6 @@
   "materials": "Test\n\nTest",
   "fabricationSteps": "Test\n\ntest \n\nTest ",
   "outcome": "Test",
-  "photos": [
-    "images/Gears-05 (1)-1.png"
-  ]
+  "coverPhoto": "images/Gears-05 (1)-1.png",
+  "photos": []
 }

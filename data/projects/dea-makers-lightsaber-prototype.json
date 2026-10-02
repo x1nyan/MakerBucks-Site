@@ -12,8 +12,8 @@
   "materials": "• Custom 3D-printed hilt components\n • Integrated electronic components (likely LED and/or sound elements, based on typical lightsaber-prop builds)\n • Fasteners and internal mounting hardware",
   "fabricationSteps": "1. Design the hilt in CAD, planning internal space for electronics.\n 2. 3D print the hilt components.\n 3. Source and integrate the electronic hardware (lighting/sound, per design).\n 4. Assemble the electronics into the printed hilt.\n 5. Finish and detail the hilt's exterior.\n 6. Test the completed prop and document with photos and video.",
   "outcome": "Successfully constructed a functional prototype with visual documentation and a video demonstration.",
+  "coverPhoto": "images/Project 2026/Lightsaber/Cover.JPG",
   "photos": [
-    "images/Project 2026/Lightsaber/Cover.JPG",
     "images/Project 2026/Lightsaber/Final Product 1.JPG",
     "images/Project 2026/Lightsaber/Final Product 2.JPG",
     "images/Project 2026/Lightsaber/Final Product 4.JPG"

@@ -60,20 +60,12 @@
     return String(value || '').trim().replace(/\\/g, '/');
   }
 
-  /** Put Cover first, then sort unique photo paths alphabetically.
+  /** Drop duplicate photo paths; the build already puts the cover first.
    * @param {string[]} paths - Photo paths from one CSV cell.
-   * @returns {string[]} Unique paths in display order.
+   * @returns {string[]} Unique paths in their original order.
    */
   function sortPhotoPaths(paths) {
-    return [...new Set(paths)].sort(
-      /** Compare paths with the cover image ahead of all other images. */
-      (a, b) => {
-      const aCover = /(?:^|\/|\\)cover\.[^/\\]+$/i.test(a);
-      const bCover = /(?:^|\/|\\)cover\.[^/\\]+$/i.test(b);
-      if (aCover !== bCover) return aCover ? -1 : 1;
-      return a.localeCompare(b);
-      }
-    );
+    return [...new Set(paths)];
   }
 
   /** Parse newline-separated CSV photo paths and discard unsupported suffixes.
