@@ -26,11 +26,11 @@
 
 .featured-section {
   position: relative;
-  margin-bottom: 22px;
+  margin-bottom: 36px;
   background: var(--accent-bg);
   border-top: 1px solid var(--accent-light);
   border-bottom: 1px solid var(--accent-light);
-  padding: 16px 0 6px;
+  padding: 24px 0 14px;
 }
 
 .featured-section::before {
@@ -59,14 +59,15 @@
   align-items: flex-end;
   justify-content: space-between;
   gap: 14px;
-  padding: 0 84px;
+  padding: 0 60px;
   margin-bottom: 12px;
 }
 
 .featured-title {
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--accent);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--ink);
   margin: 0;
 }
 
@@ -75,6 +76,32 @@
   color: var(--ink-faint);
   margin: 4px 0 0;
 }
+
+.featured-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  padding: 6px 14px;
+  border: 1px solid var(--accent-light);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.featured-toggle:hover { background: var(--accent); color: var(--accent-contrast); }
+
+.featured-toggle-caret { transition: transform 0.2s ease; }
+.is-collapsed .featured-toggle-caret { transform: rotate(180deg); }
+
+.is-collapsed .featured-track,
+.is-collapsed .scroll-btns { display: none; }
+
+.is-collapsed .featured-head { margin-bottom: 4px; }
+.is-collapsed .featured-sub { display: none; }
 
 .scroll-btns {
   display: flex;
@@ -113,21 +140,21 @@
 
 .featured-track {
   display: flex;
-  gap: 18px;
+  gap: 14px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   overscroll-behavior-x: contain;
-  scroll-padding-left: 84px;
+  scroll-padding-left: 60px;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
-  padding: 4px 84px 12px;
+  padding: 4px 60px 12px;
   scrollbar-width: none;
 }
 
 .featured-track::-webkit-scrollbar { display: none; }
 
 .featured-track .card {
-  flex: 0 0 calc((100% - 36px) / 3); /* show three complete cards */
+  flex: 0 0 calc((100% - 42px) / 4); /* show four complete cards */
   min-width: 0; /* stop long tags from stretching a card wider than its size */
   scroll-snap-align: start;
   scroll-snap-stop: always;
@@ -144,6 +171,7 @@
 .featured-track .error-state { flex: 1 0 100%; }
 
 @media (max-width: 1000px) and (min-width: 701px) {
+  .featured-track .card { flex-basis: calc((100% - 14px) / 2); }
   .featured-head { padding-left: 52px; padding-right: 52px; }
   .featured-track {
     padding-left: 52px;

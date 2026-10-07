@@ -104,6 +104,15 @@
   track.addEventListener('scroll', updateScrollButtons, { passive: true });
   window.addEventListener('resize', updateScrollButtons);
 
+  /** Collapse or expand the featured row from the header button. */
+  const toggle = document.getElementById('featuredToggle');
+  toggle.addEventListener('click', function toggleFeaturedRow() {
+    const collapsed = featuredSection.classList.toggle('is-collapsed');
+    toggle.setAttribute('aria-expanded', String(!collapsed));
+    toggle.querySelector('.featured-toggle-label').textContent = collapsed ? 'Show' : 'Hide';
+    updateScrollButtons();
+  });
+
 
   /* =========================================================
      START

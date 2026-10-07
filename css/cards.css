@@ -19,18 +19,18 @@
   --accent-light: #e4ae94;
   --accent-bg: #fff5ef;
   --accent-contrast: #ffffff;
-  --ink: #2e3032;
+  --ink: #1f2933;
   --ink-soft: #5f6366;
   --ink-faint: #7a7f82;
-  --line: #d4d6d3;
+  --line: #e3e6ea;
   --panel: #ffffff;
-  --page-bg: #e7eae8;
-  --surface-muted: #f5f6f4;
-  --control-bg: #f1f3f1;
-  --control-border: #c6cac7;
-  --surface-hover: #cfd3d0;
-  --header-bg: #dfe2df;
-  --header-border: #c5c9c6;
+  --page-bg: #f4f5f7;
+  --surface-muted: #f6f7f9;
+  --control-bg: #ffffff;
+  --control-border: #d5d9de;
+  --surface-hover: #f3e9e3;
+  --header-bg: rgba(255, 255, 255, 0.92);
+  --header-border: #e3e6ea;
   --tag-bg: #f6dfd2;
   --tag-ink: #9b431f;
   --body-copy: #444444;
@@ -43,8 +43,8 @@
   --error-ink: #843b20;
   --page-background:
     radial-gradient(ellipse at 50% -12%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.5) 28%, rgba(255, 255, 255, 0) 58%),
-    linear-gradient(180deg, #f1f3f2 0%, var(--page-bg) 48%, #dde1df 100%);
-  --radius: 12px;
+    linear-gradient(180deg, #fafbfc 0%, var(--page-bg) 60%, #eef0f3 100%);
+  --radius: 14px;
   --card-pad: 22px; /* inner spacing of each card face */
 }
 
@@ -64,7 +64,7 @@
   --control-bg: #29322d;
   --control-border: #566259;
   --surface-hover: #39443d;
-  --header-bg: #202824;
+  --header-bg: rgba(32, 40, 36, 0.92);
   --header-border: #46514a;
   --tag-bg: #49352b;
   --tag-ink: #f2b28b;
@@ -90,11 +90,14 @@ html, body {
   background: var(--page-background);
   background-attachment: fixed;
   color: var(--ink);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
 }
 
 body {
   padding: 0;
+  overflow-x: clip; /* full-bleed sections use 100vw, which includes the scrollbar */
 }
 
 a:focus-visible,
@@ -152,7 +155,7 @@ select:focus-visible {
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06), 0 4px 14px rgba(16, 24, 40, 0.05);
   padding: var(--card-pad);
   overflow: hidden; /* clips the photo to the card's rounded corners */
   backface-visibility: hidden;
@@ -174,8 +177,8 @@ select:focus-visible {
 }
 
 .card:hover .card-face {
-  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.16);
-  transform: translateY(-4px);
+  box-shadow: 0 16px 36px rgba(16, 24, 40, 0.14);
+  transform: translateY(-3px);
   border-color: var(--accent-light);
 }
 

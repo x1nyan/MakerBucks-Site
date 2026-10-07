@@ -270,10 +270,10 @@
 
 .project-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 34px;
-  margin-left: 100px;
-  margin-right: 100px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  margin-left: 60px;
+  margin-right: 60px;
 }
 
 /* =========================================================
@@ -283,9 +283,9 @@
 @media (max-width: 1000px) {
   .project-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 30px;
-    margin-left: 52px;
-    margin-right: 52px;
+    gap: 18px;
+    margin-left: 30px;
+    margin-right: 30px;
   }
 }
 
@@ -339,35 +339,40 @@
  ========================================================= */
 
 .site-header {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  display: flex;
   align-items: center;
-  min-height: 44px;
+  gap: 24px;
+  min-height: 64px;
   width: 100vw;
   margin: 0 0 0 calc(50% - 50vw);
   padding: 2px 84px;
   background: var(--header-bg);
   border-bottom: 1px solid var(--header-border);
+  box-shadow: 0 1px 12px rgba(16, 24, 40, 0.06);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 40;
 }
 
 .header-links {
   display: flex;
   align-items: center;
   gap: 4px;
-  grid-column: 1;
-  grid-row: 1;
-  justify-self: start;
+  margin-left: auto;
 }
 
 .header-link {
   display: inline-block;
-  padding: 3px 8px;
-  border: 1px solid transparent;
-  border-radius: 6px;
+  padding: 8px 18px;
+  border: none;
+  border-radius: 999px;
   background: transparent;
   color: var(--ink);
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
+  transition: background 0.2s ease, color 0.2s ease;
   text-decoration: none;
   white-space: nowrap;
 }
@@ -375,8 +380,8 @@
 .header-link[hidden] { display: none; }
 
 .header-link:hover {
+  color: var(--accent);
   background: var(--surface-hover);
-  border-color: var(--control-border);
 }
 
 .theme-toggle {
@@ -384,9 +389,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  grid-column: 2;
-  grid-row: 1;
-  justify-self: end;
+  margin-left: 0;
   width: 60px;
   height: 32px;
   padding: 3px;
@@ -427,14 +430,12 @@
 }
 
 .site-title {
-  grid-column: 2;
-  grid-row: 1;
-  justify-self: center;
+  margin: 0;
   color: var(--ink);
-  font-size: clamp(30px, 4.5vw, 52px);
+  font-size: clamp(22px, 2.6vw, 32px);
   font-weight: 800;
   line-height: 1.1;
-  letter-spacing: 0.01em;
+  letter-spacing: -0.01em;
   white-space: nowrap;
 }
 
@@ -458,9 +459,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: clamp(340px, 52vw, 620px);
+  aspect-ratio: 3 / 2; /* photos are 3:2, so the full photo spans edge to edge */
+  height: auto;
   width: 100vw;
-  margin: 0 0 28px calc(50% - 50vw);
+  margin: 0 0 36px calc(50% - 50vw);
   padding: 40px 24px;
   overflow: hidden;
   background: #2a2a2a; /* shows while the photo loads, or if it's missing */
@@ -476,8 +478,7 @@
   opacity: 1;
   transition: opacity 3.5s ease-in-out;
   z-index: 0;
-  will-change: opacity, transform;
-  animation: bannerZoom 22s ease-in-out infinite alternate;
+  will-change: opacity;
 }
 
 .banner-img--next {
@@ -495,7 +496,7 @@
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(180deg, rgba(20, 12, 8, 0.35) 0%, rgba(20, 12, 8, 0.5) 55%, rgba(20, 12, 8, 0.65) 100%),
+    linear-gradient(180deg, rgba(20, 12, 8, 0) 0%, rgba(20, 12, 8, 0) 70%, rgba(20, 12, 8, 0.28) 100%),
     linear-gradient(90deg, rgba(192, 90, 43, 0.18), rgba(20, 12, 8, 0) 45%, rgba(20, 12, 8, 0) 55%, rgba(192, 90, 43, 0.18));
   z-index: 1;
   pointer-events: none;
@@ -544,17 +545,19 @@
     max-width: 80%;
   }
 
-  .site-title { font-size: 22px; }
+  .site-title { font-size: 16px; white-space: normal; }
+  .site-header { gap: 8px; }
 
   .theme-toggle { transform: none; }
 
   .header-links { gap: 0; }
-  .header-link { padding: 4px 3px; font-size: 12px; }
+  .header-link { padding: 4px 4px; font-size: 12px; }
 
   .footer-sponsor { font-size: 13px; }
 
   .banner {
-    min-height: 300px;
+    height: auto;
+    min-height: 0;
     width: 100%;
     margin-left: 0;
     padding: 28px 16px;
