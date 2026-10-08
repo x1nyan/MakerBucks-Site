@@ -472,7 +472,7 @@
     getTargetBox: works out how big the enlarged card should be
     and where it goes (centered on screen).
 
-    Width:  up to 1100px, but never wider than the screen.
+    Width:  up to 1500px, but never wider than the screen.
     Height: exactly what the back needs to fit ALL its text.
             To find that out, the back is built invisibly
             off-screen at the target width and measured.
@@ -489,7 +489,7 @@
     const vh = window.innerHeight;
     const margin = vw <= 700 ? 12 : 24;
 
-    const width = Math.min(1100, vw - margin * 2);
+    const width = Math.min(1500, vw - margin * 2);
 
     const measure = document.createElement('div');
     measure.innerHTML = buildBackHTML(project);

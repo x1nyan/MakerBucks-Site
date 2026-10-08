@@ -44,6 +44,10 @@
   --page-background:
     radial-gradient(ellipse at 50% -12%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.5) 28%, rgba(255, 255, 255, 0) 58%),
     linear-gradient(180deg, #fafbfc 0%, var(--page-bg) 60%, #eef0f3 100%);
+  /* Brand fonts: used if installed on the visitor's device, else the fallbacks */
+  --font-body: "Gotham Book", Gotham, Montserrat, "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+  --font-heading: "Myriad Pro", "Myriad Pro Regular", Myriad, "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+  --font-serif: "Minion Pro", "Minion Pro Regular", Minion, Georgia, "Times New Roman", serif;
   --radius: 14px;
   --card-pad: 22px; /* inner spacing of each card face */
 }
@@ -90,7 +94,7 @@ html, body {
   background: var(--page-background);
   background-attachment: fixed;
   color: var(--ink);
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   line-height: 1.5;
 }
@@ -99,6 +103,12 @@ body {
   padding: 0;
   overflow-x: clip; /* full-bleed sections use 100vw, which includes the scrollbar */
 }
+
+button, input, select, textarea { font-family: inherit; }
+
+h1, h2, h3, .card-title, .site-title, .featured-title { font-family: var(--font-heading); }
+
+.featured-sub, .card-desc { font-family: var(--font-serif); }
 
 a:focus-visible,
 button:focus-visible,
@@ -288,7 +298,7 @@ select:focus-visible {
   transform: rotateY(180deg);
   background: var(--panel);
   border-color: var(--accent-light);
-  padding: 32px;
+  padding: 44px;
   overflow: hidden;
   scrollbar-gutter: stable;
 }
@@ -442,7 +452,7 @@ select:focus-visible {
 .back-header { margin-bottom: 24px; }
 
 .back-title {
-  font-size: calc(24px * var(--detail-scale));
+  font-size: calc(34px * var(--detail-scale));
   font-weight: 700;
   color: var(--accent);
   margin: 0 0 4px;
@@ -450,14 +460,14 @@ select:focus-visible {
 
 .back-meta {
   color: var(--ink-soft);
-  font-size: calc(13px * var(--detail-scale));
+  font-size: calc(17px * var(--detail-scale));
   font-weight: 600;
   margin: 0 0 6px;
 }
 
 .back-hint {
   color: var(--ink-faint);
-  font-size: calc(12px * var(--detail-scale));
+  font-size: calc(15px * var(--detail-scale));
   margin: 0;
 }
 
@@ -469,7 +479,7 @@ select:focus-visible {
   background: var(--accent-bg);
   color: var(--accent);
   font: inherit;
-  font-size: calc(13px * var(--detail-scale));
+  font-size: calc(16px * var(--detail-scale));
   font-weight: 600;
   cursor: pointer;
 }
@@ -489,8 +499,8 @@ select:focus-visible {
 .back-section:last-child { margin-bottom: 0; }
 .back-section .section-label { margin-top: 0; }
 .card-back .section-text {
-  font-size: calc(14px * var(--detail-scale));
-  line-height: calc(1.55 * var(--detail-scale));
+  font-size: calc(18px * var(--detail-scale));
+  line-height: calc(1.6 * var(--detail-scale));
 }
 
 .back-empty {

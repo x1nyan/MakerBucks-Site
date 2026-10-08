@@ -109,7 +109,6 @@
   toggle.addEventListener('click', function toggleFeaturedRow() {
     const collapsed = featuredSection.classList.toggle('is-collapsed');
     toggle.setAttribute('aria-expanded', String(!collapsed));
-    toggle.querySelector('.featured-toggle-label').textContent = collapsed ? 'Show' : 'Hide';
     updateScrollButtons();
   });
 

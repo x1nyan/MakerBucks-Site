@@ -80,21 +80,19 @@
 .featured-toggle {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  margin-left: auto;
-  padding: 6px 14px;
-  border: 1px solid var(--accent-light);
-  border-radius: 999px;
-  background: var(--panel);
-  color: var(--accent);
-  font-size: 14px;
-  font-weight: 600;
+  gap: 8px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
   cursor: pointer;
 }
 
-.featured-toggle:hover { background: var(--accent); color: var(--accent-contrast); }
+.featured-toggle:hover { color: var(--accent); }
 
-.featured-toggle-caret { transition: transform 0.2s ease; }
+.featured-toggle-caret { font-size: 0.6em; opacity: 0.6; transition: transform 0.2s ease; }
 .is-collapsed .featured-toggle-caret { transform: rotate(180deg); }
 
 .is-collapsed .featured-track,

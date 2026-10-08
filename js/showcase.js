@@ -198,6 +198,14 @@
        3rd: if still tied, alphabetical by title
      ========================================================= */
 
+  /** Count non-empty lines (steps or materials) in a text field.
+   * @param {string} text - Multi-line field value.
+   * @returns {number} Number of non-empty lines.
+   */
+  function countLines(text) {
+    return String(text || '').split('\n').filter(line => line.trim()).length;
+  }
+
   /** Return a copy of the projects ordered by the selected sort mode.
    * @param {Array<object>} list - Project records to sort.
    * @returns {Array<object>} A sorted copy; the input array is unchanged.
@@ -224,6 +232,43 @@
         sorted.sort(
           /** Compare maker names in ascending order. */
           (a, b) => (a.maker || '').localeCompare(b.maker || '')
+        );
+        break;
+
+      case 'category':
+        sorted.sort(
+          /** Compare first category, then title. */
+          (a, b) =>
+            (a.categories[0] || '').localeCompare(b.categories[0] || '') ||
+            a.title.localeCompare(b.title)
+        );
+        break;
+
+      case 'photos':
+        sorted.sort(
+          /** Most photos first. */
+          (a, b) => (b.photoUrls.length - a.photoUrls.length) || a.title.localeCompare(b.title)
+        );
+        break;
+
+      case 'steps':
+        sorted.sort(
+          /** Most build steps first. */
+          (a, b) => (countLines(b.fabrication) - countLines(a.fabrication)) || a.title.localeCompare(b.title)
+        );
+        break;
+
+      case 'materials':
+        sorted.sort(
+          /** Most listed materials first. */
+          (a, b) => (countLines(b.materials) - countLines(a.materials)) || a.title.localeCompare(b.title)
+        );
+        break;
+
+      case 'simple':
+        sorted.sort(
+          /** Fewest build steps first. */
+          (a, b) => (countLines(a.fabrication) - countLines(b.fabrication)) || a.title.localeCompare(b.title)
         );
         break;
 

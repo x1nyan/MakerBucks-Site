@@ -51,6 +51,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>WPI MakerBucks Showroom</title>
+  <link rel="icon" type="image/png" href="images/Website Assets/Gears-05.png">
 
   <script src="js/theme.js"></script>
   <link rel="stylesheet" href="css/cards.css">
@@ -87,6 +88,10 @@
   <header class="banner">
     <img class="banner-img" id="bannerImg" alt="">
     <img class="banner-img banner-img--next" id="bannerImgNext" alt="" hidden>
+    <a class="banner-cue" href="#featuredSection" aria-label="See the projects">
+      <span class="banner-cue-text">See projects</span>
+      <span class="banner-cue-arrow" aria-hidden="true">&#8595;</span>
+    </a>
   </header>
 
 
@@ -100,14 +105,13 @@
   <section class="featured-section" id="featuredSection" aria-labelledby="featuredTitle">
     <div class="featured-head">
       <div>
-        <h2 class="featured-title" id="featuredTitle">★ Featured Projects</h2>
+        <h2 class="featured-title" id="featuredTitle">
+          <button class="featured-toggle" id="featuredToggle" type="button" aria-expanded="true" aria-controls="featuredTrack" title="Click to hide or show">
+            <span>★ Featured Projects</span><span class="featured-toggle-caret" aria-hidden="true">&#9662;</span>
+          </button>
+        </h2>
         <p class="featured-sub">Click a project to see how it was made</p>
       </div>
-
-      <button class="featured-toggle" id="featuredToggle" type="button" aria-expanded="true" aria-controls="featuredTrack">
-        <span class="featured-toggle-label">Hide</span>
-        <span class="featured-toggle-caret" aria-hidden="true">&#9662;</span>
-      </button>
 
       <div class="scroll-btns" id="scrollBtns" hidden>
         <button class="scroll-btn" id="scrollPrev" type="button" aria-label="Scroll to previous projects">&#10094;</button>
@@ -158,6 +162,11 @@
         <option value="az">Sort: A → Z</option>
         <option value="za">Sort: Z → A</option>
         <option value="maker">Sort: Maker A → Z</option>
+        <option value="category">Sort: Category A → Z</option>
+        <option value="photos">Sort: Most photos</option>
+        <option value="steps">Sort: Most build steps</option>
+        <option value="materials">Sort: Most materials</option>
+        <option value="simple">Sort: Simplest builds first</option>
       </select>
 
       <button class="clear-filters-btn" id="clearFiltersBtn" type="button">Clear filters</button>
