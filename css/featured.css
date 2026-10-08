@@ -72,9 +72,10 @@
 }
 
 .featured-sub {
-  font-size: 13px;
-  color: var(--ink-faint);
-  margin: 4px 0 0;
+  font-size: 19px;
+  font-weight: 500;
+  color: var(--ink-soft);
+  margin: 6px 0 0;
 }
 
 .featured-toggle {
@@ -103,20 +104,21 @@
 
 .scroll-btns {
   display: flex;
-  gap: 8px;
+  justify-content: center;
+  gap: 6px;
 }
 
 .scroll-btns[hidden] { display: none; }
 
 .scroll-btn {
-  width: 34px;
-  height: 34px;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
-  border: 1px solid var(--accent-light);
-  background: var(--panel);
+  border: 0;
+  background: transparent;
   color: var(--accent);
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 30px;
+  font-weight: 400;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -126,7 +128,6 @@
 
 .scroll-btn:hover:not(:disabled) {
   background: var(--accent);
-  border-color: var(--accent);
   color: var(--accent-contrast);
   transform: scale(1.08);
 }
@@ -140,6 +141,11 @@
   display: flex;
   gap: 14px;
   overflow-x: auto;
+  overflow-y: hidden;
+  align-items: flex-start;
+  max-height: 640px;
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 70px), transparent);
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 70px), transparent);
   scroll-snap-type: x mandatory;
   overscroll-behavior-x: contain;
   scroll-padding-left: 60px;
