@@ -1,12 +1,11 @@
 {
-  "order": 11,
+  "title": "Mastersword",
+  "maker": "Peter Story & Emma Maertz",
   "categories": [
     "Props, Costumes & Art",
     "Electronics & Hardware"
   ],
   "featured": true,
-  "title": "Mastersword",
-  "maker": "Peter Story & Team",
   "overview": "Custom LED-illuminated sword prop developed with WPI MakerBucks support, combining CAD-designed 3D-printed components with gyroscope-reactive lighting effects.",
   "scope": "Three-layer blade design and fabrication, custom PCB development for LED control, gyroscope/accelerometer integration, and hilt finishing and detailing.",
   "materials": "• PLA filament (outer blade shell)\n • TPU filament (inner blade core, holds and cushions the LED strip)\n • Polycarbonate tubing, 3/4\" outer diameter (middle alignment layer)\n • Individually addressable LED strip\n • MPU6050 gyroscope/accelerometer module\n • Arduino Pro Mini\n • Custom PCB (ordered from JLCPCB, purple soldermask to match the hilt)\n • Purple gloss spray paint (e.g., Rustoleum 2X Gloss, \"Grape\")\n • Gold acrylic paint\n • Clear matte topcoat (e.g., Rustoleum Clear Matte)\n • Shoelaces (for the handle wrap detail) and superglue",
@@ -16,5 +15,5 @@
   "photos": [
     "images/Project 2026/Masterswords/Caption 2E_Peter Story.jpg"
   ],
-  "notes": ""
+  "order": 11
 }
